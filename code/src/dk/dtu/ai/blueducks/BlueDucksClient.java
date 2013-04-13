@@ -1,3 +1,10 @@
+/*
+ * Artificial Intelligence and Multi-Agent Systems
+ * Denmarks Tehnical University
+ * 
+ * Blue Ducks
+ * Spring 2013
+ */
 package dk.dtu.ai.blueducks;
 
 import java.io.BufferedReader;
@@ -5,14 +12,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import dk.dtu.ai.blueducks.domain.Agent;
+import dk.dtu.ai.blueducks.domain.Command;
 
-public class Client {
+
+public class BlueDucksClient {
 	
 	private BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) );
 	private ArrayList<Agent> agents = new ArrayList<Agent>();
 			
-	public Client() throws IOException {
+	public BlueDucksClient() throws IOException {
 		readMap(); 
 	}
 	
@@ -31,7 +39,7 @@ public class Client {
 			actions.add(agent.nextAction());
 		}
 		
-		System.out.println(Command.sendAction(actions));
+		System.out.println(BlueDucksClient.sendAction(actions));
 		System.out.flush();
 		
 		// Disregard these for now, but read or the server stalls when outputbuffer gets filled!
@@ -49,7 +57,7 @@ public class Client {
 		System.err.println("Hello from custom client!");
 		
 		try {
-			Client client = new Client();
+			BlueDucksClient client = new BlueDucksClient();
 			while (client.update()) {
 				// send next decision
 			}
@@ -58,5 +66,23 @@ public class Client {
 		}
 		
 	}
+	
+	public static String sendAction(ArrayList<String> actions) {
+		
+		String jointAction = "[";
+		
+		for (String action : actions) {
+			jointAction += action + ",";
+		}
+		
+		// remove the last comma
+		if (jointAction.length() > 1)
+			jointAction = jointAction.substring(0, jointAction.length() - 1);
+		
+		jointAction += "]";
+		
+		return jointAction;
+	}
+
 
 }

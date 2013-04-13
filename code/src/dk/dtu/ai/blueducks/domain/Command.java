@@ -1,8 +1,16 @@
-package dk.dtu.ai.blueducks;
+/*
+ * Artificial Intelligence and Multi-Agent Systems
+ * Denmarks Tehnical University
+ * 
+ * Blue Ducks
+ * Spring 2013
+ */
+package dk.dtu.ai.blueducks.domain;
 
 import java.util.ArrayList;
 
-import dk.dtu.ai.blueducks.domain.Direction;
+import dk.dtu.ai.blueducks.map.Direction;
+
 
 public class Command {
 	
@@ -27,25 +35,7 @@ public class Command {
 		return COMMAND_NO_OPERATION;
 	}
 	
-	public static boolean isOpposite (Direction d1, Direction d2) {
-		return d1.ordinal() + d2.ordinal() == 3;
-	}
+
 	
-	public static String sendAction(ArrayList<String> actions) {
-		
-		String jointAction = "[";
-		
-		for (String action : actions) {
-			jointAction += action + ",";
-		}
-		
-		// remove the last comma
-		if (jointAction.length() > 1)
-			jointAction = jointAction.substring(0, jointAction.length() - 1);
-		
-		jointAction += "]";
-		
-		return jointAction;
-	}
 
 }
