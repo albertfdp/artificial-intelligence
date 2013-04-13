@@ -1,11 +1,11 @@
-package client;
+package dk.dtu.ai.blueducks;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import domain.Agent;
+import dk.dtu.ai.blueducks.domain.Agent;
 
 public class Client {
 	
@@ -13,7 +13,7 @@ public class Client {
 	private ArrayList<Agent> agents = new ArrayList<Agent>();
 			
 	public Client() throws IOException {
-		readMap();
+		readMap(); 
 	}
 	
 	/*

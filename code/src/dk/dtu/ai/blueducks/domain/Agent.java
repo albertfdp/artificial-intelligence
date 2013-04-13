@@ -1,6 +1,6 @@
-package domain;
+package dk.dtu.ai.blueducks.domain;
 
-import client.Command;
+import dk.dtu.ai.blueducks.Command;
 
 public class Agent {
 	

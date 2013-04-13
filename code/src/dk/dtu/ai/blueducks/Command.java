@@ -1,8 +1,8 @@
-package client;
+package dk.dtu.ai.blueducks;
 
 import java.util.ArrayList;
 
-import domain.Direction;
+import dk.dtu.ai.blueducks.domain.Direction;
 
 public class Command {
 	

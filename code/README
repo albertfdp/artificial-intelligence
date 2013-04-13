@@ -1,0 +1,52 @@
+/*******************************************************\
+|  Mandatory Programming Assignment 02285, Spring 2013  |
+|               README for students						|
+\*******************************************************/
+
+	* Please go through this README before asking questions about the workings of the server
+	* The following describes the various options for starting the server using the provided example clients
+	* Inspection of the source code for the example clients may yield useful information regarding the implementation of your own planner
+	* The commands below must be executed from the directory containing this README
+	* It is required that the java runtime environment binaries are available on your system path for the commands below to work
+	
+	Get help about server options and arguments
+		- java -jar server.jar -?
+	
+	Basic usage (requires a path to a level and a client command):
+		- java -jar server.jar -l levels/FOMAsimple1.lvl -c "java client.RandomWalkClient"
+
+	By default the server prints the state in ASCII format to the console. To minimize overhead (e.g. when optimizing your planner) this output may be redirected to the null device using:
+		- Linux: java -jar server.jar -l levels/FOMAsimple1.lvl -c "java client.RandomWalkClient" > /dev/null 
+		- Windows: java -jar server.jar -l levels/FOMAsimple1.lvl -c "java client.RandomWalkClient" > NUL
+	Note that client messages send via 'standard error' and important server messages (including success) both use 'standard error' for printing to console, hence they bypass this redirection.
+		
+	The server may be started with a more graphical appeal using the -g option:
+		- java -jar server.jar -l levels/FOMAbispebjerg.lvl -c "java client.RandomWalkClient" -g
+			
+	The -p option starts the server paused, using the 
+		- java -jar server.jar -l levels/FOSAanagram.lvl -c "java client.RandomWalkClient" -g -p
+		
+	Animations are requested using the -j and -f options (-f may be omitted, defaults to 25):
+		- java -jar server.jar -l levels/FOMAsimple2.lvl -c "java client.RandomWalkClient" -g -j 400 -f 25
+	When the server is doing animations (-j option), the argument is the number of milliseconds that each joint action takes up
+	Using the 'Controls' panel allows for pausing the server and changing the values of -j and -f during execution.
+	
+	To tryout server with a user controlled flavor, with and without animation:
+		- java -jar server.jar -l levels/POMAchallenge.lvl -c "java client.GuiClient" -g -j 50 -f 10
+		- java -jar server.jar -l levels/FOSAsokobanLevel96.lvl -c "java client.GuiClient" -g
+	This is accomplished by simply using a different client
+	
+	GuiClient works by creating a joint action of identical actions for each agent on the level; e.g. clicking Move(W) on a level with 3 agents implies sending [Move(W),Move(W),Move(W)].
+	For each argument passed to GuiClient, a custom text field is created with that joint action; e.g.:
+		- java -jar server.jar -l levels/FOMAsimple3.lvl -c "java client.GuiClient [NoOp,Push(E,E)] [Push(E,E),Push(E,N)] [Push(E,E),Pull(W,N)] [Pull(W,E),NoOp]" -g
+	fills the custom commands upon startup.
+	
+	Note that it is the parameter of the "-c"/"--client" option that you must change to execute your own implementation of a planner.
+	To try out the included ruby random walk client (you will require an environment able to execute ruby scripts):
+		- java -jar server.jar -l levels/FOMApacman.lvl -c "ruby client/random_agent.rb 3" -g -p
+	The argument passed to random_agent.rb is the number of agents on the level
+	
+	Finally the server may be started with the timeout option. The option may be useful when testing your planner with regards to the competetion.
+		- Linux: java -jar server.jar -l levels/POMAsimple1.lvl -c "java client.RandomWalkClient" -t 300 > /dev/null
+		- Windows: java -jar server.jar -l levels/POMAsimple2.lvl -c "java client.RandomWalkClient" -t 300 > NUL
+	The argument of -t is the number of seconds before the server timeouts; i.e. 5 minutes in this case
