@@ -25,11 +25,26 @@ public class LevelMap {
 	private static LevelMap map;
 	private Cell[][] matrix;
 	private List<Agent> agents;
-	private Map<Character, Box> boxes;
+	private Map<Character, List<Box>> boxes;
+	public Cell[][] getMatrix() {
+		return matrix;
+	}
+
+	public List<Agent> getAgents() {
+		return agents;
+	}
+
+	public Map<Character, List<Box>> getBoxes() {
+		return boxes;
+	}
+
 	private static Logger logger = Logger.getAnonymousLogger();
+	private Map<Character, Cell> goals;
+	
 	private LevelMap() {
 		agents = new ArrayList<Agent>(10);
-		boxes = new HashMap<Character, Box>();
+		boxes = new HashMap<Character, List<Box>>();
+		goals = new HashMap<Character, Cell>();
 	}
 
 	/**
@@ -73,7 +88,11 @@ public class LevelMap {
 		if(cell.getContent() != null){
 			if(cell.getContent() instanceof Box){
 				Box box = (Box) cell.getContent();
-				boxes.put(box.getId(), box);
+				if(boxes.containsKey(box.getId())){
+					List<Box> list = new ArrayList<Box>();
+					boxes.put(box.getId(), list);
+				}
+				boxes.get(box.getId()).add(box);
 			}
 			if(cell.getContent() instanceof Agent){
 				Agent agent = (Agent) cell.getContent();
@@ -85,7 +104,7 @@ public class LevelMap {
 	
 	public void addGoalCell(Cell cell, int x, int y, char id) {
 		this.addCell(cell, x, y);
-		//this.goals
+		goals.put(id, cell);
 	}
 
 	/**
