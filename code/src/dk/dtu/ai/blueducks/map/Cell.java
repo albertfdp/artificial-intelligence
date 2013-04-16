@@ -51,6 +51,11 @@ public class Cell {
 		return neighbor;
 	}
 
+	/**
+	 * Gets the neighbours.
+	 *
+	 * @return the neighbours
+	 */
 	public List<Cell> getNeighbours() {
 		List<Cell> neighbors = new ArrayList<Cell>();
 		neighbors.add(this.getNeighbour(Direction.N));
@@ -68,7 +73,8 @@ public class Cell {
 	
 	public void attachCellContent(CellContent content) {
 		this.content = content;
-		content.setCell(this);
+		if(content != null)
+			content.setCell(this);
 	}
 
 	/**
