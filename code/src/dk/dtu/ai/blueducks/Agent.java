@@ -7,10 +7,13 @@
  */
 package dk.dtu.ai.blueducks;
 
+import java.util.ArrayList;
+
 import dk.dtu.ai.blueducks.domain.Command;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.CellContent;
 import dk.dtu.ai.blueducks.map.Direction;
+import dk.dtu.ai.blueducks.map.Map;
 
 public class Agent extends CellContent {
 
@@ -45,6 +48,11 @@ public class Agent extends CellContent {
 		return move(Direction.N);
 	}
 	
+	public ArrayList<Cell> computeDesires() {
+		Map map = Map.getInstance();
+		ArrayList<Cell> goals = map.getGoals();
+		return goals;
+	}
 	
 	
 

@@ -7,6 +7,8 @@
  */
 package dk.dtu.ai.blueducks.map;
 
+import java.util.ArrayList;
+
 
 /**
  * The Map of a Level.
@@ -51,6 +53,16 @@ public class Map {
 	 * @return the cell at
 	 */
 	public Cell getCellAt() {
+		return null;
+	}
+
+	/**
+	 * Gets the goals.
+	 *
+	 * @return the goals
+	 */
+	public ArrayList<Cell> getGoals() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }
