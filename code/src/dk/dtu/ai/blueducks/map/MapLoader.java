@@ -82,7 +82,7 @@ public class MapLoader {
 					cell.attachCellContent(new Box(cell, sCell.charAt(0), colors.get(sCell.charAt(0))));
 					map.addCell(cell, x, y);
 				} else if (isGoalCell(sCell)) {
-					map.addGoalCell(cell, x, y);
+					map.addGoalCell(cell, x, y); // capital
 				}
 				
 			}
