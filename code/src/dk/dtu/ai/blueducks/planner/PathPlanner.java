@@ -10,10 +10,11 @@ package dk.dtu.ai.blueducks.planner;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.dtu.ai.blueducks.interfaces.HeuristicInterface;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 
-public class Planner{
+public class PathPlanner{
 	
 	private LevelMap map;
 	private HeuristicInterface<Cell> heuristic;
@@ -27,7 +28,7 @@ public class Planner{
 	 * @param map the map
 	 * @param heuristic the heuristic
 	 */
-	public Planner(LevelMap map, HeuristicInterface<Cell> heuristic) {
+	public PathPlanner(LevelMap map, HeuristicInterface<Cell> heuristic) {
 		super();
 		this.map = map;
 		this.heuristic = heuristic;

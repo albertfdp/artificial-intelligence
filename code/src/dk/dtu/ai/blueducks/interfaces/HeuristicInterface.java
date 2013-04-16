@@ -1,4 +1,4 @@
-package dk.dtu.ai.blueducks.planner;
+package dk.dtu.ai.blueducks.interfaces;
 
 public interface HeuristicInterface<E>{
 
