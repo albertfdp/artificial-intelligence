@@ -9,8 +9,8 @@ package dtu.dk.ai.blueducks.goals;
 
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
-import dtu.dk.ai.blueducks.actions.Action;
-import dtu.dk.ai.blueducks.actions.MoveAction;
+import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.actions.MoveAction;
 
 /**
  * The Class GoToBoxGoal.
@@ -78,7 +78,8 @@ public class GoToBoxGoal extends Goal {
 	 * @return the action to be executed
 	 */	
 	public Action getAction(Cell currentCell, Cell nextCell) {
-		return new MoveAction(currentCell.getDirection(nextCell));
+		//return new MoveAction(currentCell.getDirection(nextCell));
+		return null;
 	}
 
 }

@@ -7,6 +7,9 @@
  */
 package dk.dtu.ai.blueducks.map;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * The Class Cell.
@@ -35,9 +38,7 @@ public class Cell {
 	 * @return the neighbour
 	 */
 	public Cell getNeighbour(Direction dir) {
-		
 		int neighborX = this.x, neighborY = this.y;
-		
 		if(dir == Direction.E)
 			neighborY--;
 		else if(dir == Direction.W)
@@ -73,6 +74,20 @@ public class Cell {
 	}
 
 	/**
+	 * Gets the neighbours.
+	 *
+	 * @return the neighbours
+	 */
+	public List<Cell> getNeighbours() {
+		List<Cell> neighbors = new ArrayList<Cell>();
+		neighbors.add(this.getNeighbour(Direction.N));
+		neighbors.add(this.getNeighbour(Direction.S));
+		neighbors.add(this.getNeighbour(Direction.E));
+		neighbors.add(this.getNeighbour(Direction.W));
+		return neighbors;
+	}
+	
+	/**
 	 * Attaches a cell content.
 	 * 
 	 * @param content the content
@@ -80,7 +95,8 @@ public class Cell {
 	
 	public void attachCellContent(CellContent content) {
 		this.content = content;
-		content.setCell(this);
+		if(content != null)
+			content.setCell(this);
 	}
 
 	/**

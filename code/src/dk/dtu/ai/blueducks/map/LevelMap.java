@@ -26,20 +26,9 @@ public class LevelMap {
 	private Cell[][] matrix;
 	private List<Agent> agents;
 	private Map<Character, List<Box>> boxes;
-	public Cell[][] getMatrix() {
-		return matrix;
-	}
-
-	public List<Agent> getAgents() {
-		return agents;
-	}
-
-	public Map<Character, List<Box>> getBoxes() {
-		return boxes;
-	}
-
-	private static Logger logger = Logger.getAnonymousLogger();
+	private static Logger logger = Logger.getLogger("LevelMap");
 	private Map<Character, Cell> goals;
+	
 	
 	private LevelMap() {
 		agents = new ArrayList<Agent>(10);
@@ -81,7 +70,7 @@ public class LevelMap {
 	 */
 	public void addCell(Cell cell, int x, int y) {
 		if(matrix == null || x >= matrix.length || matrix[0] == null || y >= matrix[0].length){
-			logger.severe("Class Map: could not add cell on position " + x + " " + y + " as they execeed the declared size of the matrix");
+			logger.warning("Class Map: could not add cell on position " + x + " " + y + " as they execeed the declared size of the matrix");
 			return;
 		}
 		matrix[x][y] = cell;
@@ -124,8 +113,22 @@ public class LevelMap {
 	 *
 	 * @return the goals
 	 */
-	public ArrayList<Cell> getGoals() {
+	public Map<Character, Cell> getGoals() {
 		// TODO Auto-generated method stub
-		return null;
+		return goals;
 	}
+	
+	public Cell[][] getMatrix() {
+		return matrix;
+	}
+
+	public List<Agent> getAgents() {
+		return agents;
+	}
+
+	public Map<Character, List<Box>> getBoxes() {
+		return boxes;
+	}
+
+	
 }

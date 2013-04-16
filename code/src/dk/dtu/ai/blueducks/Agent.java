@@ -10,10 +10,10 @@ package dk.dtu.ai.blueducks;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.CellContent;
 import dk.dtu.ai.blueducks.map.Direction;
-import dk.dtu.ai.blueducks.map.LevelMap;
 
 public class Agent extends CellContent {
 
@@ -50,7 +50,8 @@ public class Agent extends CellContent {
 	}
 
 	public ArrayList<Cell> computeDesires() {
-		return LevelMap.getInstance().getGoals();
+		//return LevelMap.getInstance().getGoals();
+		return null;
 	}
 
 	public HashMap<Cell, Integer> computeScore() {
@@ -67,6 +68,17 @@ public class Agent extends CellContent {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+	
+	public Action getNextAction() {
+		//TODO
+		return null;
+	}
+	
+	public void triggerReplanning() {
+		//TODO
+	}
+	
 
 	public char getId() {
 		return id;
