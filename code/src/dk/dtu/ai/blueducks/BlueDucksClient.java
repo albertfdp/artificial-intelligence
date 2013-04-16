@@ -10,79 +10,84 @@ package dk.dtu.ai.blueducks;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
-import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.MapLoader;
+import dtu.dk.ai.blueducks.actions.Action;
 
+/**
+ * The BlueDucksClient that handles the communication with the Environment Server.
+ */
 public class BlueDucksClient {
-	
-	private BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) );
-	private ArrayList<Agent> agents = new ArrayList<Agent>();
-			
-	public BlueDucksClient() throws IOException {
-		readMap(); 
-	}
-	
-	/*
+
+	private static final BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+
+	/** The Constant log. */
+	private static final Logger log = Logger.getLogger("Client");
+
+	/**
+	 * Reads the map.
 	 * 
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	private void readMap() throws IOException {
-		LevelMap map = MapLoader.loadMap(in);
+	private static void readMap() throws IOException {
+		MapLoader.loadMap(in);
 	}
-	
-	public boolean update() throws IOException {
-		
-		ArrayList<String> actions = new ArrayList<String>();
-		
-		for (Agent agent : agents) {
-			actions.add(agent.nextAction());
-		}
-		
-		System.out.println(BlueDucksClient.sendAction(actions));
-		System.out.flush();
-		
-		// Disregard these for now, but read or the server stalls when outputbuffer gets filled!
+
+	/**
+	 * Update the beliefs.
+	 *
+	 * @return the list
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	public List<Boolean> updateBeliefs() throws IOException {
+		// Read the percepts from the server
 		String percepts = in.readLine();
+		log.fine("Received percept from server: " + percepts);
 		if (percepts == null)
-			return false;
-		
-		return true;
-		
+			return null;
+
+		return null;
 	}
-	
-	public static void main(String [] args) {
-		
-		// use stderr to print to console
-		System.err.println("Hello from custom client!");
-		
-		try {
-			BlueDucksClient client = new BlueDucksClient();
-			while (client.update()) {
-				// send next decision
-			}
-		} catch (IOException e) {
-			// got nowhere to write
-		}
-		
-	}
-	
-	public static String sendAction(ArrayList<String> actions) {
-		
+
+	/**
+	 * Send joint action.
+	 *
+	 * @param actions the actions
+	 */
+	public static void sendJointAction(List<Action> actions) {
+
+		// Build the joint action representation
 		String jointAction = "[";
-		
-		for (String action : actions) {
-			jointAction += action + ",";
+		for (Action action : actions) {
+			jointAction += action.toCommandString() + ",";
 		}
-		
-		// remove the last comma
+
+		// Remove the last comma
 		if (jointAction.length() > 1)
 			jointAction = jointAction.substring(0, jointAction.length() - 1);
-		
 		jointAction += "]";
-		
-		return jointAction;
+
+		// Sent the joint action to the server
+		log.fine("Sending joint action: " + jointAction);
+		System.out.println(jointAction);
+		System.out.flush();
 	}
 
+	public static void main(String[] args) {
+
+		Logger.getAnonymousLogger().info("BlueDucksClient started. Initializing...");
+		BlueDucksClient client = null;
+		try {
+			// Read the map and init the client
+			BlueDucksClient.readMap();
+			MotherOdin.init(client);
+		} catch (IOException e) {
+			Logger.getAnonymousLogger().severe("Error initializing map:" + e);
+			return;
+		}
+		MotherOdin.getInstance().run();
+	}
 
 }
