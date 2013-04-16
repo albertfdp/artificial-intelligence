@@ -17,9 +17,9 @@ public class MapLoader {
 	 * 
 	 * @return the map
 	 */
-	public static Map loadMap() {
+	public static LevelMap loadMap() {
 		
-		Map map=Map.getInstance();
+		LevelMap map=LevelMap.getInstance();
 		map.init(0,0);
 		// TODO
 		return null;
