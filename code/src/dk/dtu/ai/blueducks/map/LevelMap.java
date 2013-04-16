@@ -83,8 +83,9 @@ public class LevelMap {
 		
 	}
 	
-	public void addGoalCell(Cell cell, int x, int y) {
-		
+	public void addGoalCell(Cell cell, int x, int y, char id) {
+		this.addCell(cell, x, y);
+		//this.goals
 	}
 
 	/**
