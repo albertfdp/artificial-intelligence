@@ -14,6 +14,7 @@ import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.CellContent;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
+import dtu.dk.ai.blueducks.actions.Action;
 
 public class Agent extends CellContent {
 
@@ -67,6 +68,17 @@ public class Agent extends CellContent {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+	
+	public Action getNextAction() {
+		//TODO
+		return null;
+	}
+	
+	public void triggerReplanning() {
+		//TODO
+	}
+	
 
 	public char getId() {
 		return id;
