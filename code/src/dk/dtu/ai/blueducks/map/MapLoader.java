@@ -11,6 +11,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 
+import dk.dtu.ai.blueducks.Agent;
+
 /**
  * The Map Loader.
  */
@@ -44,8 +46,8 @@ public class MapLoader {
 	 */
 	public static Map loadMap(BufferedReader br) throws IOException {
 		
-		Map.init(0);
 		Map map=Map.getInstance();
+		map.init(0,0);
 		
 		String line;
 		String color = DEFAULT_COLOR;
@@ -56,8 +58,8 @@ public class MapLoader {
 			line = line.replace("\\s", ""); // remove spaces
 			color = line.split(":")[0];
 			
-			for (String id : line.split(":")[1].split(",")) // assign color, id
-				map.addColor(id.charAt(0), color);
+			//for (String id : line.split(":")[1].split(",")) // assign color, id
+				//map.addColor(id.charAt(0), color);
 		}
 		
 		// read lines specifying layout
@@ -70,7 +72,9 @@ public class MapLoader {
 				if (isWall(sCell) || isUnknown(sCell)) {
 					
 				} else if (isAgent(sCell)) {
-					
+					//Agent agent = new Agent(sCell.charAt(0), color);
+					//Cell cell = new Cell();
+					//cell.attachCellContent(agent);
 				} else if (isBox(sCell)) {
 					
 				} else if (isGoalCell(sCell)) {

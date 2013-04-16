@@ -7,8 +7,7 @@
  */
 package dk.dtu.ai.blueducks.domain;
 
-import java.util.ArrayList;
-
+import dk.dtu.ai.blueducks.map.CellContent;
 import dk.dtu.ai.blueducks.map.Direction;
 
 
@@ -19,20 +18,49 @@ public class Command {
 	private final static String COMMAND_PULL = "Pull";
 	private final static String COMMAND_NO_OPERATION = "NoOp";
 	
-	public static String Move (Direction dir) {
-		return COMMAND_MOVE + "(" + dir + ")";
+	/**
+	 * Move.
+	 *
+	 * @param cellContent the cell content (agent or box)
+	 * @param direction the direction
+	 * @return the string
+	 */
+	public static String Move (CellContent cellContent, Direction direction) {
+		return COMMAND_MOVE + "(" + cellContent + "," + direction + ")";
 	}
 	
-	public static String Push (Direction from, Direction to) {
-		return COMMAND_PUSH + "(" + from + "," + to + ")";
+	/**
+	 * Push.
+	 *
+	 * @param cellContent the cell content (agent or box)
+	 * @param agentDirection the agent direction
+	 * @param boxDirection the box direction
+	 * @return the string
+	 */
+	public static String Push (CellContent cellContent, Direction agentDirection, Direction boxDirection) {
+		return COMMAND_PUSH + "(" + cellContent + "," + agentDirection + "," + boxDirection + ")";
 	}
 	
-	public static String Pull (Direction from, Direction to) {
-		return COMMAND_PULL + "(" + from + "," + to + ")";
+	/**
+	 * Pull.
+	 *
+	 * @param cellContent the cell content (agent or box)
+	 * @param agentDirection the agent direction
+	 * @param currentBoxDirection the current box direction relative to the last position of the agent
+	 * @return the string
+	 */
+	public static String Pull (CellContent cellContent, Direction agentDirection, Direction currentBoxDirection) {
+		return COMMAND_PULL + "(" + cellContent + "," + agentDirection + "," + currentBoxDirection + ")";
 	}
 	
-	public static String NoOperation() {
-		return COMMAND_NO_OPERATION;
+	/**
+	 * No operation.
+	 *
+	 * @param cellContent the cell content (agent or box)
+	 * @return the string
+	 */
+	public static String NoOperation(CellContent cellContent) {
+		return COMMAND_NO_OPERATION + "("  + cellContent + ")";
 	}
 	
 

@@ -7,29 +7,54 @@
  */
 package dk.dtu.ai.blueducks;
 
+import java.util.ArrayList;
+
 import dk.dtu.ai.blueducks.domain.Command;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.CellContent;
 import dk.dtu.ai.blueducks.map.Direction;
+import dk.dtu.ai.blueducks.map.Map;
 
 public class Agent extends CellContent {
 
 	private char id;
 	private String color;
 
+	/**
+	 * Instantiates a new agent.
+	 *
+	 * @param initialCell the initial cell
+	 * @param id the id
+	 * @param color the color
+	 */
 	public Agent(Cell initialCell, char id, String color) {
 		super(initialCell);
 		this.id = id;
 		this.color = color;
 	}
 
-	public String move(Direction dir) {
-		return Command.Move(dir);
+	/**
+	 * Move.
+	 *
+	 * @param direction the direction
+	 * @return the string
+	 */
+	public String move(Direction direction) {
+		return Command.Move(this, direction);
 	}
 
+	/*???????????????????*/
 	public String nextAction() {
 		return move(Direction.N);
 	}
+	
+	public ArrayList<Cell> computeDesires() {
+		Map map = Map.getInstance();
+		ArrayList<Cell> goals = map.getGoals();
+		return goals;
+	}
+
+	
 
 	public char getId() {
 		return id;
