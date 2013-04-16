@@ -35,16 +35,20 @@ public class Cell {
 	 * @return the neighbour
 	 */
 	public Cell getNeighbour(Direction dir) {
+		
 		int neighborX = this.x, neighborY = this.y;
+		
 		if(dir == Direction.E)
 			neighborY--;
-		
 		else if(dir == Direction.W)
 			neighborY++;
-		//if(map.getCellAt(neighborX, neighborY)){
-			
-		//}
-		return null;
+		else if(dir == Direction.N)
+			neighborX--;
+		else if(dir == Direction.S)
+			neighborX++;
+		
+		Cell neighbor = map.getCellAt(neighborX, neighborY);
+		return neighbor;
 	}
 
 	/**
