@@ -2,6 +2,7 @@ package dtu.dk.ai.goals;
 
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
+import dtu.dk.ai.actions.Action;
 
 public class MoveBoxGoal extends Goal {
 	
@@ -27,6 +28,11 @@ public class MoveBoxGoal extends Goal {
 
 	public void setTo(Cell to) {
 		this.to = to;
+	}
+	
+	@Override
+	public Action getAction(Cell currentCell, Cell nextCell) {
+		return null;
 	}
 
 }
