@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import dk.dtu.ai.blueducks.domain.Command;
-
+import dk.dtu.ai.blueducks.map.Map;
+import dk.dtu.ai.blueducks.map.MapLoader;
 
 public class BlueDucksClient {
 	
@@ -28,7 +28,7 @@ public class BlueDucksClient {
 	 * 
 	 */
 	private void readMap() throws IOException {
-		// We will read it depending on the data structure decided
+		Map map = MapLoader.loadMap(in);
 	}
 	
 	public boolean update() throws IOException {
