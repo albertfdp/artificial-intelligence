@@ -17,19 +17,36 @@ public class Agent extends CellContent {
 	private char id;
 	private String color;
 
+	/**
+	 * Instantiates a new agent.
+	 *
+	 * @param initialCell the initial cell
+	 * @param id the id
+	 * @param color the color
+	 */
 	public Agent(Cell initialCell, char id, String color) {
 		super(initialCell);
 		this.id = id;
 		this.color = color;
 	}
 
-	public String move(Direction dir) {
-		return Command.Move(dir);
+	/**
+	 * Move.
+	 *
+	 * @param direction the direction
+	 * @return the string
+	 */
+	public String move(Direction direction) {
+		return Command.Move(this, direction);
 	}
 
+	/*???????????????????*/
 	public String nextAction() {
 		return move(Direction.N);
 	}
+	
+	
+	
 
 	public char getId() {
 		return id;
