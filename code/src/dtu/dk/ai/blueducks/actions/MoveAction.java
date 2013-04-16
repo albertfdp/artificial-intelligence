@@ -1,4 +1,4 @@
-package dtu.dk.ai.actions;
+package dtu.dk.ai.blueducks.actions;
 
 import dk.dtu.ai.blueducks.map.Direction;
 
