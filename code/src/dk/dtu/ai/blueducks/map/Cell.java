@@ -46,7 +46,6 @@ public class Cell {
 			neighborX--;
 		else if(dir == Direction.S)
 			neighborX++;
-		
 		Cell neighbor = map.getCellAt(neighborX, neighborY);
 		return neighbor;
 	}

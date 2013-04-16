@@ -1,25 +1,16 @@
-/*
- * Artificial Intelligence and Multi-Agent Systems
- * Denmarks Tehnical University
- * 
- * Blue Ducks
- * Spring 2013
- */
-package dtu.dk.ai.actions;
-
+package dtu.dk.ai.blueducks.actions;
 
 import dk.dtu.ai.blueducks.map.Direction;
 
-/**
- * The Push Action.
- */
-public class PushAction extends Action {
+public class PullAction extends Action {
 
 	/** The agent direction. */
 	Direction agentDirection;
 
 	/** The box direction. */
 	Direction boxDirection;
+
+
 
 	/**
 	 * Instantiates an action to push a box.
@@ -28,7 +19,7 @@ public class PushAction extends Action {
 	 * @param dirAgent the direction in which the agent moves
 	 * @param dirBox the direction in which the box moves
 	 */
-	public PushAction(Direction dirAgent, Direction dirBox) {
+	public PullAction(Direction dirAgent, Direction dirBox) {
 		super();
 		this.agentDirection = dirAgent;
 		this.boxDirection = dirBox;
@@ -36,6 +27,6 @@ public class PushAction extends Action {
 
 	@Override
 	public String toCommandString() {
-		return "Push(" + agentDirection + "," + boxDirection + ")";
+		return "Pull("+ agentDirection + "," + boxDirection + ")";
 	}
 }

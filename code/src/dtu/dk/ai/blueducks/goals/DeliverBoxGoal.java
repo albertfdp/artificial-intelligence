@@ -1,19 +1,13 @@
-package dtu.dk.ai.goals;
+package dtu.dk.ai.blueducks.goals;
 
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
-import dtu.dk.ai.actions.Action;
 
-public class MoveBoxGoal extends Goal {
+public class DeliverBoxGoal extends Goal {
 	
 	private Box what;
 	private Cell to;
 	
-	public MoveBoxGoal(Box what, Cell to) {
-		this.what = what;
-		this.to = to;
-	}
-
 	public Box getWhat() {
 		return what;
 	}
@@ -29,10 +23,10 @@ public class MoveBoxGoal extends Goal {
 	public void setTo(Cell to) {
 		this.to = to;
 	}
-	
-	@Override
-	public Action getAction(Cell currentCell, Cell nextCell) {
-		return null;
+
+	public DeliverBoxGoal(Box what, Cell to) {
+		this.what = what;
+		this.to = to;
 	}
 
 }
