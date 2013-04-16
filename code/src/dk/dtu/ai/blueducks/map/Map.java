@@ -90,4 +90,14 @@ public class Map {
 		}
 		return null;
 	}
+
+	/**
+	 * Gets the goals.
+	 *
+	 * @return the goals
+	 */
+	public ArrayList<Cell> getGoals() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
