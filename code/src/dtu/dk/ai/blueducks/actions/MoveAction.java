@@ -36,7 +36,7 @@ public class MoveAction extends Action {
 
 	@Override
 	public String toCommandString() {
-		return "Push(" + agentDirection + ")";
+		return "Move(" + agentDirection + ")";
 	}
 
 	@Override
