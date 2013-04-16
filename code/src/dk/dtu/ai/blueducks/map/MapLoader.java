@@ -79,7 +79,7 @@ public class MapLoader {
 					cell.attachCellContent(new Box(cell, sCell.charAt(0), color));
 					map.addCell(cell, x, y);
 				} else if (isGoalCell(sCell)) {
-					
+					map.addGoalCell(cell, x, y);
 				}
 				
 			}
