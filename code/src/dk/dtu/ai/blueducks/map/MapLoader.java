@@ -75,7 +75,6 @@ public class MapLoader {
 		map.init(width, height);
 				
 		Map<Character, String> colors = readColorDefinition(colorsSb.toString());
-		
 		Scanner scan = new Scanner(mapSb.toString());
 		int y = 0;
 		while (scan.hasNextLine()) {
@@ -97,6 +96,7 @@ public class MapLoader {
 					map.addGoalCell(cell, x, y, Character.toUpperCase(sCell.charAt(0)));
 				}
 			}
+			y++;
 		}
 		scan.close();
 		
