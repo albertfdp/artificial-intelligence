@@ -19,4 +19,9 @@ public abstract class Action {
 	 */
 	public abstract String toCommandString();
 
+	/**
+	 * Update the beliefs (LevelMap) according to the action.
+	 */
+	public abstract void updateBeliefs();
+
 }
