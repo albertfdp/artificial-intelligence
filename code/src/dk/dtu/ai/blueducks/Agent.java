@@ -8,6 +8,7 @@
 package dk.dtu.ai.blueducks;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import dk.dtu.ai.blueducks.domain.Command;
 import dk.dtu.ai.blueducks.map.Cell;
@@ -49,12 +50,24 @@ public class Agent extends CellContent {
 	}
 	
 	public ArrayList<Cell> computeDesires() {
-		LevelMap map = LevelMap.getInstance();
-		ArrayList<Cell> goals = map.getGoals();
-		return goals;
+		return LevelMap.getInstance().getGoals();
 	}
 
+	public HashMap<Cell, Integer> computeScore() {
+		HashMap<Cell, Integer> goalsScore = new HashMap<Cell, Integer>();
+		ArrayList<Cell> goals = computeDesires(); 
+		for (Cell cell : goals) {
+			goalsScore.put(cell, computeScore(cell));
+		}
+		
+		return goalsScore;
+	}
 	
+
+	private Integer computeScore(Cell cell) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 	public char getId() {
 		return id;
