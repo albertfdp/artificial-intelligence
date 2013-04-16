@@ -26,20 +26,9 @@ public class LevelMap {
 	private Cell[][] matrix;
 	private List<Agent> agents;
 	private Map<Character, List<Box>> boxes;
-	public Cell[][] getMatrix() {
-		return matrix;
-	}
-
-	public List<Agent> getAgents() {
-		return agents;
-	}
-
-	public Map<Character, List<Box>> getBoxes() {
-		return boxes;
-	}
-
 	private static Logger logger = Logger.getAnonymousLogger();
 	private Map<Character, Cell> goals;
+	
 	
 	private LevelMap() {
 		agents = new ArrayList<Agent>(10);
@@ -124,8 +113,22 @@ public class LevelMap {
 	 *
 	 * @return the goals
 	 */
-	public ArrayList<Cell> getGoals() {
+	public Map<Character, Cell> getGoals() {
 		// TODO Auto-generated method stub
-		return null;
+		return goals;
 	}
+	
+	public Cell[][] getMatrix() {
+		return matrix;
+	}
+
+	public List<Agent> getAgents() {
+		return agents;
+	}
+
+	public Map<Character, List<Box>> getBoxes() {
+		return boxes;
+	}
+
+	
 }
