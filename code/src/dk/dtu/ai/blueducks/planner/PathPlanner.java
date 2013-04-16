@@ -10,6 +10,7 @@ package dk.dtu.ai.blueducks.planner;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.dtu.ai.blueducks.interfaces.HeuristicInterface;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 
