@@ -10,6 +10,7 @@ package dk.dtu.ai.blueducks.map;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
@@ -50,6 +51,8 @@ public class MapLoader {
 		LevelMap map=LevelMap.getInstance();
 		map.init(0,0);
 		
+		Map <Character, String> colors = new HashMap<Character, String>();
+		
 		String line;
 		String color = DEFAULT_COLOR;
 		
@@ -59,8 +62,8 @@ public class MapLoader {
 			line = line.replace("\\s", ""); // remove spaces
 			color = line.split(":")[0];
 			
-			//for (String id : line.split(":")[1].split(",")) // assign color, id
-				//map.addColor(id.charAt(0), color);
+			for (String id : line.split(":")[1].split(",")) // assign color, id
+				colors.put(id.charAt(0), color);
 		}
 		
 		// read lines specifying layout
@@ -73,10 +76,10 @@ public class MapLoader {
 				if (isWall(sCell) || isUnknown(sCell)) {
 					// do nothing
 				} else if (isAgent(sCell)) {
-					cell.attachCellContent(new Agent(cell, sCell.charAt(0), color));
+					cell.attachCellContent(new Agent(cell, sCell.charAt(0), colors.get(sCell.charAt(0))));
 					map.addCell(cell, x, y);
 				} else if (isBox(sCell)) {
-					cell.attachCellContent(new Box(cell, sCell.charAt(0), color));
+					cell.attachCellContent(new Box(cell, sCell.charAt(0), colors.get(sCell.charAt(0))));
 					map.addCell(cell, x, y);
 				} else if (isGoalCell(sCell)) {
 					map.addGoalCell(cell, x, y);
