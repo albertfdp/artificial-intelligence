@@ -13,7 +13,7 @@ import dk.dtu.ai.blueducks.domain.Command;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.CellContent;
 import dk.dtu.ai.blueducks.map.Direction;
-import dk.dtu.ai.blueducks.map.Map;
+import dk.dtu.ai.blueducks.map.LevelMap;
 
 public class Agent extends CellContent {
 
@@ -49,7 +49,7 @@ public class Agent extends CellContent {
 	}
 	
 	public ArrayList<Cell> computeDesires() {
-		Map map = Map.getInstance();
+		LevelMap map = LevelMap.getInstance();
 		ArrayList<Cell> goals = map.getGoals();
 		return goals;
 	}

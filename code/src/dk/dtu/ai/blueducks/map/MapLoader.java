@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import dk.dtu.ai.blueducks.Agent;
+import dk.dtu.ai.blueducks.Box;
 
 /**
  * The Map Loader.
@@ -68,18 +69,19 @@ public class MapLoader {
 			for (int x = 0; x < line.length(); x++) {
 				
 				String sCell = line.substring(x, x + 1);
-				
+				Cell cell = new Cell(x, y);
 				if (isWall(sCell) || isUnknown(sCell)) {
-					
+					// do nothing
 				} else if (isAgent(sCell)) {
-					//Agent agent = new Agent(sCell.charAt(0), color);
-					//Cell cell = new Cell();
-					//cell.attachCellContent(agent);
+					cell.attachCellContent(new Agent(cell, sCell.charAt(0), color));
+					map.addCell(cell, x, y);
 				} else if (isBox(sCell)) {
-					
+					cell.attachCellContent(new Box(cell, sCell.charAt(0), color));
+					map.addCell(cell, x, y);
 				} else if (isGoalCell(sCell)) {
 					
 				}
+				
 			}
 			line = br.readLine();
 			y++;

@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import dk.dtu.ai.blueducks.map.Map;
+import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.MapLoader;
 
 public class BlueDucksClient {
