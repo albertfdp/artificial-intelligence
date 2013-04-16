@@ -82,6 +82,10 @@ public class LevelMap {
 		}
 		
 	}
+	
+	public void addGoalCell(Cell cell, int x, int y) {
+		
+	}
 
 	/**
 	 * Gets the cell at a given position.
