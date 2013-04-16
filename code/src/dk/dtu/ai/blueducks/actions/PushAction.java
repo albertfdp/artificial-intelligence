@@ -5,14 +5,18 @@
  * Blue Ducks
  * Spring 2013
  */
-package dtu.dk.ai.blueducks.actions;
+package dk.dtu.ai.blueducks.actions;
+
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 
-public class PullAction extends Action {
+/**
+ * The Push Action.
+ */
+public class PushAction extends Action {
 
 	/** The agent direction. */
 	Direction agentDirection;
@@ -22,38 +26,48 @@ public class PullAction extends Action {
 
 	/** The agent. */
 	Agent agent;
-
+	
 	/** The box. */
 	Box box;
 	
 	/**
 	 * Instantiates an action to push a box.
-	 * 
-	 * @param cellContent the cell content
+	 *
 	 * @param dirAgent the direction in which the agent moves
 	 * @param dirBox the direction in which the box moves
+	 * @param agent the agent
+	 * @param box the box
 	 */
-	public PullAction(Direction dirAgent, Direction dirBox, Agent agent, Box box) {
+	public PushAction(Direction dirAgent, Direction dirBox, Agent agent, Box box) {
 		super();
 		this.agentDirection = dirAgent;
 		this.boxDirection = dirBox;
 		this.agent = agent;
-		this.box = box; 
+		this.box = box;
 	}
 
+	/* (non-Javadoc)
+	 * @see dtu.dk.ai.blueducks.actions.Action#toCommandString()
+	 */
 	@Override
 	public String toCommandString() {
-		return "Pull("+ agentDirection + "," + boxDirection + ")";
+		return "Push(" + agentDirection + "," + boxDirection + ")";
 	}
 
+	/* (non-Javadoc)
+	 * @see dtu.dk.ai.blueducks.actions.Action#updateBeliefs()
+	 */
 	@Override
 	public void updateBeliefs() {
+		// TODO Auto-generated method stub
 		Cell agentCell = agent.getCell();
 		Cell boxCell = box.getCell();
-		Cell destCell = agentCell.getNeighbour(boxDirection);
+		Cell destCell = boxCell.getNeighbour(boxDirection);
 		
-		destCell.attachCellContent(agentCell.getContent());
-		agentCell.attachCellContent(boxCell.getContent());
-		boxCell.attachCellContent(null);
+		destCell.attachCellContent(boxCell.getContent());
+		boxCell.attachCellContent(agentCell.getContent());
+		agentCell.attachCellContent(null);
+		
+		
 	}
 }

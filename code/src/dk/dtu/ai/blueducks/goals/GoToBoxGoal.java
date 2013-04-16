@@ -1,8 +1,8 @@
-package dtu.dk.ai.blueducks.goals;
+package dk.dtu.ai.blueducks.goals;
 
 import dk.dtu.ai.blueducks.Box;
+import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.map.Cell;
-import dtu.dk.ai.blueducks.actions.Action;
 
 public class GoToBoxGoal extends Goal {
 	

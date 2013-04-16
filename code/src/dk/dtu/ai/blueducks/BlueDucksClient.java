@@ -13,8 +13,8 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.logging.Logger;
 
+import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.map.MapLoader;
-import dtu.dk.ai.blueducks.actions.Action;
 
 /**
  * The BlueDucksClient that handles the communication with the Environment Server.

@@ -10,11 +10,11 @@ package dk.dtu.ai.blueducks;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.CellContent;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
-import dtu.dk.ai.blueducks.actions.Action;
 
 public class Agent extends CellContent {
 

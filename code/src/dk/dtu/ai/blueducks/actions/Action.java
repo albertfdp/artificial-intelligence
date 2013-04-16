@@ -5,7 +5,7 @@
  * Blue Ducks
  * Spring 2013
  */
-package dtu.dk.ai.blueducks.actions;
+package dk.dtu.ai.blueducks.actions;
 
 /**
  * The Class Action.

@@ -10,10 +10,10 @@ package dk.dtu.ai.blueducks;
 import java.util.LinkedList;
 import java.util.List;
 
+import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.actions.MoveAction;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
-import dtu.dk.ai.blueducks.actions.Action;
-import dtu.dk.ai.blueducks.actions.MoveAction;
 
 /**
  * The Class MotherOdin.
