@@ -28,7 +28,7 @@ public class BlueDucksClient {
 	 * 
 	 */
 	private void readMap() throws IOException {
-		Map map = MapLoader.loadMap(in);
+		LevelMap map = MapLoader.loadMap(in);
 	}
 	
 	public boolean update() throws IOException {

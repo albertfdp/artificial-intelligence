@@ -44,9 +44,9 @@ public class MapLoader {
 	 * @return the map
 	 * @throws IOException 
 	 */
-	public static Map loadMap(BufferedReader br) throws IOException {
+	public static LevelMap loadMap(BufferedReader br) throws IOException {
 		
-		Map map=Map.getInstance();
+		LevelMap map=LevelMap.getInstance();
 		map.init(0,0);
 		
 		String line;

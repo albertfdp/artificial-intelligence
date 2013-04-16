@@ -17,8 +17,17 @@ public class Cell {
 	private CellContent content;
 
 	/** The Constant map. */
-	protected static Map map;
+	protected static LevelMap map;
+	
+	public int x;
+	public int y;
 
+	
+	public Cell(int x, int y){
+		super();
+		this.x = x;
+		this.y = y;
+	}
 	/**
 	 * Gets the neighbour in the given direction.
 	 * 
@@ -26,7 +35,15 @@ public class Cell {
 	 * @return the neighbour
 	 */
 	public Cell getNeighbour(Direction dir) {
-		// TODO:
+		int neighborX = this.x, neighborY = this.y;
+		if(dir == Direction.E)
+			neighborY--;
+		
+		else if(dir == Direction.W)
+			neighborY++;
+		//if(map.getCellAt(neighborX, neighborY)){
+			
+		//}
 		return null;
 	}
 
@@ -35,6 +52,7 @@ public class Cell {
 	 * 
 	 * @param content the content
 	 */
+	
 	public void attachCellContent(CellContent content) {
 		this.content = content;
 		content.setCell(this);
