@@ -7,7 +7,7 @@
  */
 package dtu.dk.ai.actions;
 
-import dk.dtu.ai.blueducks.map.CellContent;
+
 import dk.dtu.ai.blueducks.map.Direction;
 
 /**
@@ -21,9 +21,6 @@ public class PushAction extends Action {
 	/** The box direction. */
 	Direction boxDirection;
 
-	/** The cell content. */
-	CellContent cellContent;
-
 	/**
 	 * Instantiates an action to push a box.
 	 * 
@@ -31,7 +28,7 @@ public class PushAction extends Action {
 	 * @param dirAgent the direction in which the agent moves
 	 * @param dirBox the direction in which the box moves
 	 */
-	public PushAction(CellContent cellContent, Direction dirAgent, Direction dirBox) {
+	public PushAction(Direction dirAgent, Direction dirBox) {
 		super();
 		this.agentDirection = dirAgent;
 		this.boxDirection = dirBox;
@@ -39,6 +36,6 @@ public class PushAction extends Action {
 
 	@Override
 	public String toCommandString() {
-		return "Push(" + cellContent + "," + agentDirection + "," + boxDirection + ")";
+		return "Push(" + agentDirection + "," + boxDirection + ")";
 	}
 }

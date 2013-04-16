@@ -1,6 +1,5 @@
 package dtu.dk.ai.actions;
 
-import dk.dtu.ai.blueducks.map.CellContent;
 import dk.dtu.ai.blueducks.map.Direction;
 
 public class PullAction extends Action {
@@ -11,8 +10,7 @@ public class PullAction extends Action {
 	/** The box direction. */
 	Direction boxDirection;
 
-	/** The cell content. */
-	CellContent cellContent;
+
 
 	/**
 	 * Instantiates an action to push a box.
@@ -21,7 +19,7 @@ public class PullAction extends Action {
 	 * @param dirAgent the direction in which the agent moves
 	 * @param dirBox the direction in which the box moves
 	 */
-	public PullAction(CellContent cellContent, Direction dirAgent, Direction dirBox) {
+	public PullAction(Direction dirAgent, Direction dirBox) {
 		super();
 		this.agentDirection = dirAgent;
 		this.boxDirection = dirBox;
@@ -29,6 +27,6 @@ public class PullAction extends Action {
 
 	@Override
 	public String toCommandString() {
-		return "Pull(" + cellContent + "," + agentDirection + "," + boxDirection + ")";
+		return "Pull("+ agentDirection + "," + boxDirection + ")";
 	}
 }
