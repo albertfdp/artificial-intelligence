@@ -53,8 +53,7 @@ public class MapLoader {
 		
 		Map <Character, String> colors = new HashMap<Character, String>();
 		
-		String line;
-		String color = DEFAULT_COLOR;
+		String line, color;
 		
 		// read lines specifying colors
 		while ((line = br.readLine()).matches(REGEX_COLOR_DEFINITION)) {
@@ -76,10 +75,16 @@ public class MapLoader {
 				if (isWall(sCell) || isUnknown(sCell)) {
 					// do nothing
 				} else if (isAgent(sCell)) {
-					cell.attachCellContent(new Agent(cell, sCell.charAt(0), colors.get(sCell.charAt(0))));
+					String agentColor = colors.get(sCell.charAt(0));
+					if (agentColor == null)
+						agentColor = DEFAULT_COLOR;
+					cell.attachCellContent(new Agent(cell, sCell.charAt(0), agentColor));
 					map.addCell(cell, x, y);
 				} else if (isBox(sCell)) {
-					cell.attachCellContent(new Box(cell, sCell.charAt(0), colors.get(sCell.charAt(0))));
+					String boxColor = colors.get(sCell.charAt(0));
+					if (boxColor == null)
+						boxColor = DEFAULT_COLOR;
+					cell.attachCellContent(new Box(cell, sCell.charAt(0), boxColor));
 					map.addCell(cell, x, y);
 				} else if (isGoalCell(sCell)) {
 					map.addGoalCell(cell, x, y, Character.toUpperCase(sCell.charAt(0)));
