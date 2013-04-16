@@ -13,4 +13,20 @@ public class MoveBoxGoal extends Goal {
 		this.to = to;
 	}
 
+	public Box getWhat() {
+		return what;
+	}
+
+	public void setWhat(Box what) {
+		this.what = what;
+	}
+
+	public Cell getTo() {
+		return to;
+	}
+
+	public void setTo(Cell to) {
+		this.to = to;
+	}
+
 }
