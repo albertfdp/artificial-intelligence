@@ -17,7 +17,8 @@ public class Box extends CellContent {
 	
 	public Box(Cell cell, char id, String color) {
 		super(cell);
-		// TODO Auto-generated constructor stub
+		this.id = id;
+		this.color = color;
 	}
 
 	public char getId() {

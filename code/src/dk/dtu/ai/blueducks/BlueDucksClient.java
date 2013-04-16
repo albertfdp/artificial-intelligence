@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.MapLoader;
 
 public class BlueDucksClient {
@@ -28,7 +27,7 @@ public class BlueDucksClient {
 	 * 
 	 */
 	private void readMap() throws IOException {
-		LevelMap map = MapLoader.loadMap(in);
+		MapLoader.loadMap(in);
 	}
 	
 	public boolean update() throws IOException {

@@ -49,6 +49,28 @@ public class Cell {
 		Cell neighbor = map.getCellAt(neighborX, neighborY);
 		return neighbor;
 	}
+	
+	/**
+	 * Gets the direction to the second cell respectively to the current instance.
+	 *
+	 * @param cell the cell
+	 * @return the direction
+	 */
+	public Direction getDirection (Cell cell) {
+		
+		int xdiff = this.x - cell.x;
+		int ydiff = this.y - cell.y;
+		
+		if (xdiff > 0) {
+			return Direction.W;
+		} else if (xdiff < 0 ) {
+			return Direction.E;
+		} else if (ydiff > 0 ) {
+			return Direction.N;
+		} else { 
+			return Direction.S;
+		}	
+	}
 
 	/**
 	 * Attaches a cell content.

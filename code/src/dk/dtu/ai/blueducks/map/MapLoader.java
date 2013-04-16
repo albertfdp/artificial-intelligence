@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
@@ -48,54 +49,83 @@ public class MapLoader {
 	 */
 	public static LevelMap loadMap(BufferedReader br) throws IOException {
 		
-		LevelMap map=LevelMap.getInstance();
-		map.init(0,0);
+		StringBuilder colorsSb = new StringBuilder();
+		StringBuilder mapSb = new StringBuilder();
+		String line;
 		
-		Map <Character, String> colors = new HashMap<Character, String>();
+		int width = 0;
+		int height = 0;
 		
-		String line, color;
-		
-		// read lines specifying colors
-		while ((line = br.readLine()).matches(REGEX_COLOR_DEFINITION)) {
-			
-			line = line.replace("\\s", ""); // remove spaces
-			color = line.split(":")[0];
-			
-			for (String id : line.split(":")[1].split(",")) // assign color, id
-				colors.put(id.charAt(0), color);
+		while ((line = br.readLine()) != null) {
+			if (!line.equals("")) {
+				if (!line.matches(REGEX_COLOR_DEFINITION)) {
+					height++;
+					width = (line.length() > width) ? line.length() : width;
+					mapSb.append(line + "\n");
+				} else {
+					colorsSb.append(line + "\n");
+				}
+			}
+			else {
+				break;
+			}
 		}
 		
-		// read lines specifying layout
-		int y = 0; // line counter
-		while (!line.equals("")) {
-			for (int x = 0; x < line.length(); x++) {
+		LevelMap map = LevelMap.getInstance();
+		map.init(width, height);
 				
-				String sCell = line.substring(x, x + 1);
+		Map<Character, String> colors = readColorDefinition(colorsSb.toString());
+		
+		Scanner scan = new Scanner(mapSb.toString());
+		int y = 0;
+		while (scan.hasNextLine()) {
+			String l = scan.nextLine();
+			for (int x = 0; x < l.length(); x++) {
+				String sCell = l.substring(x, x + 1);
 				Cell cell = new Cell(x, y);
-				if (isWall(sCell) || isUnknown(sCell)) {
-					// do nothing
-				} else if (isAgent(sCell)) {
+				if (isAgent(sCell)) {
 					String agentColor = colors.get(sCell.charAt(0));
-					if (agentColor == null)
-						agentColor = DEFAULT_COLOR;
+					agentColor = (agentColor == null) ? DEFAULT_COLOR : agentColor;
 					cell.attachCellContent(new Agent(cell, sCell.charAt(0), agentColor));
 					map.addCell(cell, x, y);
 				} else if (isBox(sCell)) {
 					String boxColor = colors.get(sCell.charAt(0));
-					if (boxColor == null)
-						boxColor = DEFAULT_COLOR;
+					boxColor = (boxColor == null) ? DEFAULT_COLOR : boxColor;
 					cell.attachCellContent(new Box(cell, sCell.charAt(0), boxColor));
 					map.addCell(cell, x, y);
 				} else if (isGoalCell(sCell)) {
 					map.addGoalCell(cell, x, y, Character.toUpperCase(sCell.charAt(0)));
 				}
-				
 			}
-			line = br.readLine();
-			y++;
+		}
+		scan.close();
+		
+		for (Agent agent : map.getAgents()) {
+			System.err.println(agent.toString());
 		}
 		
 		return map;
+	}
+	
+	/**
+	 * Read color definition.
+	 *
+	 * @param string the string
+	 * @return the map of <id, color>
+	 */
+	private static Map<Character, String> readColorDefinition(String string) {
+		Map<Character, String> colors = new HashMap<Character, String>();
+		Scanner scan = new Scanner(string);
+		while (scan.hasNextLine()) {
+			String line = scan.nextLine();
+			if (line.matches(REGEX_COLOR_DEFINITION)) {
+				line = line.replace("\\s", "");
+				for (String id : line.split(":")[1].split(","))
+					colors.put(id.charAt(0), line.split(":")[0]);
+			}
+		}
+		scan.close();
+		return colors;
 	}
 	
 	
