@@ -73,13 +73,12 @@ public class MapLoader {
 		
 		LevelMap map = LevelMap.getInstance();
 		map.init(width, height);
-				
 		Map<Character, String> colors = readColorDefinition(colorsSb.toString());
 		Scanner scan = new Scanner(mapSb.toString());
-		int y = 0;
+		int x = 0;
 		while (scan.hasNextLine()) {
 			String l = scan.nextLine();
-			for (int x = 0; x < l.length(); x++) {
+			for (int y = 0; y < l.length(); y++) {
 				String sCell = l.substring(x, x + 1);
 				Cell cell = new Cell(x, y);
 				if (isAgent(sCell)) {
@@ -96,13 +95,9 @@ public class MapLoader {
 					map.addGoalCell(cell, x, y, Character.toUpperCase(sCell.charAt(0)));
 				}
 			}
-			y++;
+			x++;
 		}
 		scan.close();
-		
-		for (Agent agent : map.getAgents()) {
-			System.err.println(agent.toString());
-		}
 		
 		return map;
 	}
