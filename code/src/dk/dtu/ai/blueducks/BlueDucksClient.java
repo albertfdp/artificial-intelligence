@@ -8,9 +8,11 @@
 package dk.dtu.ai.blueducks;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.actions.Action;
@@ -37,11 +39,11 @@ public class BlueDucksClient {
 
 	/**
 	 * Update the beliefs.
-	 *
+	 * 
 	 * @return the list
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public List<Boolean> updateBeliefs() throws IOException {
+	public static List<Boolean> updateBeliefs() throws IOException {
 		// Read the percepts from the server
 		String percepts = in.readLine();
 		log.fine("Received percept from server: " + percepts);
@@ -53,7 +55,7 @@ public class BlueDucksClient {
 
 	/**
 	 * Send joint action.
-	 *
+	 * 
 	 * @param actions the actions
 	 */
 	public static void sendJointAction(List<Action> actions) {
@@ -77,16 +79,24 @@ public class BlueDucksClient {
 
 	public static void main(String[] args) {
 
-		Logger.getAnonymousLogger().info("BlueDucksClient started. Initializing...");
-		BlueDucksClient client = null;
+		// Init the logger
 		try {
-			// Read the map and init the client
+			LogManager.getLogManager().readConfiguration(new FileInputStream("logging.properties"));
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		Logger.getAnonymousLogger().info("BlueDucksClient started. Initializing...");
+
+		// Init the system
+		try {
+			// Read the map
 			BlueDucksClient.readMap();
-			MotherOdin.init(client);
 		} catch (IOException e) {
 			Logger.getAnonymousLogger().severe("Error initializing map:" + e);
 			return;
 		}
+
+		// Run the main loop of the supervisor Mother Odin
 		MotherOdin.getInstance().run();
 	}
 

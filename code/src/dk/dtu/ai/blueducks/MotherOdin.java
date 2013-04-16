@@ -20,21 +20,8 @@ import dk.dtu.ai.blueducks.map.LevelMap;
  */
 public class MotherOdin {
 
-	/** The client. */
-	private BlueDucksClient client;
-
-	/**
-	 * Instantiates a new Mother Odin.
-	 * 
-	 * @param client the client
-	 */
-	public MotherOdin(BlueDucksClient client) {
-		super();
-		this.client = client;
-	}
-
 	/** The instance. */
-	private static MotherOdin mInstance;
+	private static MotherOdin mInstance = new MotherOdin();
 
 	/**
 	 * Gets the single instance of MotherOdin.
@@ -43,12 +30,6 @@ public class MotherOdin {
 	 */
 	public static MotherOdin getInstance() {
 		return mInstance;
-	}
-
-	public static void init(BlueDucksClient client) {
-		if (mInstance == null) {
-			mInstance = new MotherOdin(client);
-		}
 	}
 
 	public void run() {

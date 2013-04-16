@@ -14,7 +14,6 @@ import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.CellContent;
 import dk.dtu.ai.blueducks.map.Direction;
-import dk.dtu.ai.blueducks.map.LevelMap;
 
 public class Agent extends CellContent {
 
@@ -51,7 +50,8 @@ public class Agent extends CellContent {
 	}
 
 	public ArrayList<Cell> computeDesires() {
-		return LevelMap.getInstance().getGoals();
+		//return LevelMap.getInstance().getGoals();
+		return null;
 	}
 
 	public HashMap<Cell, Integer> computeScore() {

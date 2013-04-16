@@ -26,7 +26,7 @@ public class LevelMap {
 	private Cell[][] matrix;
 	private List<Agent> agents;
 	private Map<Character, List<Box>> boxes;
-	private static Logger logger = Logger.getAnonymousLogger();
+	private static Logger logger = Logger.getLogger("LevelMap");
 	private Map<Character, Cell> goals;
 	
 	
@@ -70,7 +70,7 @@ public class LevelMap {
 	 */
 	public void addCell(Cell cell, int x, int y) {
 		if(matrix == null || x >= matrix.length || matrix[0] == null || y >= matrix[0].length){
-			logger.severe("Class Map: could not add cell on position " + x + " " + y + " as they execeed the declared size of the matrix");
+			logger.warning("Class Map: could not add cell on position " + x + " " + y + " as they execeed the declared size of the matrix");
 			return;
 		}
 		matrix[x][y] = cell;
