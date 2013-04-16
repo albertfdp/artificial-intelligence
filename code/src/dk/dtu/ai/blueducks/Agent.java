@@ -17,7 +17,7 @@ import dk.dtu.ai.blueducks.map.LevelMap;
 
 public class Agent extends CellContent {
 
-	private int id;
+	private char id;
 	private String color;
 
 	/**
@@ -56,11 +56,11 @@ public class Agent extends CellContent {
 
 	
 
-	public int getId() {
+	public char getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(char id) {
 		this.id = id;
 	}
 
