@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
 
-
 /**
  * The Map of a Level.
  */
@@ -26,10 +25,9 @@ public class LevelMap {
 	private Cell[][] matrix;
 	private List<Agent> agents;
 	private Map<Character, List<Box>> boxes;
-	private static Logger logger = Logger.getLogger("LevelMap");
+	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
 	private Map<Character, Cell> goals;
-	
-	
+
 	private LevelMap() {
 		agents = new ArrayList<Agent>(10);
 		boxes = new HashMap<Character, List<Box>>();
@@ -43,7 +41,7 @@ public class LevelMap {
 	 * @return single instance of Map
 	 */
 	public static LevelMap getInstance() {
-		if(LevelMap.map == null) {
+		if (LevelMap.map == null) {
 			LevelMap.map = new LevelMap();
 		}
 		return LevelMap.map;
@@ -57,7 +55,7 @@ public class LevelMap {
 	public void init(int width, int height) {
 		this.matrix = new Cell[height][];
 		int i;
-		for(i = 0; i < height; i++){
+		for (i = 0; i < height; i++) {
 			this.matrix[i] = new Cell[width];
 		}
 		Cell.map = this;
@@ -69,28 +67,29 @@ public class LevelMap {
 	 * @param cell the cell
 	 */
 	public void addCell(Cell cell, int x, int y) {
-		if(matrix == null || x >= matrix.length || matrix[0] == null || y >= matrix[0].length){
-			logger.warning("Class Map: could not add cell on position " + x + " " + y + " as they execeed the declared size of the matrix");
+		if (matrix == null || x >= matrix.length || matrix[0] == null || y >= matrix[0].length) {
+			logger.warning("Could not add cell on position " + x + " " + y
+					+ " as they exceed the declared size of the matrix");
 			return;
 		}
 		matrix[x][y] = cell;
-		if(cell.getContent() != null){
-			if(cell.getContent() instanceof Box){
+		if (cell.getContent() != null) {
+			if (cell.getContent() instanceof Box) {
 				Box box = (Box) cell.getContent();
-				if(boxes.containsKey(box.getId())){
+				if (boxes.containsKey(box.getId())) {
 					List<Box> list = new ArrayList<Box>();
 					boxes.put(box.getId(), list);
 				}
 				boxes.get(box.getId()).add(box);
 			}
-			if(cell.getContent() instanceof Agent){
+			if (cell.getContent() instanceof Agent) {
 				Agent agent = (Agent) cell.getContent();
 				agents.add(agent.getId(), agent);
 			}
 		}
-		
+
 	}
-	
+
 	public void addGoalCell(Cell cell, int x, int y, char id) {
 		this.addCell(cell, x, y);
 		goals.put(id, cell);
@@ -102,7 +101,7 @@ public class LevelMap {
 	 * @return the cell at
 	 */
 	public Cell getCellAt(int x, int y) {
-		if(matrix != null && x < matrix.length && matrix[0] != null && y < matrix[0].length){
+		if (matrix != null && x < matrix.length && matrix[0] != null && y < matrix[0].length) {
 			return matrix[x][y];
 		}
 		return null;
@@ -110,14 +109,14 @@ public class LevelMap {
 
 	/**
 	 * Gets the goals.
-	 *
+	 * 
 	 * @return the goals
 	 */
 	public Map<Character, Cell> getGoals() {
 		// TODO Auto-generated method stub
 		return goals;
 	}
-	
+
 	public Cell[][] getMatrix() {
 		return matrix;
 	}
@@ -130,5 +129,4 @@ public class LevelMap {
 		return boxes;
 	}
 
-	
 }

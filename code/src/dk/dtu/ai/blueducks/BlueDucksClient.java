@@ -11,7 +11,9 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -26,7 +28,7 @@ public class BlueDucksClient {
 	private static final BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
 	/** The Constant log. */
-	private static final Logger log = Logger.getLogger("Client");
+	private static final Logger log = Logger.getLogger(BlueDucksClient.class.getSimpleName());
 
 	/**
 	 * Reads the map.
@@ -35,22 +37,41 @@ public class BlueDucksClient {
 	 */
 	private static void readMap() throws IOException {
 		MapLoader.loadMap(in);
+
+		// Read empty new line
+		in.readLine();
 	}
 
 	/**
-	 * Update the beliefs.
+	 * Read percepts from the environment.
 	 * 
-	 * @return the list
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @return an array of boolean values stating which of the actions succeeded.
 	 */
-	public static List<Boolean> updateBeliefs() throws IOException {
+	public static boolean[] readPercepts() {
 		// Read the percepts from the server
-		String percepts = in.readLine();
-		log.fine("Received percept from server: " + percepts);
-		if (percepts == null)
-			return null;
+		String percepts = null;
+		try {
+			percepts = in.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		return null;
+		if (log.isLoggable(Level.FINEST))
+			log.finest("Received percept from server: " + percepts);
+		if (percepts == null) {
+			log.warning("No percepts read from the server.");
+			return null;
+		}
+
+		// Parse the percepts;
+		String[] splitPercepts = percepts.split("[,\\]\\[]");
+		boolean[] resp = new boolean[splitPercepts.length - 1];
+		for (int i = 1; i < splitPercepts.length; i++)
+			resp[i - 1] = Boolean.valueOf(splitPercepts[i]);
+		if (log.isLoggable(Level.FINER))
+			log.finer("Environment action success response: " + Arrays.toString(resp));
+
+		return resp;
 	}
 
 	/**
@@ -91,8 +112,9 @@ public class BlueDucksClient {
 		try {
 			// Read the map
 			BlueDucksClient.readMap();
+			log.info("Map read and intialized.");
 		} catch (IOException e) {
-			Logger.getAnonymousLogger().severe("Error initializing map:" + e);
+			log.severe("Error initializing map:" + e);
 			return;
 		}
 
