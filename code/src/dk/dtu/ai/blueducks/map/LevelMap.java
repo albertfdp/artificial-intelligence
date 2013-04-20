@@ -76,7 +76,7 @@ public class LevelMap {
 		if (cell.getContent() != null) {
 			if (cell.getContent() instanceof Box) {
 				Box box = (Box) cell.getContent();
-				if (boxes.containsKey(box.getId())) {
+				if (!boxes.containsKey(box.getId())) {
 					List<Box> list = new ArrayList<Box>();
 					boxes.put(box.getId(), list);
 				}
@@ -84,10 +84,9 @@ public class LevelMap {
 			}
 			if (cell.getContent() instanceof Agent) {
 				Agent agent = (Agent) cell.getContent();
-				agents.add(agent.getId(), agent);
+				agents.add(Character.getNumericValue(agent.getId()), agent);
 			}
 		}
-
 	}
 
 	public void addGoalCell(Cell cell, int x, int y, char id) {
