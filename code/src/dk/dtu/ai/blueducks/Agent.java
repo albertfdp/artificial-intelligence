@@ -91,7 +91,30 @@ public class Agent extends CellContent {
 		return 0;
 	}
 	
-	
+	public Action getNextAction() {
+		if (currentGoal == null) triggerReplanning();
+		if (isSubgoalFinished()) {
+			currentSubgoal++;
+			if (currentSubgoal == subgoals.size()) triggerReplanning();
+			if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
+				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal);
+				path = pathPlanner.getBestPath(gtbGoal.getFrom(), gtbGoal.getTo().getCell());
+				currentPositionInPath = 0;
+			}
+			else if (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) {
+				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoal);
+				path = pathPlanner.getBestPath(mbGoal.getWhat().getCell(), mbGoal.getTo());
+				currentPositionInPath = 0;
+			}
+		}
+		
+		Cell currentCell = path.get(currentPositionInPath);
+		currentPositionInPath++;
+		Cell nextCell = path.get(currentPositionInPath);
+		return subgoals.get(currentSubgoal).getAction(currentCell, nextCell, this);
+		
+	}
+	/*
 	public Action getNextAction() {
 		if (currentGoal == null) triggerReplanning();
 		if (isSubgoalFinished()) {
@@ -133,7 +156,7 @@ public class Agent extends CellContent {
 		}
 		
 		return null;
-	}
+	}*/
 	
 	public void triggerReplanning() {
 		currentGoal = goalPlanner.getNextGoal();
