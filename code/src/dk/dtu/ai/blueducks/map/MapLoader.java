@@ -10,8 +10,10 @@ package dk.dtu.ai.blueducks.map;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
@@ -20,18 +22,12 @@ import dk.dtu.ai.blueducks.Box;
  * The Map Loader.
  */
 public class MapLoader {
-	
-	/** The Constant REGEX_WALL. */
-	private final static String REGEX_WALL = "^\\+$";
-	
-	/** The Constant REGEX_UNKNOWN. */
-	private final static String REGEX_UNKNOWN = "^\\*$";
-	
+		
 	/** The Constant REGEX_AGENT. */
-	private final static String REGEX_AGENT = "^\\d$";
+	private final static String REGEX_AGENT = "\\d";
 	
 	/** The Constant REGEX_BOX. */
-	private final static String REGEX_BOX = "^[A-Z]$";
+	private final static String REGEX_BOX = "[A-Z]";
 	
 	/** The Constant REGEX_GOAL_CELL. */
 	private final static String REGEX_GOAL_CELL = "^[a-z]$";
@@ -39,6 +35,8 @@ public class MapLoader {
 	private final static String REGEX_COLOR_DEFINITION = "^[a-z]+:\\s*[0-9A-Z](,\\s*[0-9A-Z])*\\s*$";
 	
 	private final static String DEFAULT_COLOR = "blue";
+	
+	private static final Logger log = Logger.getLogger(MapLoader.class.getSimpleName());
 	
 	/**
 	 * Loads the map.
@@ -73,31 +71,46 @@ public class MapLoader {
 		
 		LevelMap map = LevelMap.getInstance();
 		map.init(width, height);
+		
 		Map<Character, String> colors = readColorDefinition(colorsSb.toString());
 		Scanner scan = new Scanner(mapSb.toString());
 		int x = 0;
 		while (scan.hasNextLine()) {
 			String l = scan.nextLine();
+			
 			for (int y = 0; y < l.length(); y++) {
-				String sCell = l.substring(x, x + 1);
+				char c = l.charAt(y);
+				String color = (colors.get(c) == null) ? DEFAULT_COLOR : colors.get(c);
 				Cell cell = new Cell(x, y);
-				if (isAgent(sCell)) {
-					String agentColor = colors.get(sCell.charAt(0));
-					agentColor = (agentColor == null) ? DEFAULT_COLOR : agentColor;
-					cell.attachCellContent(new Agent(cell, sCell.charAt(0), agentColor));
+				if (isAgent(c)) {
+					cell.attachCellContent(new Agent(cell, c, color));
 					map.addCell(cell, x, y);
-				} else if (isBox(sCell)) {
-					String boxColor = colors.get(sCell.charAt(0));
-					boxColor = (boxColor == null) ? DEFAULT_COLOR : boxColor;
-					cell.attachCellContent(new Box(cell, sCell.charAt(0), boxColor));
+				} else if (isBox(c)) {
+					cell.attachCellContent(new Box(cell, c, color));
 					map.addCell(cell, x, y);
-				} else if (isGoalCell(sCell)) {
-					map.addGoalCell(cell, x, y, Character.toUpperCase(sCell.charAt(0)));
+				} else if (isGoalCell(c)) {
+					map.addGoalCell(cell, x, y, Character.toUpperCase(c));
 				}
 			}
+			
 			x++;
 		}
 		scan.close();
+		
+		
+		for (Agent a : map.getAgents()) {
+			log.info("agent-" + a.getId() + " [" + a.getColor() + "] at [" + a.getCell().x + "," + a.getCell().y + "]");
+		}
+		
+		for (Map.Entry<Character, List<Box>> entry : map.getBoxes().entrySet()) {
+			for (Box b : entry.getValue()) {
+				log.info("box-" + b.getId() + " [" + b.getColor() + "] at [" + b.getCell().x + "," + b.getCell().y + "]");
+			}
+		}
+		
+		for (Map.Entry<Character, Cell> entry : map.getGoals().entrySet()) {
+			log.info("goal-" + entry.getKey() + " at [" + entry.getValue().x + "," + entry.getValue().y + "]");
+		}
 		
 		return map;
 	}
@@ -114,63 +127,25 @@ public class MapLoader {
 		while (scan.hasNextLine()) {
 			String line = scan.nextLine();
 			if (line.matches(REGEX_COLOR_DEFINITION)) {
-				line = line.replace("\\s", "");
-				for (String id : line.split(":")[1].split(","))
+				line = line.replaceAll("\\s", "");
+				for (String id : line.split(":")[1].split(",")) {
 					colors.put(id.charAt(0), line.split(":")[0]);
+				}
 			}
 		}
 		scan.close();
 		return colors;
 	}
 	
-	
-	/**
-	 * Checks if is wall.
-	 *
-	 * @param s the s
-	 * @return true, if is wall
-	 */
-	private static boolean isWall(String s) {
-		return s.matches(REGEX_WALL);
+	private static boolean isGoalCell(char c) {
+		return Character.toString(c).matches(REGEX_GOAL_CELL);
 	}
 	
-	/**
-	 * Checks if is unknown.
-	 *
-	 * @param s the s
-	 * @return true, if is unknown
-	 */
-	private static boolean isUnknown(String s) {
-		return s.matches(REGEX_UNKNOWN);
+	private static boolean isAgent(char c) {
+		return Character.toString(c).matches(REGEX_AGENT);
 	}
 	
-	/**
-	 * Checks if is goal cell.
-	 *
-	 * @param s the s
-	 * @return true, if is goal cell
-	 */
-	private static boolean isGoalCell(String s) {
-		return s.matches(REGEX_GOAL_CELL);
-	}
-	
-	/**
-	 * Checks if is agent.
-	 *
-	 * @param s the s
-	 * @return true, if is agent
-	 */
-	private static boolean isAgent(String s) {
-		return s.matches(REGEX_AGENT);
-	}
-	
-	/**
-	 * Checks if is box.
-	 *
-	 * @param s the s
-	 * @return true, if is box
-	 */
-	private static boolean isBox(String s) {
-		return s.matches(REGEX_BOX);
+	private static boolean isBox(char c) {
+		return Character.toString(c).matches(REGEX_BOX);
 	}
 }
