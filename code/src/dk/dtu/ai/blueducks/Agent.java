@@ -12,9 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import dk.dtu.ai.blueducks.actions.Action;
-import dk.dtu.ai.blueducks.actions.MoveAction;
-import dk.dtu.ai.blueducks.actions.PullAction;
-import dk.dtu.ai.blueducks.actions.PushAction;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
