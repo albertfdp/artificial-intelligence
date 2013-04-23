@@ -37,6 +37,8 @@ public class MapLoader {
 	private final static String DEFAULT_COLOR = "blue";
 	
 	private static final Logger log = Logger.getLogger(MapLoader.class.getSimpleName());
+
+	private static final String REGEX_FREE_CELL = "\\s";
 	
 	/**
 	 * Loads the map.
@@ -90,6 +92,8 @@ public class MapLoader {
 					map.addCell(cell, x, y);
 				} else if (isGoalCell(c)) {
 					map.addGoalCell(cell, x, y, Character.toUpperCase(c));
+				} else if (isFreeCell(c)) {
+					map.addCell(cell, x, y);
 				}
 			}
 			
@@ -135,6 +139,10 @@ public class MapLoader {
 		}
 		scan.close();
 		return colors;
+	}
+		
+	private static boolean isFreeCell(char c) {
+		return Character.toString(c).matches(REGEX_FREE_CELL);
 	}
 	
 	private static boolean isGoalCell(char c) {
