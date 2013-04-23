@@ -4,6 +4,7 @@ import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.map.Cell;
+import dk.dtu.ai.blueducks.map.State;
 
 public class DeliverBoxGoal extends Goal {
 	
@@ -34,6 +35,12 @@ public class DeliverBoxGoal extends Goal {
 	@Override
 	public Action getAction(Cell currentCell, Cell nextCell, Agent agent) {
 		return null;
+	}
+
+	@Override
+	public boolean isSatisfied(State state) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

@@ -5,6 +5,7 @@ import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.actions.MoveAction;
 import dk.dtu.ai.blueducks.map.Cell;
+import dk.dtu.ai.blueducks.map.State;
 
 public class GoToBoxGoal extends Goal {
 	
@@ -35,6 +36,12 @@ public class GoToBoxGoal extends Goal {
 	@Override
 	public Action getAction(Cell currentCell, Cell nextCell, Agent agent) {
 		return new MoveAction(currentCell.getDirection(nextCell), agent);
+	}
+
+	@Override
+	public boolean isSatisfied(State state) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
