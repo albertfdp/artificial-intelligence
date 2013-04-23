@@ -27,7 +27,10 @@ public class LevelMap {
 	private Map<Character, List<Box>> boxes;
 	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
 	private Map<Character, Cell> goals;
-
+	private int width;
+	private int height;
+	
+	
 	private LevelMap() {
 		agents = new ArrayList<Agent>(10);
 		boxes = new HashMap<Character, List<Box>>();
@@ -54,11 +57,14 @@ public class LevelMap {
 	 */
 	public void init(int width, int height) {
 		this.matrix = new Cell[height][];
+		this.width = width;
+		this.height = height;
 		int i;
 		for (i = 0; i < height; i++) {
 			this.matrix[i] = new Cell[width];
 		}
 		Cell.map = this;
+		
 	}
 
 	/**
@@ -100,7 +106,7 @@ public class LevelMap {
 	 * @return the cell at
 	 */
 	public Cell getCellAt(int x, int y) {
-		if (matrix != null && x < matrix.length && matrix[0] != null && y < matrix[0].length) {
+		if (x < this.height && y < this.width) {
 			return matrix[x][y];
 		}
 		return null;
@@ -126,6 +132,21 @@ public class LevelMap {
 
 	public Map<Character, List<Box>> getBoxes() {
 		return boxes;
+	}
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
 	}
 
 }
