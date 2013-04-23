@@ -10,7 +10,6 @@ package dk.dtu.ai.blueducks.map;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * The Class Cell.
  */
@@ -21,16 +20,16 @@ public class Cell {
 
 	/** The Constant map. */
 	protected static LevelMap map;
-	
+
 	public int x;
 	public int y;
 
-	
-	public Cell(int x, int y){
+	public Cell(int x, int y) {
 		super();
 		this.x = x;
 		this.y = y;
 	}
+
 	/**
 	 * Gets the neighbour in the given direction.
 	 * 
@@ -39,43 +38,43 @@ public class Cell {
 	 */
 	public Cell getNeighbour(Direction dir) {
 		int neighborX = this.x, neighborY = this.y;
-		if(dir == Direction.E)
+		if (dir == Direction.E)
 			neighborY--;
-		else if(dir == Direction.W)
+		else if (dir == Direction.W)
 			neighborY++;
-		else if(dir == Direction.N)
+		else if (dir == Direction.N)
 			neighborX--;
-		else if(dir == Direction.S)
+		else if (dir == Direction.S)
 			neighborX++;
 		Cell neighbor = map.getCellAt(neighborX, neighborY);
 		return neighbor;
 	}
-	
+
 	/**
 	 * Gets the direction to the second cell respectively to the current instance.
-	 *
+	 * 
 	 * @param cell the cell
 	 * @return the direction
 	 */
-	public Direction getDirection (Cell cell) {
-		
+	public Direction getDirection(Cell cell) {
+
 		int xdiff = this.x - cell.x;
 		int ydiff = this.y - cell.y;
-		
+
 		if (xdiff > 0) {
 			return Direction.W;
-		} else if (xdiff < 0 ) {
+		} else if (xdiff < 0) {
 			return Direction.E;
-		} else if (ydiff > 0 ) {
+		} else if (ydiff > 0) {
 			return Direction.N;
-		} else { 
+		} else {
 			return Direction.S;
-		}	
+		}
 	}
 
 	/**
 	 * Gets the neighbours.
-	 *
+	 * 
 	 * @return the neighbours
 	 */
 	public List<Cell> getNeighbours() {
@@ -86,16 +85,16 @@ public class Cell {
 		neighbors.add(this.getNeighbour(Direction.W));
 		return neighbors;
 	}
-	
+
 	/**
 	 * Attaches a cell content.
 	 * 
 	 * @param content the content
 	 */
-	
+
 	public void attachCellContent(CellContent content) {
 		this.content = content;
-		if(content != null)
+		if (content != null)
 			content.setCell(this);
 	}
 
@@ -106,5 +105,10 @@ public class Cell {
 	 */
 	public CellContent getContent() {
 		return content;
+	}
+
+	@Override
+	public String toString() {
+		return "Cell[" + x + ", " + y + "]";
 	}
 }

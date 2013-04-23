@@ -50,7 +50,7 @@ public class Agent extends CellContent {
 		super(initialCell);
 		this.id = id;
 		this.color = color;
-		goalPlanner = new GoalPlanner();
+		goalPlanner = new GoalPlanner(LevelMap.getInstance(), new ManhattanHeuristic());
 		goalSplitter = new GoalSplitter();
 		pathPlanner = new PathPlanner(LevelMap.getInstance(), new ManhattanHeuristic());
 	}
