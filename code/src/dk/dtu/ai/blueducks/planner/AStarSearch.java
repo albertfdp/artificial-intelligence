@@ -7,10 +7,8 @@
  */
 package dk.dtu.ai.blueducks.planner;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -19,7 +17,7 @@ import dk.dtu.ai.blueducks.heuristics.Heuristic;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 
-public class PathPlanner {
+public class AStarSearch {
 
 	// distance between a cell and its neighbor
 	static final double DISTANCE_ONE = 1.0;
@@ -40,7 +38,7 @@ public class PathPlanner {
 	 * @param map the map
 	 * @param heuristic the heuristic
 	 */
-	public PathPlanner(LevelMap map, Heuristic<Cell, Cell> heuristic) {
+	public AStarSearch(LevelMap map, Heuristic<Cell, Cell> heuristic) {
 		super();
 		this.map = map;
 		this.heuristic = heuristic;

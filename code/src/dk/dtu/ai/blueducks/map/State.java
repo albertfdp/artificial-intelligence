@@ -1,5 +1,29 @@
 package dk.dtu.ai.blueducks.map;
 
-public class State {
+import java.util.List;
+
+import dk.dtu.ai.blueducks.planner.AStarNode;
+
+public class State implements AStarNode {
+
+	
+	public List<AStarNode> getNeighbours() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AStarNode getPreviousNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object getEdgeFromPrevNode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
 
 }

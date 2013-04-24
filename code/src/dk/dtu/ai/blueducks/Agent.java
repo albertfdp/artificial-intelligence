@@ -22,7 +22,7 @@ import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.planner.GoalPlanner;
 import dk.dtu.ai.blueducks.planner.GoalSplitter;
-import dk.dtu.ai.blueducks.planner.PathPlanner;
+import dk.dtu.ai.blueducks.planner.AStarSearch;
 
 public class Agent extends CellContent {
 
@@ -30,7 +30,7 @@ public class Agent extends CellContent {
 	private String color;
 	private GoalPlanner goalPlanner;
 	private GoalSplitter goalSplitter;
-	private PathPlanner pathPlanner;
+	private AStarSearch pathPlanner;
 	List<Cell> path;
 	List<Goal> subgoals;
 	Goal currentGoal;
@@ -49,7 +49,7 @@ public class Agent extends CellContent {
 		this.color = color;
 		goalPlanner = new GoalPlanner(LevelMap.getInstance(), new ManhattanHeuristic());
 		goalSplitter = new GoalSplitter();
-		pathPlanner = new PathPlanner(LevelMap.getInstance(), new ManhattanHeuristic());
+		pathPlanner = new AStarSearch(LevelMap.getInstance(), new ManhattanHeuristic());
 	}
 
 	/**
