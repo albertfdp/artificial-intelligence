@@ -11,6 +11,7 @@ import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
+import dk.dtu.ai.blueducks.map.State;
 
 public class PullAction extends Action {
 
@@ -55,5 +56,17 @@ public class PullAction extends Action {
 		destCell.attachCellContent(agentCell.getContent());
 		agentCell.attachCellContent(boxCell.getContent());
 		boxCell.attachCellContent(null);
+	}
+
+	@Override
+	public State getNextState(State state) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isApplicable(State state) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

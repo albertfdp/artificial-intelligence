@@ -11,6 +11,7 @@ package dk.dtu.ai.blueducks.actions;
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
+import dk.dtu.ai.blueducks.map.State;
 
 /**
  * The Class MoveAction.
@@ -48,5 +49,16 @@ public class MoveAction extends Action {
 		agentCell.attachCellContent(null);
 		
 		
+	}
+
+	@Override
+	public State getNextState(State state) {
+		
+		return state;		
+	}
+
+	@Override
+	public boolean isApplicable(State state) {
+		return false;
 	}
 }

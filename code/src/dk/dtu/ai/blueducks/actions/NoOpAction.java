@@ -7,6 +7,8 @@
  */
 package dk.dtu.ai.blueducks.actions;
 
+import dk.dtu.ai.blueducks.map.State;
+
 
 /**
  * The Class NoOpAction.
@@ -21,6 +23,16 @@ public class NoOpAction extends Action {
 	@Override
 	public void updateBeliefs() {
 		
+	}
+
+	@Override
+	public State getNextState(State state) {
+		return state;
+	}
+
+	@Override
+	public boolean isApplicable(State state) {
+		return true;
 	}
 
 }
