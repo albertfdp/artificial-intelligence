@@ -9,11 +9,13 @@ import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
-public class State implements AStarNode {
-	private Map<Cell, Box> boxes; //remove
+public class State extends AStarNode {
+
+	private Map<Cell, Box> boxes;
 	Cell agentCell;
 	State previousState;
 	Action previousAction;
+
 	
 	public State (Cell agentCell, Action previousAction,State previousState){
 		boxes = new HashMap<Cell, Box>();
@@ -27,7 +29,7 @@ public class State implements AStarNode {
 	}
 
 	@Override
-	public AStarNode getPreviousNode() {
+	public AStarNode getPreviousNode(){
 		// TODO Auto-generated method stub
 		return null;
 	}

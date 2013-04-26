@@ -18,7 +18,7 @@ import dk.dtu.ai.blueducks.map.State;
  * The AStarNode interface must be implemented by classes that can be used, as nodes, in the A Star
  * Search algorithm.
  */
-public interface AStarNode {
+public abstract class AStarNode {
 
 	/**
 	 * Gets the neighbours of this node.<br/>
@@ -29,14 +29,14 @@ public interface AStarNode {
 	 * 
 	 * @return the neighbours
 	 */
-	public List<AStarNode> getNeighbours();
+	public abstract List<AStarNode> getNeighbours();
 
 	/**
 	 * Gets the previous node in the search graph, if any.
 	 * 
 	 * @return the previous node, or null if this is the first node in the search
 	 */
-	public AStarNode getPreviousNode();
+	public abstract AStarNode getPreviousNode();
 
 	/**
 	 * Gets the action required in order to reach this node from the previous node.<br/>
@@ -46,6 +46,6 @@ public interface AStarNode {
 	 * 
 	 * @return the action from prev node
 	 */
-	public Object getEdgeFromPrevNode();
+	public abstract Object getEdgeFromPrevNode();
 
 }
