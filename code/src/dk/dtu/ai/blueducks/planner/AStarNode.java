@@ -18,7 +18,29 @@ import dk.dtu.ai.blueducks.map.State;
  * The AStarNode interface must be implemented by classes that can be used, as nodes, in the A Star
  * Search algorithm.
  */
-public abstract class AStarNode {
+public abstract class AStarNode implements Comparable<AStarNode> {
+
+	/**
+	 * Cost from start along best known path
+	 */
+	public float g;
+
+	/**
+	 * Estimated total cost from start to goal through this node
+	 */
+	public float f;
+
+	/*
+	 * Returns a negative integer, zero, or a positive integer as this object is less than, equal
+	 * to, or greater than the specified object.
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(AStarNode o) {
+		int value = (int) this.f - (int) o.f;
+		return value;
+	}
 
 	/**
 	 * Gets the neighbours of this node.<br/>

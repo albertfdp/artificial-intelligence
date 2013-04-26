@@ -4,7 +4,7 @@ import java.util.List;
 
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
-public class State implements AStarNode {
+public class State extends AStarNode {
 
 	public Cell getAgentAt(){
 		return null;
