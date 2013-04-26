@@ -30,5 +30,10 @@ public class NoOpAction extends Action {
 		return state;
 	}
 
+	@Override
+	public boolean isApplicable(State state) {
+		return true;
+	}
+
 
 }
