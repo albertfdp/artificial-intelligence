@@ -1,5 +1,6 @@
 package dk.dtu.ai.blueducks.map;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map.Entry;
 
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.actions.MoveAction;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class State extends AStarNode {
@@ -55,8 +57,9 @@ public class State extends AStarNode {
 		return agentCell;
 	}
 	
-	public boolean isFree(Cell cell){
-		//TODO: if(cell == this.agentCell || boxes.keySet().contains(cell) || LevelMap.getInstance().getAgents())
+	public boolean isFree(Cell cell) {
+		if(cell == null || cell == this.agentCell || boxes.keySet().contains(cell))
+			return false;
 		return true;
 	}
 	public Cell getCellForBox(Box box){
@@ -67,4 +70,20 @@ public class State extends AStarNode {
 		}
 		return null;
 	}
+	
+
+	public List<Action> getPossibleActions() {
+		List<Action> actions = new ArrayList<Action>();
+		List<Cell> neighbourCells = agentCell.getNeighbours();
+		for(Cell cell : neighbourCells ){
+			if(isFree(cell)){
+		//		actions.add(new MoveAction(agentCell.getDirection(cell), agent))
+			}
+		}
+		
+		return actions;
+	}
+
+	
+	
 }
