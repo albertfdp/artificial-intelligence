@@ -31,7 +31,8 @@ public class GoToBoxGoal extends Goal {
 
 	@Override
 	public boolean isSatisfied(State state) {
-		// TODO Auto-generated method stub
+		if(state.getAgentCell().getNeighbours().contains(to))
+			return true;
 		return false;
 	}
 
