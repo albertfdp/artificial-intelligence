@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class State extends AStarNode {
@@ -64,5 +65,9 @@ public class State extends AStarNode {
 			}
 		}
 		return null;
+	}
+	@Override
+	public boolean satisfiesGoal(Goal goal) {
+		return goal.isSatisfied(this);
 	}
 }

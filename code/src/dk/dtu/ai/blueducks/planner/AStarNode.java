@@ -10,6 +10,7 @@ package dk.dtu.ai.blueducks.planner;
 import java.util.List;
 
 import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.State;
@@ -69,5 +70,13 @@ public abstract class AStarNode implements Comparable<AStarNode> {
 	 * @return the action from prev node
 	 */
 	public abstract Object getEdgeFromPrevNode();
+	
+	/**
+	 * Checks if the node satisfies the given goal.
+	 *
+	 * @param goal the goal
+	 * @return true, if successful
+	 */
+	public abstract boolean satisfiesGoal(Goal goal);
 
 }
