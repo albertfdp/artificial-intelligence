@@ -59,7 +59,7 @@ public class AStarSearch<NodeType extends AStarNode, GoalType extends Goal> {
 
 		while (!openSet.isEmpty()) {
 			AStarNode current = openSet.peek();
-			if (current.equals(end))
+			if (current.satisfiesGoal(end))
 				return computePath(current);
 			closedSet.add(current);
 			openSet.remove();
