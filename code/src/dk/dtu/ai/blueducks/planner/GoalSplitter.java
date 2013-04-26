@@ -10,6 +10,7 @@ import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
 import dk.dtu.ai.blueducks.map.Cell;
+import dk.dtu.ai.blueducks.map.LevelMap;
 
 public class GoalSplitter {
 
@@ -21,10 +22,9 @@ public class GoalSplitter {
 	 * @return List<Goal> of subgoals
 	 */
 	public List<Goal> getSubgoal(Goal goal, Agent agent) {
-		
 		List<Goal> subgoals = new ArrayList<Goal>();
 		Cell goalCell = ((DeliverBoxGoal)goal).getTo();
-		Cell agentCell = agent.getCell();
+		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
 		Box b = ((DeliverBoxGoal)goal).getWhat();
 		
 		if(!agentCell.getNeighbours().contains(goalCell))

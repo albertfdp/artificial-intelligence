@@ -23,23 +23,17 @@ public abstract class Action {
 
 	/**
 	 * Update the beliefs (LevelMap) according to the action.
+	 * It should only be called by Mother Odin - NOT the agent threads!!! 
 	 */
 	public abstract void updateBeliefs();
 
 	/**
-	 * Gets the next state obtained by applying the action on the given state.
+	 * Gets the next state obtained by applying the action on the given state. 
 	 * 
 	 * @param state the state
 	 * @return the next state
 	 */
 	public abstract State getNextState(State state);
-
-	/**
-	 * Checks if the action is applicable.
-	 * 
-	 * @param state the state
-	 * @return true, if is applicable
-	 */
-	public abstract boolean isApplicable(State state);
-
 }
+
+

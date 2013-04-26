@@ -7,16 +7,14 @@
  */
 package dk.dtu.ai.blueducks;
 
-import dk.dtu.ai.blueducks.map.Cell;
-import dk.dtu.ai.blueducks.map.CellContent;
 
-public class Box extends CellContent {
+public class Box {
 	
 	private char id;
 	private String color;
 	
-	public Box(Cell cell, char id, String color) {
-		super(cell);
+	public Box(char id, String color) 
+	{
 		this.id = id;
 		this.color = color;
 	}
