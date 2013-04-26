@@ -15,7 +15,7 @@ import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
-import dk.dtu.ai.blueducks.heuristics.ManhattanHeuristic;
+import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristic;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.CellContent;
 import dk.dtu.ai.blueducks.map.Direction;
@@ -46,9 +46,9 @@ public class Agent {
 	public Agent(char id, String color) {
 		this.id = id;
 		this.color = color;
-		goalPlanner = new GoalPlanner(LevelMap.getInstance(), new ManhattanHeuristic());
+		goalPlanner = new GoalPlanner(LevelMap.getInstance(), new GoToBoxHeuristic());
 		goalSplitter = new GoalSplitter();
-		pathPlanner = new AStarSearch(LevelMap.getInstance(), new ManhattanHeuristic());
+		pathPlanner = new AStarSearch(LevelMap.getInstance(), new GoToBoxHeuristic());
 	}
 
 	/**

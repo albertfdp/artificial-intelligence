@@ -9,15 +9,14 @@ import java.util.Map.Entry;
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.actions.MoveAction;
+import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class State extends AStarNode {
-
 	private Map<Cell, Box> boxes;
 	Cell agentCell;
 	State previousState;
 	Action previousAction;
-
 	
 	public State (Cell agentCell, Action previousAction,State previousState){
 		boxes = new HashMap<Cell, Box>();
@@ -70,7 +69,6 @@ public class State extends AStarNode {
 		}
 		return null;
 	}
-	
 
 	public List<Action> getPossibleActions() {
 		List<Action> actions = new ArrayList<Action>();
@@ -84,6 +82,9 @@ public class State extends AStarNode {
 		return actions;
 	}
 
-	
-	
+	@Override
+	public boolean satisfiesGoal(Goal goal) {
+		return goal.isSatisfied(this);
+	}
+
 }
