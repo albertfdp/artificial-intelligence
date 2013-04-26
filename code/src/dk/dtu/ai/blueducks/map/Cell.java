@@ -15,8 +15,7 @@ import java.util.List;
  */
 public class Cell {
 
-	/** The content. */
-	private CellContent content;
+
 
 	/** The Constant map. */
 	protected static LevelMap map;
@@ -84,27 +83,6 @@ public class Cell {
 		neighbors.add(this.getNeighbour(Direction.E));
 		neighbors.add(this.getNeighbour(Direction.W));
 		return neighbors;
-	}
-
-	/**
-	 * Attaches a cell content.
-	 * 
-	 * @param content the content
-	 */
-
-	public void attachCellContent(CellContent content) {
-		this.content = content;
-		if (content != null)
-			content.setCell(this);
-	}
-
-	/**
-	 * Gets the content.
-	 * 
-	 * @return the content
-	 */
-	public CellContent getContent() {
-		return content;
 	}
 
 	@Override

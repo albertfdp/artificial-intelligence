@@ -10,7 +10,6 @@ package dk.dtu.ai.blueducks.actions;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
-import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.State;
 
@@ -60,15 +59,15 @@ public class PushAction extends Action {
 	 */
 	@Override
 	public void updateBeliefs() {
-		// TODO Auto-generated method stub
-		Cell agentCell = agent.getCell();
-		Cell boxCell = box.getCell();
-		Cell destCell = boxCell.getNeighbour(boxDirection);
-		
-		destCell.attachCellContent(boxCell.getContent());
-		boxCell.attachCellContent(agentCell.getContent());
-		agentCell.attachCellContent(null);
-		
+//		// TODO Auto-generated method stub
+//		Cell agentCell = agent.getCell();
+//		Cell boxCell = box.getCell();
+//		Cell destCell = boxCell.getNeighbour(boxDirection);
+//		
+//		destCell.attachCellContent(boxCell.getContent());
+//		boxCell.attachCellContent(agentCell.getContent());
+//		agentCell.attachCellContent(null);
+//		
 		
 	}
 
@@ -78,9 +77,4 @@ public class PushAction extends Action {
 		return null;
 	}
 
-	@Override
-	public boolean isApplicable(State state) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }

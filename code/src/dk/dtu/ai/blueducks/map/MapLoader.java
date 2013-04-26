@@ -10,7 +10,6 @@ package dk.dtu.ai.blueducks.map;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -85,11 +84,11 @@ public class MapLoader {
 				String color = (colors.get(c) == null) ? DEFAULT_COLOR : colors.get(c);
 				Cell cell = new Cell(x, y);
 				if (isAgent(c)) {
-					cell.attachCellContent(new Agent(cell, c, color));
 					map.addCell(cell, x, y);
+					map.attachAgent(cell, new Agent(c, color));
 				} else if (isBox(c)) {
-					cell.attachCellContent(new Box(cell, c, color));
 					map.addCell(cell, x, y);
+					map.attachBox(cell, new Box(c, color));
 				} else if (isGoalCell(c)) {
 					map.addGoalCell(cell, x, y, Character.toUpperCase(c));
 				} else if (isFreeCell(c)) {
@@ -101,20 +100,20 @@ public class MapLoader {
 		}
 		scan.close();
 		
-		
-		for (Agent a : map.getAgents()) {
-			log.info("agent-" + a.getId() + " [" + a.getColor() + "] at [" + a.getCell().x + "," + a.getCell().y + "]");
-		}
-		
-		for (Map.Entry<Character, List<Box>> entry : map.getBoxes().entrySet()) {
-			for (Box b : entry.getValue()) {
-				log.info("box-" + b.getId() + " [" + b.getColor() + "] at [" + b.getCell().x + "," + b.getCell().y + "]");
-			}
-		}
-		
-		for (Map.Entry<Character, Cell> entry : map.getGoals().entrySet()) {
-			log.info("goal-" + entry.getKey() + " at [" + entry.getValue().x + "," + entry.getValue().y + "]");
-		}
+		//TODO: change the logging
+//		for (Agent a : map.getAgents()) {
+//			log.info("agent-" + a.getId() + " [" + a.getColor() + "] at [" + a.getCell().x + "," + a.getCell().y + "]");
+//		}
+//		
+//		for (Map.Entry<Character, List<Box>> entry : map.getBoxes().entrySet()) {
+//			for (Box b : entry.getValue()) {
+//				log.info("box-" + b.getId() + " [" + b.getColor() + "] at [" + b.getCell().x + "," + b.getCell().y + "]");
+//			}
+//		}
+//		
+//		for (Map.Entry<Character, Cell> entry : map.getGoals().entrySet()) {
+//			log.info("goal-" + entry.getKey() + " at [" + entry.getValue().x + "," + entry.getValue().y + "]");
+//		}
 		
 		return map;
 	}

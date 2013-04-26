@@ -9,8 +9,9 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 
 	@Override
 	public float getHeuristicValue(State state, GoToBoxGoal goal) {
-		distance = Math.abs(goal.getTo().x - state.getAgentAt().x)
-				+ Math.abs(goal.getTo().y - state.getAgentAt().y);
+		distance = Math.abs(goal.getTo().x - state.getAgentCell().x)
+				+ Math.abs(goal.getTo().y - state.getAgentCell().y);
+
 		return distance;
 	}
 

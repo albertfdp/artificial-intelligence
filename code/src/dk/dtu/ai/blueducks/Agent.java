@@ -24,7 +24,7 @@ import dk.dtu.ai.blueducks.planner.GoalPlanner;
 import dk.dtu.ai.blueducks.planner.GoalSplitter;
 import dk.dtu.ai.blueducks.planner.AStarSearch;
 
-public class Agent extends CellContent {
+public class Agent {
 
 	private char id;
 	private String color;
@@ -43,8 +43,7 @@ public class Agent extends CellContent {
 	 * @param id the id
 	 * @param color the color
 	 */
-	public Agent(Cell initialCell, char id, String color) {
-		super(initialCell);
+	public Agent(char id, String color) {
 		this.id = id;
 		this.color = color;
 		goalPlanner = new GoalPlanner(LevelMap.getInstance(), new GoToBoxHeuristic());
@@ -89,18 +88,19 @@ public class Agent extends CellContent {
 	}
 	
 	public Action getNextAction() {
+		LevelMap map = LevelMap.getInstance();
 		if (currentGoal == null) triggerReplanning();
-		if (isSubgoalFinished()) {
+		if (currentGoal.isSatisfied(map.getCurrentState())) {
 			currentSubgoal++;
 			if (currentSubgoal == subgoals.size()) triggerReplanning();
 			if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
 				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal);
-				path = pathPlanner.getBestPath(gtbGoal.getFrom(), gtbGoal.getTo().getCell());
+				path = pathPlanner.getBestPath(gtbGoal.getFrom(), map.getCurrentState().getCellForBox(gtbGoal.getTo()));
 				currentPositionInPath = 0;
 			}
 			else if (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) {
 				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoal);
-				path = pathPlanner.getBestPath(mbGoal.getWhat().getCell(), mbGoal.getTo());
+				path = pathPlanner.getBestPath(map.getCurrentState().getCellForBox(mbGoal.getWhat()), mbGoal.getTo());
 				currentPositionInPath = 0;
 			}
 		}
@@ -161,19 +161,19 @@ public class Agent extends CellContent {
 		currentSubgoal = 0;
 	}
 	
-	private boolean isSubgoalFinished(){
-		if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
-			GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal);
-			if (gtbGoal.getTo().getCell().getNeighbours().contains(this.getCell())) 
-				return true;
-		}
-		else if (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) {
-			MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoal);
-			if (mbGoal.getWhat().getCell() == mbGoal.getTo()) 
-				return true;
-		}
-		return false;
-	}
+//	private boolean isSubgoalFinished(){
+//		if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
+//			GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal);
+//			if (gtbGoal.getTo().getCell().getNeighbours().contains(this.getCell())) 
+//				return true;
+//		}
+//		else if (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) {
+//			MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoal);
+//			if (mbGoal.getWhat().getCell() == mbGoal.getTo()) 
+//				return true;
+//		}
+//		return false;
+//	}
 
 	public char getId() {
 		return id;

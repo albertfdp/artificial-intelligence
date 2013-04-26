@@ -7,10 +7,9 @@
  */
 package dk.dtu.ai.blueducks.map;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
@@ -23,17 +22,16 @@ public class LevelMap {
 
 	private static LevelMap map;
 	private Cell[][] matrix;
-	private List<Agent> agents;
-	private Map<Character, List<Box>> boxes;
+	private Map<Cell, Agent> agents;
+	
 	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
 	private Map<Character, Cell> goals;
 	private int width;
 	private int height;
-	
+	private State currentState;
 	
 	private LevelMap() {
-		agents = new ArrayList<Agent>(10);
-		boxes = new HashMap<Character, List<Box>>();
+		agents = new HashMap<Cell, Agent>(10);
 		goals = new HashMap<Character, Cell>();
 	}
 
@@ -79,27 +77,28 @@ public class LevelMap {
 			return;
 		}
 		matrix[x][y] = cell;
-		if (cell.getContent() != null) {
-			if (cell.getContent() instanceof Box) {
-				Box box = (Box) cell.getContent();
-				if (!boxes.containsKey(box.getId())) {
-					List<Box> list = new ArrayList<Box>();
-					boxes.put(box.getId(), list);
-				}
-				boxes.get(box.getId()).add(box);
-			}
-			if (cell.getContent() instanceof Agent) {
-				Agent agent = (Agent) cell.getContent();
-				agents.add(Character.getNumericValue(agent.getId()), agent);
-			}
-		}
 	}
 
+	/**
+	 * Adds a cell that is also a goal
+	 * @param cell
+	 * @param x
+	 * @param y
+	 * @param id
+	 */
 	public void addGoalCell(Cell cell, int x, int y, char id) {
 		this.addCell(cell, x, y);
 		goals.put(id, cell);
 	}
 
+	
+	public void attachAgent(Cell cell, Agent agent) {
+		agents.put(cell, agent);
+	}
+	
+	public void attachBox(Cell cell, Box box) {
+		this.currentState.addBox(cell, box);
+	}
 	/**
 	 * Gets the cell at a given position.
 	 * 
@@ -126,27 +125,30 @@ public class LevelMap {
 		return matrix;
 	}
 
-	public List<Agent> getAgents() {
+	public Map<Cell, Agent> getAgents() {
 		return agents;
 	}
 
-	public Map<Character, List<Box>> getBoxes() {
-		return boxes;
-	}
 	public int getWidth() {
 		return width;
 	}
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
 
 	public int getHeight() {
 		return height;
 	}
 
-	public void setHeight(int height) {
-		this.height = height;
+	public Cell getCellForAgent(Agent agent){
+		for(Entry<Cell, Agent> e : agents.entrySet()){
+			if(e.getValue() == agent){
+				return e.getKey();
+			}
+		}
+		return null;
+	}
+
+	public State getCurrentState() {
+		return currentState;
 	}
 
 }

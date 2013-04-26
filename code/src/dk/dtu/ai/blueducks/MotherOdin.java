@@ -48,7 +48,7 @@ public class MotherOdin {
 			log.info("Starting loop " + (++currentLoop) + "...");
 			actions.clear();
 			// Get the actions from each agent
-			for (Agent agent : map.getAgents())
+			for (Agent agent : map.getAgents().values())
 				actions.add(agent.getNextAction());
 			// Send the joint actions to the server
 			BlueDucksClient.sendJointAction(actions);
@@ -69,7 +69,7 @@ public class MotherOdin {
 			// Notify the agents that something has changed
 			if (!jointActionSuccessful) {
 				log.info("Triggering agent replanning!");
-				for (Agent agent : map.getAgents())
+				for (Agent agent : map.getAgents().values())
 					agent.triggerReplanning();
 			}
 		}

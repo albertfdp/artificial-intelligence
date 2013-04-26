@@ -1,7 +1,6 @@
 package dk.dtu.ai.blueducks.planner;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Random;
 
 import dk.dtu.ai.blueducks.Box;
@@ -33,11 +32,9 @@ public class GoalPlanner {
 	private void generateGoals(){
 		
 		this.goalList = new ArrayList<Goal>();
-		for(Character c: map.getBoxes().keySet()){
-			if(map.getGoals().containsKey(c)){
-				for(Box b: map.getBoxes().get(c)){
+		for(Box b: map.getCurrentState().getBoxes().values()){
+			if(map.getGoals().containsKey(b.getId())){
 					goalList.add(new DeliverBoxGoal(b,map.getGoals().get(b)));
-				}
 			}
 		}
 		
