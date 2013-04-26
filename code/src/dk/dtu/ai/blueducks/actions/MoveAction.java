@@ -9,6 +9,7 @@ package dk.dtu.ai.blueducks.actions;
 
 
 import dk.dtu.ai.blueducks.Agent;
+import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.State;
 
@@ -50,10 +51,25 @@ public class MoveAction extends Action {
 		
 	}
 
+	/** 
+	 * Returns the next state when this MoveAction is the transition from the given one
+	 * 
+	 * @param state	The previous state
+	 * @return the next state
+	 */
 	@Override
 	public State getNextState(State state) {
+		if (!isApplicable(state))
+			return state;
+		Cell nextCell = state.getAgentCell().getNeighbour(agentDirection);
 		
-		return state;		
+		State nextState = new State(nextCell, this, state);
+		return nextState;	
+	}
+
+	@Override
+	public boolean isApplicable(State state) {
+		return state.isFree(state.getAgentCell().getNeighbour(agentDirection));
 	}
 
 }

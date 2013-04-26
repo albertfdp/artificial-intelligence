@@ -8,8 +8,12 @@
 package dk.dtu.ai.blueducks.actions;
 
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
+import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.State;
 
@@ -70,11 +74,37 @@ public class PushAction extends Action {
 //		
 		
 	}
-
+	
 	@Override
 	public State getNextState(State state) {
-		// TODO Auto-generated method stub
-		return null;
+		if (!isApplicable(state))
+			return state;
+		Cell boxCell = state.getCellForBox(box);
+		Cell destCell = boxCell.getNeighbour(boxDirection);
+					
+		State nextState = new State(boxCell, this, state);
+		Map<Cell, Box> boxes = state.getBoxes();
+		for (Entry<Cell, Box> e : boxes.entrySet()) {
+			if (e.getValue() != box) {
+				nextState.addBox(e.getKey(), e.getValue());
+			} else {
+				nextState.addBox(destCell, box);
+			}
+		}
+		return nextState;
+	}
+
+	@Override
+	public boolean isApplicable(State state) {
+		Cell agentCell = state.getAgentCell();
+		Cell boxCell = state.getCellForBox(box);
+		Cell destCell = boxCell.getNeighbour(boxDirection);
+		
+		return (
+				state.isFree(destCell) // destination is free, and implicit, box and dest are neighbors
+				&& (agentCell.getNeighbour(agentDirection) == boxCell) // agent and box are neighbors
+				&& (agent.getColor().equals(box.getColor()))); 
+		
 	}
 
 }

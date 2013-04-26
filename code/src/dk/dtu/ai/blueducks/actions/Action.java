@@ -34,6 +34,14 @@ public abstract class Action {
 	 * @return the next state
 	 */
 	public abstract State getNextState(State state);
+	
+	/**
+	 * Checks if is applicable.
+	 *
+	 * @param state the state
+	 * @return true, if is applicable
+	 */
+	public abstract boolean isApplicable(State state);
 }
 
 
