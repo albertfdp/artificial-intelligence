@@ -6,6 +6,9 @@ import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class State implements AStarNode {
 
+	public Cell getAgentAt(){
+		return null;
+	}
 	
 	public List<AStarNode> getNeighbours() {
 		// TODO Auto-generated method stub
