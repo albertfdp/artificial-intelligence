@@ -66,8 +66,8 @@ public class PushAction extends Action {
 	public void updateBeliefs() {
 		
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
-		Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(box);
-		Cell destCell = agentCell.getNeighbour(boxDirection);
+		Cell boxCell = agentCell.getNeighbour(agentDirection);
+		Cell destCell = boxCell.getNeighbour(boxDirection);
 		
 		Map<Cell, Agent> agents = LevelMap.getInstance().getAgents();
 		agents.put(boxCell, agent);

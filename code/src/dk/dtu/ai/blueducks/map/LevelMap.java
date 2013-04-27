@@ -20,16 +20,33 @@ import dk.dtu.ai.blueducks.Box;
  */
 public class LevelMap {
 
+	/** The map. */
 	private static LevelMap map;
+	
+	/** The matrix. */
 	private Cell[][] matrix;
+	
+	/** The agents. */
 	private Map<Cell, Agent> agents;
 	
+	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
+	
+	/** The goals. */
 	private Map<Character, Cell> goals;
+	
+	/** The width. */
 	private int width;
+	
+	/** The height. */
 	private int height;
+	
+	/** The current state. */
 	private State currentState;
 	
+	/**
+	 * Instantiates a new level map.
+	 */
 	private LevelMap() {
 		agents = new HashMap<Cell, Agent>(10);
 		goals = new HashMap<Character, Cell>();
@@ -93,10 +110,22 @@ public class LevelMap {
 	}
 
 	
+	/**
+	 * Attach agent.
+	 *
+	 * @param cell the cell
+	 * @param agent the agent
+	 */
 	public void attachAgent(Cell cell, Agent agent) {
 		agents.put(cell, agent);
 	}
 	
+	/**
+	 * Attach box.
+	 *
+	 * @param cell the cell
+	 * @param box the box
+	 */
 	public void attachBox(Cell cell, Box box) {
 		this.currentState.addBox(cell, box);
 	}
@@ -118,27 +147,44 @@ public class LevelMap {
 	 * @return the goals
 	 */
 	public Map<Character, Cell> getGoals() {
-		// TODO Auto-generated method stub
 		return goals;
 	}
 
-	public Cell[][] getMatrix() {
-		return matrix;
-	}
 
+	/**
+	 * Gets the agents.
+	 *
+	 * @return the agents
+	 */
 	public Map<Cell, Agent> getAgents() {
 		return agents;
 	}
 
+	/**
+	 * Gets the width.
+	 *
+	 * @return the width
+	 */
 	public int getWidth() {
 		return width;
 	}
 
 
+	/**
+	 * Gets the height.
+	 *
+	 * @return the height
+	 */
 	public int getHeight() {
 		return height;
 	}
 
+	/**
+	 * Gets the cell for a given agent.
+	 *
+	 * @param agent
+	 * @return the cell for the agent
+	 */
 	public Cell getCellForAgent(Agent agent){
 		for(Entry<Cell, Agent> e : agents.entrySet()){
 			if(e.getValue() == agent){
@@ -148,6 +194,11 @@ public class LevelMap {
 		return null;
 	}
 
+	/**
+	 * Gets the current state.
+	 *
+	 * @return the current state
+	 */
 	public State getCurrentState() {
 		return currentState;
 	}

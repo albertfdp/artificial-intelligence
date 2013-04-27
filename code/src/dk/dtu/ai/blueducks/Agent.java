@@ -48,6 +48,9 @@ public class Agent {
 		goalSplitter = new GoalSplitter();
 	}
 	
+	/**
+	 * @returns the next action the agent will have to perform
+	 */
 	public Action getNextAction() {
 		LevelMap map = LevelMap.getInstance();
 		State agentState = map.getCurrentState().duplicate();
@@ -77,26 +80,31 @@ public class Agent {
 
 	}
 
+
+	/**
+	 * Trigger replanning.
+	 * This method should be called when something has happened and the
+	 * agent can't follow his plan and needs to recompute its goals.
+	 */
 	public void triggerReplanning() {
 		currentGoal = goalPlanner.getNextGoal();
 		subgoals = goalSplitter.getSubgoal(currentGoal, this);
 		currentSubgoal = 0;
 	}
 
+	/**
+	 * @returns the id (the letter of the agent)
+	 */
 	public char getId() {
 		return id;
 	}
 
-	public void setId(char id) {
-		this.id = id;
-	}
-
+	
+	/**
+	 * @returns the color of the agent
+	 */
 	public String getColor() {
 		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
 	}
 
 }

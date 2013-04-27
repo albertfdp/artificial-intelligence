@@ -1,3 +1,10 @@
+/*
+ * Artificial Intelligence and Multi-Agent Systems
+ * Denmarks Tehnical University
+ * 
+ * Blue Ducks
+ * Spring 2013
+ */
 package dk.dtu.ai.blueducks.map;
 
 import java.util.ArrayList;
@@ -16,12 +23,30 @@ import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class State extends AStarNode {
+	
+	/** The boxes. */
 	private Map<Cell, Box> boxes;
+	
+	/** The agent cell. */
 	Cell agentCell;
+	
+	/** The previous state. */
 	State previousState;
+	
+	/** The previous action. */
 	Action previousAction;
+	
+	/** The agent. */
 	Agent agent;
 	
+	/**
+	 * Instantiates a new state.
+	 *
+	 * @param agentCell the agent cell
+	 * @param previousAction the previous action
+	 * @param previousState the previous state
+	 * @param agent the agent
+	 */
 	public State (Cell agentCell, Action previousAction, State previousState, Agent agent){
 		boxes = new HashMap<Cell, Box>();
 		this.agentCell = agentCell;
@@ -29,6 +54,9 @@ public class State extends AStarNode {
 		this.previousState = previousState;
 		this.agent = agent;
 	}
+	
+	
+	@Override
 	public List<AStarNode> getNeighbours() {
 		List<Action> actions = getPossibleActions();
 		List<AStarNode> nodes = new ArrayList<AStarNode>();
@@ -48,9 +76,21 @@ public class State extends AStarNode {
 		return this.previousAction;
 	}
 	
+	/**
+	 * Gets the boxes.
+	 *
+	 * @return the boxes
+	 */
 	public Map<Cell, Box> getBoxes() {
 		return boxes;
 	}
+	
+	/**
+	 * Adds the box.
+	 *
+	 * @param cell the cell
+	 * @param box the box
+	 */
 	public void addBox(Cell cell, Box box) {
 		boxes.put(cell, box);
 		
@@ -63,11 +103,24 @@ public class State extends AStarNode {
 		return agentCell;
 	}
 	
+	/**
+	 * Checks if a given cell is free.
+	 *
+	 * @param cell the cell
+	 * @return true, if is free
+	 */
 	public boolean isFree(Cell cell) {
 		if(cell == null || cell == this.agentCell || boxes.keySet().contains(cell))
 			return false;
 		return true;
 	}
+	
+	/**
+	 * Gets the cell for box.
+	 *
+	 * @param box the box
+	 * @return the cell for box
+	 */
 	public Cell getCellForBox(Box box){
 		for(Entry<Cell, Box> e : boxes.entrySet()){
 			if(e.getValue() == box){
@@ -77,6 +130,11 @@ public class State extends AStarNode {
 		return null;
 	}
 
+	/**
+	 * Gets the possible actions.
+	 *
+	 * @return the possible actions
+	 */
 	public List<Action> getPossibleActions() {
 		List<Action> actions = new ArrayList<Action>();
 		List<Cell> neighbourCells = agentCell.getNeighbours();
@@ -110,6 +168,11 @@ public class State extends AStarNode {
 	}
 
 	
+	/**
+	 * Duplicate - shallow copy of the object
+	 *
+	 * @return a copy of the state 
+	 */
 	public State duplicate() {
 		State st = new State(agentCell, previousAction, previousState, agent);
 		st.boxes = new HashMap<Cell, Box>(this.boxes);
