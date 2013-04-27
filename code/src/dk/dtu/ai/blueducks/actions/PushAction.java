@@ -81,6 +81,7 @@ public class PushAction extends Action {
 	
 	@Override
 	public State getNextState(State state) {
+		// TODO: remove applicable check
 		if (!isApplicable(state))
 			return state;
 		Cell boxCell = state.getCellForBox(box);
@@ -100,6 +101,7 @@ public class PushAction extends Action {
 
 	@Override
 	public boolean isApplicable(State state) {
+		// TODO: Remove
 		Cell agentCell = state.getAgentCell();
 		Cell boxCell = state.getCellForBox(box);
 		Cell destCell = boxCell.getNeighbour(boxDirection);

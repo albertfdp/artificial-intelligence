@@ -74,6 +74,7 @@ public class Agent {
 		State currentState = path.get(currentPositionInPath);
 		currentPositionInPath++;
 		return (Action) currentState.getEdgeFromPrevNode();
+
 	}
 
 	public void triggerReplanning() {
