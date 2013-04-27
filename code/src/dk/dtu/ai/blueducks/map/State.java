@@ -84,8 +84,7 @@ public class State extends AStarNode {
 			if (isFree(cell)) {
 				actions.add(new MoveAction(agentCell.getDirection(cell), agent));
 			} else {
-				//TODO: CHECK COLOR!!!!!!!!!!!
-				if (boxes.keySet().contains(cell)) {
+				if (boxes.keySet().contains(cell) && boxes.get(cell).getColor() == agent.getColor()) {
 					for (Cell neighbour : cell.getNeighbours()) {
 						if (isFree(neighbour)) {
 							actions.add(new PushAction(agentCell.getDirection(cell), cell
@@ -110,4 +109,10 @@ public class State extends AStarNode {
 		return goal.isSatisfied(this);
 	}
 
+	
+	public State duplicate() {
+		State st = new State(agentCell, previousAction, previousState, agent);
+		st.boxes = new HashMap<Cell, Box>(this.boxes);
+		return st;
+	}
 }

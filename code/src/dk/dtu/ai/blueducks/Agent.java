@@ -7,8 +7,6 @@
  */
 package dk.dtu.ai.blueducks;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import dk.dtu.ai.blueducks.actions.Action;
@@ -18,8 +16,6 @@ import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
 import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristic;
 import dk.dtu.ai.blueducks.heuristics.ManhattanHeuristic;
 import dk.dtu.ai.blueducks.heuristics.MoveBoxHeuristic;
-import dk.dtu.ai.blueducks.map.Cell;
-import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
 import dk.dtu.ai.blueducks.planner.AStarSearch;
@@ -51,46 +47,10 @@ public class Agent {
 		goalPlanner = new GoalPlanner(LevelMap.getInstance(), new ManhattanHeuristic());
 		goalSplitter = new GoalSplitter();
 	}
-
-	/**
-	 * Move.
-	 * 
-	 * @param direction the direction
-	 * @return the string
-	 */
-	public String move(Direction direction) {
-		// return MoveAction(this, direction).toCommandString();
-		return null;
-	}
-
-	/* ??????????????????? */
-	public String nextAction() {
-		return move(Direction.N);
-	}
-
-	public ArrayList<Cell> computeDesires() {
-		// return LevelMap.getInstance().getGoals();
-		return null;
-	}
-
-	public HashMap<Cell, Integer> computeScore() {
-		HashMap<Cell, Integer> goalsScore = new HashMap<Cell, Integer>();
-		ArrayList<Cell> goals = computeDesires();
-		for (Cell cell : goals) {
-			goalsScore.put(cell, computeScore(cell));
-		}
-
-		return goalsScore;
-	}
-
-	private Integer computeScore(Cell cell) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
+	
 	public Action getNextAction() {
-		//TODO: duplicate state!!! - so that each levelmap 
 		LevelMap map = LevelMap.getInstance();
+		State agentState = map.getCurrentState().duplicate();
 		if (currentGoal == null)
 			triggerReplanning();
 		if (currentGoal.isSatisfied(map.getCurrentState())) {
@@ -99,78 +59,28 @@ public class Agent {
 				triggerReplanning();
 			if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
 				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal);
-				path = AStarSearch.<State, GoToBoxGoal> getBestPath(LevelMap.getInstance().getCurrentState(),
+				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState,
 						gtbGoal, new GoToBoxHeuristic());
 				currentPositionInPath = 0;
 				path.remove(0);
 			} else if (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) {
 				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoal);
-				path = AStarSearch.<State, MoveBoxGoal> getBestPath(LevelMap.getInstance().getCurrentState(),
+				path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState,
 						mbGoal, new MoveBoxHeuristic());
 				currentPositionInPath = 0;
 				path.remove(0);
 			}
 		}
-		//TODO: check this!
 		State currentState = path.get(currentPositionInPath);
 		currentPositionInPath++;
 		return (Action) currentState.getEdgeFromPrevNode();
-//		Cell nextCell = path.get(currentPositionInPath);
-//		return subgoals.get(currentSubgoal).getAction(currentCell, nextCell, this);
-		//TODO: Get the first state in the path and get its "previous" action. Then remove it from the path
-		
-
 	}
-
-	/*
-	 * public Action getNextAction() { if (currentGoal == null) triggerReplanning(); if
-	 * (isSubgoalFinished()) { currentSubgoal++; if (currentSubgoal == subgoals.size())
-	 * triggerReplanning(); if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) { GoToBoxGoal
-	 * gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal); path =
-	 * pathPlanner.getBestPath(gtbGoal.getFrom(), gtbGoal.getTo().getCell()); currentPositionInPath
-	 * = 0; }
-	 * 
-	 * else if (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) { MoveBoxGoal mbGoal =
-	 * (MoveBoxGoal) subgoals.get(currentSubgoal); path =
-	 * pathPlanner.getBestPath(mbGoal.getWhat().getCell(), mbGoal.getTo()); currentPositionInPath =
-	 * 0; } }
-	 * 
-	 * Cell currentCell = path.get(currentPositionInPath); currentPositionInPath++; Cell nextCell =
-	 * path.get(currentPositionInPath); if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
-	 * return new MoveAction(currentCell.getDirection(nextCell), this); } if
-	 * (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) { // pull //if (nextCell ==
-	 * this.getCell()) { //FIXME FIXME FIXME how do I know where the agent moves // if the
-	 * pathplanner gives me the next position of the box? //return new PullAction(dirAgent, dirBox,
-	 * agent, box)
-	 * 
-	 * //} //else { MoveBoxGoal mbg = (MoveBoxGoal) subgoals.get(currentSubgoal); return new
-	 * PushAction(this.getCell().getDirection(currentCell), currentCell.getDirection(nextCell),
-	 * this, mbg.getWhat());
-	 * 
-	 * // } }
-	 * 
-	 * return null; }
-	 */
 
 	public void triggerReplanning() {
 		currentGoal = goalPlanner.getNextGoal();
 		subgoals = goalSplitter.getSubgoal(currentGoal, this);
 		currentSubgoal = 0;
 	}
-
-	// private boolean isSubgoalFinished(){
-	// if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
-	// GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal);
-	// if (gtbGoal.getTo().getCell().getNeighbours().contains(this.getCell()))
-	// return true;
-	// }
-	// else if (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) {
-	// MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoal);
-	// if (mbGoal.getWhat().getCell() == mbGoal.getTo())
-	// return true;
-	// }
-	// return false;
-	// }
 
 	public char getId() {
 		return id;

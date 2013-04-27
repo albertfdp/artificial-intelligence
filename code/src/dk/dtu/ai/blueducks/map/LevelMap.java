@@ -44,7 +44,7 @@ public class LevelMap {
 	public static LevelMap getInstance() {
 		if (LevelMap.map == null) {
 			LevelMap.map = new LevelMap();
-			//TODO: instantiate currentStaet
+			map.currentState = new State(null, null, null, null);
 		}
 		return LevelMap.map;
 	}
