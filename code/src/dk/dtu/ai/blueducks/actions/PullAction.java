@@ -68,7 +68,7 @@ public class PullAction extends Action {
 		Cell agentCell = state.getAgentCell();
 		Cell destCell = agentCell.getNeighbour(agentDirection);
 		
-		State nextState = new State(destCell, this, state);
+		State nextState = new State(destCell, this, state, agent);
 			
 		Map<Cell, Box> boxes = state.getBoxes();
 		for (Entry<Cell, Box> e : boxes.entrySet()) {

@@ -82,7 +82,7 @@ public class PushAction extends Action {
 		Cell boxCell = state.getCellForBox(box);
 		Cell destCell = boxCell.getNeighbour(boxDirection);
 					
-		State nextState = new State(boxCell, this, state);
+		State nextState = new State(boxCell, this, state, agent);
 		Map<Cell, Box> boxes = state.getBoxes();
 		for (Entry<Cell, Box> e : boxes.entrySet()) {
 			if (e.getValue() != box) {
