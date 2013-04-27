@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.actions.Action;
-import dk.dtu.ai.blueducks.actions.MoveAction;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
