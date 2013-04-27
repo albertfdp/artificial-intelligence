@@ -63,7 +63,7 @@ public class MoveAction extends Action {
 			return state;
 		Cell nextCell = state.getAgentCell().getNeighbour(agentDirection);
 		
-		State nextState = new State(nextCell, this, state);
+		State nextState = new State(nextCell, this, state, agent);
 		return nextState;	
 	}
 

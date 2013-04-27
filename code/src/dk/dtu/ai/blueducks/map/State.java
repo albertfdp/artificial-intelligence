@@ -6,8 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.actions.MoveAction;
+import dk.dtu.ai.blueducks.actions.PullAction;
+import dk.dtu.ai.blueducks.actions.PushAction;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
@@ -16,31 +20,35 @@ public class State extends AStarNode {
 	Cell agentCell;
 	State previousState;
 	Action previousAction;
+	Agent agent;
 	
-	public State (Cell agentCell, Action previousAction,State previousState){
+	public State (Cell agentCell, Action previousAction, State previousState, Agent agent){
 		boxes = new HashMap<Cell, Box>();
 		this.agentCell = agentCell;
 		this.previousAction = previousAction;
 		this.previousState = previousState;
+		this.agent = agent;
 	}
 	public List<AStarNode> getNeighbours() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Action> actions = getPossibleActions();
+		List<AStarNode> nodes = new ArrayList<AStarNode>();
+		for (Action action : actions) {
+			nodes.add(action.getNextState(this));
+		}
+		return nodes;
 	}
 
 	@Override
 	public AStarNode getPreviousNode(){
-		// TODO Auto-generated method stub
-		return null;
+		return this.previousState;
 	}
 
 	@Override
 	public Object getEdgeFromPrevNode() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.previousAction;
 	}
+	
 	public Map<Cell, Box> getBoxes() {
-		// TODO Auto-generated method stub
 		return boxes;
 	}
 	public void addBox(Cell cell, Box box) {
@@ -72,9 +80,24 @@ public class State extends AStarNode {
 	public List<Action> getPossibleActions() {
 		List<Action> actions = new ArrayList<Action>();
 		List<Cell> neighbourCells = agentCell.getNeighbours();
-		for(Cell cell : neighbourCells ){
-			if(isFree(cell)){
-		//		actions.add(new MoveAction(agentCell.getDirection(cell), agent))
+		for (Cell cell : neighbourCells) {
+			if (isFree(cell)) {
+				actions.add(new MoveAction(agentCell.getDirection(cell), agent));
+			} else {
+				if (boxes.keySet().contains(cell)) {
+					for (Cell neighbour : cell.getNeighbours()) {
+						if (isFree(neighbour)) {
+							actions.add(new PushAction(agentCell.getDirection(cell), cell
+									.getDirection(neighbour), agent, boxes.get(cell)));
+						}
+					}
+					for (Cell myNeighbour : neighbourCells) {
+						if (isFree(myNeighbour)) {
+							actions.add(new PullAction(agentCell.getDirection(myNeighbour), agentCell
+									.getDirection(cell), agent, boxes.get(cell)));
+						}
+					}
+				}
 			}
 		}
 		
