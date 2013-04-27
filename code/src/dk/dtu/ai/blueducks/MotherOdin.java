@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.map.LevelMap;
 
 /**
@@ -73,5 +74,9 @@ public class MotherOdin {
 					agent.triggerReplanning();
 			}
 		}
+	}
+	
+	public List<Goal> getTopLevelGoals(){
+		return null;
 	}
 }
