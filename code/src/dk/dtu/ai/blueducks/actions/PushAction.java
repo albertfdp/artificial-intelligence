@@ -15,6 +15,7 @@ import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
+import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
 
 /**
@@ -63,16 +64,19 @@ public class PushAction extends Action {
 	 */
 	@Override
 	public void updateBeliefs() {
-//		// TODO Auto-generated method stub
-//		Cell agentCell = agent.getCell();
-//		Cell boxCell = box.getCell();
-//		Cell destCell = boxCell.getNeighbour(boxDirection);
-//		
-//		destCell.attachCellContent(boxCell.getContent());
-//		boxCell.attachCellContent(agentCell.getContent());
-//		agentCell.attachCellContent(null);
-//		
 		
+		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
+		Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(box);
+		Cell destCell = agentCell.getNeighbour(boxDirection);
+		
+		Map<Cell, Agent> agents = LevelMap.getInstance().getAgents();
+		agents.put(boxCell, agent);
+		agents.remove(agentCell);
+		
+		Map<Cell, Box> boxes = LevelMap.getInstance().getCurrentState().getBoxes();
+		boxes.put(destCell, box);
+		boxes.remove(boxCell);
+	
 	}
 	
 	@Override

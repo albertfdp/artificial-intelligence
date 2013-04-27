@@ -8,9 +8,12 @@
 package dk.dtu.ai.blueducks.actions;
 
 
+import java.util.Map;
+
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
+import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
 
 /**
@@ -42,13 +45,13 @@ public class MoveAction extends Action {
 
 	@Override
 	public void updateBeliefs() {
-//		Cell agentCell = agent.getCell();
-//		Cell destCell = agentCell.getNeighbour(agentDirection);
-//		
-//		destCell.attachCellContent(agentCell.getContent());
-//		agentCell.attachCellContent(null);
-//		
+		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
+		Cell destCell = agentCell.getNeighbour(agentDirection);
 		
+		Map<Cell, Agent> agents = LevelMap.getInstance().getAgents();
+		agents.put(destCell, agent);
+		agents.remove(agentCell);
+			
 	}
 
 	/** 

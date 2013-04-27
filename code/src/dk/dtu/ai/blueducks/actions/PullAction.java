@@ -14,6 +14,7 @@ import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
+import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
 
 public class PullAction extends Action {
@@ -52,13 +53,19 @@ public class PullAction extends Action {
 
 	@Override
 	public void updateBeliefs() {
-//		Cell agentCell = agent.getCell();
-//		Cell boxCell = box.getCell();
-//		Cell destCell = agentCell.getNeighbour(boxDirection);
-//		
-//		destCell.attachCellContent(agentCell.getContent());
-//		agentCell.attachCellContent(boxCell.getContent());
-//		boxCell.attachCellContent(null);
+		
+		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
+		Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(box);
+		Cell destCell = agentCell.getNeighbour(boxDirection);
+		
+		Map<Cell, Agent> agents = LevelMap.getInstance().getAgents();
+		agents.put(destCell, agent);
+		agents.remove(agentCell);
+		
+		Map<Cell, Box> boxes = LevelMap.getInstance().getCurrentState().getBoxes();
+		boxes.put(agentCell, box);
+		boxes.remove(boxCell);
+
 	}
 
 	@Override
