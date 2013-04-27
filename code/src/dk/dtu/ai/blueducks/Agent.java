@@ -89,6 +89,7 @@ public class Agent {
 	}
 
 	public Action getNextAction() {
+		//TODO: duplicate state!!! - so that each levelmap 
 		LevelMap map = LevelMap.getInstance();
 		if (currentGoal == null)
 			triggerReplanning();
@@ -101,24 +102,22 @@ public class Agent {
 				path = AStarSearch.<State, GoToBoxGoal> getBestPath(LevelMap.getInstance().getCurrentState(),
 						gtbGoal, new GoToBoxHeuristic());
 				currentPositionInPath = 0;
-				//TODO: The first position in the path is the current state, so it should be removed???
-				//path.remove(0);
+				path.remove(0);
 			} else if (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) {
 				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoal);
 				path = AStarSearch.<State, MoveBoxGoal> getBestPath(LevelMap.getInstance().getCurrentState(),
 						mbGoal, new MoveBoxHeuristic());
 				currentPositionInPath = 0;
-				//TODO: The first position in the path is the current state, so it should be removed???
-				//path.remove(0);
+				path.remove(0);
 			}
 		}
-
-//		Cell currentCell = path.get(currentPositionInPath);
-//		currentPositionInPath++;
+		//TODO: check this!
+		State currentState = path.get(currentPositionInPath);
+		currentPositionInPath++;
+		return (Action) currentState.getEdgeFromPrevNode();
 //		Cell nextCell = path.get(currentPositionInPath);
 //		return subgoals.get(currentSubgoal).getAction(currentCell, nextCell, this);
 		//TODO: Get the first state in the path and get its "previous" action. Then remove it from the path
-		return null;
 		
 
 	}

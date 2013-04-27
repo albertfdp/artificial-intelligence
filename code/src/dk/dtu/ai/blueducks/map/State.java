@@ -84,6 +84,7 @@ public class State extends AStarNode {
 			if (isFree(cell)) {
 				actions.add(new MoveAction(agentCell.getDirection(cell), agent));
 			} else {
+				//TODO: CHECK COLOR!!!!!!!!!!!
 				if (boxes.keySet().contains(cell)) {
 					for (Cell neighbour : cell.getNeighbours()) {
 						if (isFree(neighbour)) {
