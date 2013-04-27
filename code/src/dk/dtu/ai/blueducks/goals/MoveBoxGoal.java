@@ -50,7 +50,8 @@ public class MoveBoxGoal extends Goal {
 
 	@Override
 	public boolean isSatisfied(State state) {
-		// TODO Auto-generated method stub
+		if (state.getCellForBox(what) == to)
+			return true;
 		return false;
 	}
 

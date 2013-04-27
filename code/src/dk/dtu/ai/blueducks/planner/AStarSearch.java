@@ -7,45 +7,29 @@
  */
 package dk.dtu.ai.blueducks.planner;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.heuristics.Heuristic;
-import dk.dtu.ai.blueducks.map.LevelMap;
 
-public class AStarSearch<NodeType extends AStarNode, GoalType extends Goal> {
+public class AStarSearch {
 
-	Logger log = Logger.getLogger(AStarSearch.class.getSimpleName());
+	private static final Logger log = Logger.getLogger(AStarSearch.class.getSimpleName());
 
 	// distance between a cell and its neighbor
-	static final float DISTANCE_ONE = 1.0f;
+	private static final float DISTANCE_ONE = 1.0f;
 
-	private LevelMap map;
-	private Heuristic<AStarNode, Goal> heuristic;
-	private Set<AStarNode> closedSet;
-	private PriorityQueue<AStarNode> openSet;
+	@SuppressWarnings("unchecked")
+	public static <NodeType extends AStarNode, GoalType extends Goal> List<NodeType> getBestPath(
+			NodeType begin, GoalType end, Heuristic<NodeType, GoalType> heuristic) {
 
-	/**
-	 * Instantiates a new planner.
-	 * 
-	 * @param map the map
-	 * @param heuristic the heuristic
-	 */
-	public AStarSearch(LevelMap map, Heuristic<AStarNode, Goal> heuristic) {
-		super();
-		this.map = map;
-		this.heuristic = heuristic;
-	}
-
-	public List<AStarNode> getBestPath(NodeType begin, GoalType end) {
+		Set<NodeType> closedSet;
+		PriorityQueue<NodeType> openSet;
 
 		log.finest("Starting Path Planning from " + begin + " to " + end);
 		// empty set for already explored cells
@@ -58,13 +42,14 @@ public class AStarSearch<NodeType extends AStarNode, GoalType extends Goal> {
 		begin.f = heuristic.getHeuristicValue(begin, end);
 
 		while (!openSet.isEmpty()) {
-			AStarNode current = openSet.peek();
+			NodeType current = openSet.peek();
 			if (current.satisfiesGoal(end))
-				return computePath(current);
+				return AStarSearch.<NodeType> computePath(current);
 			closedSet.add(current);
 			openSet.remove();
 
-			for (AStarNode entity : current.getNeighbours()) {
+			for (AStarNode _entity : current.getNeighbours()) {
+				NodeType entity = (NodeType) _entity;
 				float tentativeScore = current.g + DISTANCE_ONE;
 
 				if (closedSet.contains(entity)) {
@@ -91,12 +76,13 @@ public class AStarSearch<NodeType extends AStarNode, GoalType extends Goal> {
 		return null;
 	}
 
-	private List<AStarNode> computePath(AStarNode finalState) {
-		LinkedList<AStarNode> path = new LinkedList<>();
+	@SuppressWarnings("unchecked")
+	private static <NodeType extends AStarNode> List<NodeType> computePath(NodeType finalState) {
+		LinkedList<NodeType> path = new LinkedList<>();
 
 		while (finalState != null) {
 			path.addFirst(finalState);
-			finalState = finalState.getPreviousNode();
+			finalState = (NodeType) finalState.getPreviousNode();
 		}
 
 		return path;

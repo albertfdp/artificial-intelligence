@@ -28,7 +28,7 @@ public class GoalSplitter {
 		Box b = ((DeliverBoxGoal)goal).getWhat();
 		
 		if(!agentCell.getNeighbours().contains(goalCell))
-			subgoals.add((Goal) new GoToBoxGoal(agentCell,b));
+			subgoals.add((Goal) new GoToBoxGoal(agentCell,LevelMap.getInstance().getCurrentState().getCellForBox(b)));
 		
 		subgoals.add((Goal) new MoveBoxGoal(b, goalCell));
 			
