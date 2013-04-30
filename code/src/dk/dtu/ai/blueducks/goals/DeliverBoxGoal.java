@@ -39,7 +39,7 @@ public class DeliverBoxGoal extends Goal {
 
 	@Override
 	public boolean isSatisfied(State state) {
-		
+		// TODO: check also if the cell has already been satisfied by another box
 		if (state.getCellForBox(what) == to)
 			return true;
 		

@@ -87,7 +87,7 @@ public class Agent {
 	 * agent can't follow his plan and needs to recompute its goals.
 	 */
 	public void triggerReplanning() {
-		currentGoal = goalPlanner.getNextGoal(MotherOdin.getInstance().getTopLevelGoals());
+		currentGoal = goalPlanner.getNextGoal(color, MotherOdin.getInstance().getTopLevelGoals());
 		subgoals = goalSplitter.getSubgoal(currentGoal, this);
 		currentSubgoal = 0;
 	}
