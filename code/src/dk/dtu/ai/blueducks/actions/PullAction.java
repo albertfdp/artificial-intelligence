@@ -70,14 +70,13 @@ public class PullAction extends Action {
 
 	@Override
 	public State getNextState(State state) {
-		if (!isApplicable(state))
-			return state;
 		Cell agentCell = state.getAgentCell();
 		Cell destCell = agentCell.getNeighbour(agentDirection);
 		
 		State nextState = new State(destCell, this, state, agent);
-			
 		Map<Cell, Box> boxes = state.getBoxes();
+		
+		// TODO: improve 	
 		for (Entry<Cell, Box> e : boxes.entrySet()) {
 			if (e.getValue() != box) {
 				nextState.addBox(e.getKey(), e.getValue());
@@ -89,16 +88,5 @@ public class PullAction extends Action {
 		return nextState;
 	}
 
-	@Override
-	public boolean isApplicable(State state) {
-		Cell agentCell = state.getAgentCell();
-		Cell boxCell = state.getCellForBox(box);
-		Cell destCell = agentCell.getNeighbour(agentDirection);
-		
-		return (
-				state.isFree(destCell) // destination is free, and implicit, agent and dest are neighbors
-				&& (agentCell.getNeighbour(boxDirection) == boxCell) // agent and box are neighbors
-				&& (agent.getColor().equals(box.getColor()))); 
-	}
-
+	
 }

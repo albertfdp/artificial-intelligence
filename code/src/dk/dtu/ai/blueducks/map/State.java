@@ -77,6 +77,15 @@ public class State extends AStarNode {
 	}
 	
 	/**
+	 * Sets the boxes.
+	 *
+	 * @param boxes the boxes
+	 */
+	public void setBoxes(Map<Cell, Box> boxes) {
+		this.boxes = boxes;
+	}
+	
+	/**
 	 * Gets the boxes.
 	 *
 	 * @return the boxes
