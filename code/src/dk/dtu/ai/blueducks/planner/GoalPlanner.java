@@ -1,15 +1,17 @@
 package dk.dtu.ai.blueducks.planner;
 
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
+import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.heuristics.Heuristic;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
+import dk.dtu.ai.blueducks.map.State;
+
 
 public class GoalPlanner {
 
@@ -19,11 +21,11 @@ public class GoalPlanner {
 
 	
 	
-	public GoalPlanner(LevelMap map, Heuristic<Cell, Cell> heuristic) {
+	public GoalPlanner(Heuristic<Cell, Cell> heuristic) {
 		super();
-		this.map = map;
+		this.map = LevelMap.getInstance();
 		this.heuristic = heuristic;
-		generateGoals();
+
 	}
 	
 		
@@ -31,18 +33,17 @@ public class GoalPlanner {
 	 * Generates a list with all the possible goals
 	 * 
 	 */
-	public List<Goal> generateGoals(){
+	public List<Goal> generateAgentGoals(String color, List<Goal> topLevelGoals){
 		//TODO: 
-		/*
-		goalList = new ArrayList<Goal>();
-		for(Box b: map.getCurrentState().getBoxes().values()){
-			if(map.getGoals().containsKey(b.getId())){
-					goalList.add(new DeliverBoxGoal(b,map.getGoals().get(b)));
-			}
+		List<Goal> agentGoals = new ArrayList<Goal>();
+		
+		for(Goal g: topLevelGoals){
+			DeliverBoxGoal deliverBoxg = (DeliverBoxGoal) g;
+			if(deliverBoxg.getWhat().getColor().equals(color))
+				agentGoals.add(deliverBoxg);
 		}
-		return this.goalList;
-		*/
-		return null;
+		
+		return agentGoals;
 		
 	}
 	/*
@@ -52,13 +53,34 @@ public class GoalPlanner {
 	 * @return Goal
 	 */
 	
-	public Goal getNextGoal() {
-		/*int i = 0;
-		Random rand = new Random();
+	public Goal getNextGoal(List<Goal> goalList) {
 		
-		i = rand.nextInt(goalList.size());
-		return goalList.get(i);*/
-		// TODO:
-		return null;
+		Goal nextGoal = null;
+		
+		for(Goal goal : goalList){
+			if(nextGoal == null)
+				nextGoal = goal;
+			else
+				nextGoal = bestGoal(goal, nextGoal);
+		}
+		return nextGoal;
 	}
+	
+	private Goal bestGoal(Goal g1, Goal g2) {
+		
+		DeliverBoxGoal deliverBoxg1 = (DeliverBoxGoal) g1;
+		DeliverBoxGoal deliverBoxg2 = (DeliverBoxGoal) g2;
+		
+		float heuristicG1 = this.heuristic.getHeuristicValue(map.getCurrentState().getAgentCell(),
+				map.getCurrentState().getCellForBox(deliverBoxg1.getWhat()));
+		
+		float heuristicG2 = this.heuristic.getHeuristicValue(map.getCurrentState().getAgentCell(),
+				map.getCurrentState().getCellForBox(deliverBoxg2.getWhat()));
+		
+		if( heuristicG1 > heuristicG2)
+				return g1;
+		
+		return g2;
+	}
+
 }

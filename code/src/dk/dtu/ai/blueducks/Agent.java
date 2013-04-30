@@ -44,7 +44,7 @@ public class Agent {
 	public Agent(char id, String color) {
 		this.id = id;
 		this.color = color;
-		goalPlanner = new GoalPlanner(LevelMap.getInstance(), new ManhattanHeuristic());
+		goalPlanner = new GoalPlanner(new ManhattanHeuristic());
 		goalSplitter = new GoalSplitter();
 	}
 	
@@ -87,7 +87,7 @@ public class Agent {
 	 * agent can't follow his plan and needs to recompute its goals.
 	 */
 	public void triggerReplanning() {
-		currentGoal = goalPlanner.getNextGoal();
+		currentGoal = goalPlanner.getNextGoal(MotherOdin.getInstance().getTopLevelGoals());
 		subgoals = goalSplitter.getSubgoal(currentGoal, this);
 		currentSubgoal = 0;
 	}
