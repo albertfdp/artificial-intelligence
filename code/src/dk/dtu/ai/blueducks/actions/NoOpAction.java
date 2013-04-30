@@ -29,11 +29,5 @@ public class NoOpAction extends Action {
 	public State getNextState(State state) {
 		return state;
 	}
-
-	@Override
-	public boolean isApplicable(State state) {
-		return true;
-	}
-
-
+	
 }

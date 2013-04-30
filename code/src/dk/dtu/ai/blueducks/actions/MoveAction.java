@@ -8,9 +8,11 @@
 package dk.dtu.ai.blueducks.actions;
 
 
+import java.util.HashMap;
 import java.util.Map;
 
 import dk.dtu.ai.blueducks.Agent;
+import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
@@ -62,17 +64,10 @@ public class MoveAction extends Action {
 	 */
 	@Override
 	public State getNextState(State state) {
-		if (!isApplicable(state))
-			return state;
 		Cell nextCell = state.getAgentCell().getNeighbour(agentDirection);
-		
 		State nextState = new State(nextCell, this, state, agent);
+		nextState.setBoxes(state.getBoxes());
 		return nextState;	
-	}
-
-	@Override
-	public boolean isApplicable(State state) {
-		return state.isFree(state.getAgentCell().getNeighbour(agentDirection));
 	}
 
 }
