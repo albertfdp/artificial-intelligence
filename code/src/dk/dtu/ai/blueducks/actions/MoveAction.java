@@ -70,4 +70,9 @@ public class MoveAction extends Action {
 		return nextState;	
 	}
 
+	@Override
+	public String toString() {
+		return "MoveAction [agentDirection=" + agentDirection + ", agent=" + agent + "]";
+	}
+
 }

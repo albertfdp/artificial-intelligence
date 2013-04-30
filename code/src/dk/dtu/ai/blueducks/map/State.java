@@ -62,7 +62,7 @@ public class State extends AStarNode {
 	public List<AStarNode> getNeighbours() {
 		List<Action> actions = getPossibleActions();
 		
-		log.info("Possible Actions: " + actions );
+		log.info("Possible Actions: " + actions .get(0));
 		List<AStarNode> nodes = new ArrayList<AStarNode>();
 		for (Action action : actions) {
 			nodes.add(action.getNextState(this));
@@ -151,8 +151,10 @@ public class State extends AStarNode {
 	public List<Action> getPossibleActions() {
 		List<Action> actions = new ArrayList<Action>();
 		List<Cell> neighbourCells = agentCell.getNeighbours();
+		log.info("AGENT CELL "+ agentCell);
 		for (Cell cell : neighbourCells) {
 			if (isFree(cell)) {
+				log.info("ACTION "+ agentCell.getDirection(cell));
 				actions.add(new MoveAction(agentCell.getDirection(cell), agent));
 			} else {
 				if (boxes.keySet().contains(cell) && boxes.get(cell).getColor() == agent.getColor()) {

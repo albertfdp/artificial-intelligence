@@ -38,9 +38,9 @@ public class Cell {
 	public Cell getNeighbour(Direction dir) {
 		int neighborX = this.x, neighborY = this.y;
 		if (dir == Direction.E)
-			neighborY--;
-		else if (dir == Direction.W)
 			neighborY++;
+		else if (dir == Direction.W)
+			neighborY--;
 		else if (dir == Direction.N)
 			neighborX--;
 		else if (dir == Direction.S)
