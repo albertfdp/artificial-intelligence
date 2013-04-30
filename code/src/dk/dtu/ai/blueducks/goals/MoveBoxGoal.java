@@ -55,4 +55,9 @@ public class MoveBoxGoal extends Goal {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "MoveBoxGoal [what=" + what + ", to=" + to + "]";
+	}
+
 }

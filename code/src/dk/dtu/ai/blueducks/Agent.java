@@ -34,7 +34,7 @@ public class Agent {
 	Goal currentGoal;
 	int currentSubgoalIndex;
 	int currentPositionInPath;
-	
+
 	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
 
@@ -51,7 +51,7 @@ public class Agent {
 		goalPlanner = new GoalPlanner(this);
 		goalSplitter = new GoalSplitter();
 	}
-	
+
 	/**
 	 * @returns the next action the agent will have to perform
 	 */
@@ -64,14 +64,14 @@ public class Agent {
 			triggerReplanning();
 			if (subgoals.get(currentSubgoalIndex) instanceof GoToBoxGoal) {
 				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoalIndex);
-				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState,
-						gtbGoal, new GoToBoxHeuristic());
+				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState, gtbGoal,
+						new GoToBoxHeuristic());
 				currentPositionInPath = 0;
 				path.remove(0);
 			} else if (subgoals.get(currentSubgoalIndex) instanceof MoveBoxGoal) {
 				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoalIndex);
-				path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState,
-						mbGoal, new MoveBoxHeuristic());
+				path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState, mbGoal,
+						new MoveBoxHeuristic());
 				currentPositionInPath = 0;
 				path.remove(0);
 			}
@@ -83,14 +83,14 @@ public class Agent {
 			}
 			if (subgoals.get(currentSubgoalIndex) instanceof GoToBoxGoal) {
 				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoalIndex);
-				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState,
-						gtbGoal, new GoToBoxHeuristic());
+				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState, gtbGoal,
+						new GoToBoxHeuristic());
 				currentPositionInPath = 0;
 				path.remove(0);
 			} else if (subgoals.get(currentSubgoalIndex) instanceof MoveBoxGoal) {
 				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoalIndex);
-				path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState,
-						mbGoal, new MoveBoxHeuristic());
+				path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState, mbGoal,
+						new MoveBoxHeuristic());
 				currentPositionInPath = 0;
 				path.remove(0);
 			}
@@ -101,16 +101,16 @@ public class Agent {
 
 	}
 
-
 	/**
-	 * Trigger replanning.
-	 * This method should be called when something has happened and the
-	 * agent can't follow his plan and needs to recompute its goals.
+	 * Trigger replanning. This method should be called when something has happened and the agent
+	 * can't follow his plan and needs to recompute its goals.
 	 */
 	public void triggerReplanning() {
 		currentGoal = goalPlanner.getNextGoal(color, MotherOdin.getInstance().getTopLevelGoals());
 		subgoals = goalSplitter.getSubgoal(currentGoal, this);
 		currentSubgoalIndex = 0;
+		// Regenerate top level goals
+		MotherOdin.getInstance().generateTopLevelGoals();
 		logger.info("Triggering replanning");
 	}
 
@@ -121,7 +121,6 @@ public class Agent {
 		return id;
 	}
 
-	
 	/**
 	 * @returns the color of the agent
 	 */

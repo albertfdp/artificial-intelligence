@@ -13,6 +13,11 @@ public class Box {
 	private char id;
 	private String color;
 	
+	@Override
+	public String toString() {
+		return "Box [id=" + id + ", color=" + color + "]";
+	}
+
 	public Box(char id, String color) 
 	{
 		this.id = id;

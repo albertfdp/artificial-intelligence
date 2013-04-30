@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.actions.Action;
@@ -49,11 +50,21 @@ public class MotherOdin {
 		topLevelGoals.clear();
 		List<Box> boxes = map.getBoxesList();
 		for (Map.Entry<Character, List<Cell>> goalCells : map.getGoals().entrySet()) {
-			for (Cell cell : goalCells.getValue())
+			for (Cell goalCell : goalCells.getValue()) {
+				// If there's a box on the goal and it has the same color, do not add this goal
+				// anymore
+				Box boxOnGoal = map.getCurrentState().getBoxes().get(goalCell);
+				if (boxOnGoal != null && boxOnGoal.getId() == goalCells.getKey())
+					continue;
+				// Create goals for each of the boxes that could fulfill this goal
 				for (Box b : boxes)
 					if (b.getId() == goalCells.getKey())
-						topLevelGoals.add(new DeliverBoxGoal(b, cell));
+						topLevelGoals.add(new DeliverBoxGoal(b, goalCell));
+			}
 		}
+
+		if (log.isLoggable(Level.FINE))
+			log.fine("Generated top level goals: " + topLevelGoals);
 	}
 
 	/**
@@ -63,7 +74,7 @@ public class MotherOdin {
 		List<Action> actions = new LinkedList<Action>();
 		int currentLoop = 0;
 		generateTopLevelGoals();
-		
+
 		while (true) {
 			log.info("Starting loop " + (++currentLoop) + "...");
 			actions.clear();

@@ -46,4 +46,9 @@ public class DeliverBoxGoal extends Goal {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "DeliverBoxGoal [what=" + what + ", to=" + to + "]";
+	}
+
 }

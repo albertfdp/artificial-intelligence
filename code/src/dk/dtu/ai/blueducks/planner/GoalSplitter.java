@@ -2,6 +2,7 @@ package dk.dtu.ai.blueducks.planner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
@@ -23,16 +24,17 @@ public class GoalSplitter {
 	 */
 	public List<Goal> getSubgoal(Goal goal, Agent agent) {
 		List<Goal> subgoals = new ArrayList<Goal>();
-		Cell goalCell = ((DeliverBoxGoal)goal).getTo();
+		Cell goalCell = ((DeliverBoxGoal) goal).getTo();
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
-		Box b = ((DeliverBoxGoal)goal).getWhat();
-		
-		if(!agentCell.getNeighbours().contains(goalCell))
-			subgoals.add((Goal) new GoToBoxGoal(agentCell,LevelMap.getInstance().getCurrentState().getCellForBox(b)));
-		
+		Box b = ((DeliverBoxGoal) goal).getWhat();
+
+		if (!agentCell.getNeighbours().contains(goalCell))
+			subgoals.add((Goal) new GoToBoxGoal(agentCell, LevelMap.getInstance().getCurrentState()
+					.getCellForBox(b)));
+
 		subgoals.add((Goal) new MoveBoxGoal(b, goalCell));
-			
+		Logger.getLogger(GoalSplitter.class.getSimpleName()).info("Split " + goal + " in: " + subgoals);
+
 		return subgoals;
 	}
-	
 }

@@ -48,10 +48,8 @@ public class AStarSearch {
 			closedSet.add(current);
 			openSet.remove(current);
 
-			log.info("We picked: "+  current);
 			for (AStarNode _entity : current.getNeighbours()) {
 				NodeType entity = (NodeType) _entity;
-				log.info("Entity:" +  entity);
 				float tentativeScore = current.g + DISTANCE_ONE;
 
 				if (closedSet.contains(entity)) {
@@ -64,7 +62,6 @@ public class AStarSearch {
 					// update partial score from start to neighbor cell
 					entity.g = tentativeScore;
 
-					log.info("Entity " + entity +  " " + end);
 					// update estimated score till goal for neighbor cell
 					entity.f = entity.g + heuristic.getHeuristicValue(entity, end);
 

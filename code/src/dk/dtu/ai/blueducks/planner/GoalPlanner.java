@@ -74,7 +74,7 @@ public class GoalPlanner {
 		float heuristicG2 = this.heuristic.getHeuristicValue(map.getCellForAgent(agent), map
 				.getCurrentState().getCellForBox(deliverBoxg2.getWhat()));
 
-		if (heuristicG1 > heuristicG2)
+		if (heuristicG1 < heuristicG2)
 			return g1;
 
 		return g2;
