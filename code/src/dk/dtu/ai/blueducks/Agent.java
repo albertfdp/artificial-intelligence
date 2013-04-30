@@ -76,9 +76,12 @@ public class Agent {
 				path.remove(0);
 			}
 		}
+		logger.info("Current subgoal: " + subgoals.get(currentSubgoalIndex));
 		if (subgoals.get(currentSubgoalIndex).isSatisfied(agentState)) {
+			logger.info("Subgoal is satisfied.");
 			currentSubgoalIndex++;
 			if (currentSubgoalIndex == subgoals.size()) {
+				logger.info("All subgoals are satisfied so top level goal is satisfied.");
 				triggerReplanning();
 			}
 			if (subgoals.get(currentSubgoalIndex) instanceof GoToBoxGoal) {
@@ -95,6 +98,7 @@ public class Agent {
 				path.remove(0);
 			}
 		}
+		logger.info("Path: " + path);
 		State currentState = path.get(currentPositionInPath);
 		currentPositionInPath++;
 		return (Action) currentState.getEdgeFromPrevNode();
@@ -106,12 +110,14 @@ public class Agent {
 	 * can't follow his plan and needs to recompute its goals.
 	 */
 	public void triggerReplanning() {
+		logger.info("Triggering replanning");
+		// Regenerate top level goals
+		MotherOdin.getInstance().generateTopLevelGoals();
+		// Pick a new goal
 		currentGoal = goalPlanner.getNextGoal(color, MotherOdin.getInstance().getTopLevelGoals());
 		subgoals = goalSplitter.getSubgoal(currentGoal, this);
 		currentSubgoalIndex = 0;
-		// Regenerate top level goals
-		MotherOdin.getInstance().generateTopLevelGoals();
-		logger.info("Triggering replanning");
+
 	}
 
 	/**

@@ -185,7 +185,7 @@ public class State extends AStarNode {
 
 	@Override
 	public String toString() {
-		return "State [boxes=" + boxes + ", agentCell=" + agentCell + ", previousAction=" + previousAction
+		return "State [agentCell=" + agentCell + ", previousAction=" + previousAction
 				+ "]";
 	}
 

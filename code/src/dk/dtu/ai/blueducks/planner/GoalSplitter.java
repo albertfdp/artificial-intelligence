@@ -27,10 +27,10 @@ public class GoalSplitter {
 		Cell goalCell = ((DeliverBoxGoal) goal).getTo();
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
 		Box b = ((DeliverBoxGoal) goal).getWhat();
+		Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(b);
 
-		if (!agentCell.getNeighbours().contains(goalCell))
-			subgoals.add((Goal) new GoToBoxGoal(agentCell, LevelMap.getInstance().getCurrentState()
-					.getCellForBox(b)));
+		if (!agentCell.getNeighbours().contains(boxCell))
+			subgoals.add((Goal) new GoToBoxGoal(agentCell, boxCell));
 
 		subgoals.add((Goal) new MoveBoxGoal(b, goalCell));
 		Logger.getLogger(GoalSplitter.class.getSimpleName()).info("Split " + goal + " in: " + subgoals);
