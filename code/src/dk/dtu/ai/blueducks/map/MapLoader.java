@@ -10,8 +10,10 @@ package dk.dtu.ai.blueducks.map;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
@@ -100,8 +102,10 @@ public class MapLoader {
 		}
 		scan.close();
 		
-		//TODO: change the logging
-//		for (Agent a : map.getAgents()) {
+//		//TODO: change the logging
+//		for (Entry<Cell, Agent> e : map.getAgents().entrySet()) {
+//			Agent a = e.getValue();
+//			LevelMap map
 //			log.info("agent-" + a.getId() + " [" + a.getColor() + "] at [" + a.getCell().x + "," + a.getCell().y + "]");
 //		}
 //		
@@ -114,7 +118,7 @@ public class MapLoader {
 //		for (Map.Entry<Character, Cell> entry : map.getGoals().entrySet()) {
 //			log.info("goal-" + entry.getKey() + " at [" + entry.getValue().x + "," + entry.getValue().y + "]");
 //		}
-		
+//		
 		return map;
 	}
 	

@@ -114,6 +114,7 @@ public class LevelMap {
 	 */
 	public void addGoalCell(Cell cell, int x, int y, char id) {
 		this.addCell(cell, x, y);
+		logger.info("Added Cell: " + x + " "+ y);
 		List<Cell> list;
 		if(!goals.containsKey(id)) {
 			list = new ArrayList<Cell>();
@@ -132,6 +133,7 @@ public class LevelMap {
 	 * @param agent the agent
 	 */
 	public void attachAgent(Cell cell, Agent agent) {
+		logger.info("Attached agent" + agent.getId() +" to Cell: " + cell.x + " "+ cell.y);
 		agents.put(cell, agent);
 	}
 
@@ -142,6 +144,7 @@ public class LevelMap {
 	 * @param box the box
 	 */
 	public void attachBox(Cell cell, Box box) {
+		logger.info("Attached box" + box.getId() +" to Cell: " + cell.x + " "+ cell.y);
 		this.currentState.addBox(cell, box);
 		this.boxesList.add(box);
 	}
