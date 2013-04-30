@@ -35,13 +35,6 @@ public abstract class Action {
 	 */
 	public abstract State getNextState(State state);
 	
-	/**
-	 * Checks if is applicable.
-	 *
-	 * @param state the state
-	 * @return true, if is applicable
-	 */
-	public abstract boolean isApplicable(State state);
 }
 
 

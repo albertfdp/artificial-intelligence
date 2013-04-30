@@ -81,13 +81,12 @@ public class PushAction extends Action {
 	
 	@Override
 	public State getNextState(State state) {
-		// TODO: remove applicable check
-		if (!isApplicable(state))
-			return state;
 		Cell boxCell = state.getCellForBox(box);
 		Cell destCell = boxCell.getNeighbour(boxDirection);
 					
 		State nextState = new State(boxCell, this, state, agent);
+		
+		// TODO: improve
 		Map<Cell, Box> boxes = state.getBoxes();
 		for (Entry<Cell, Box> e : boxes.entrySet()) {
 			if (e.getValue() != box) {
@@ -99,18 +98,5 @@ public class PushAction extends Action {
 		return nextState;
 	}
 
-	@Override
-	public boolean isApplicable(State state) {
-		// TODO: Remove
-		Cell agentCell = state.getAgentCell();
-		Cell boxCell = state.getCellForBox(box);
-		Cell destCell = boxCell.getNeighbour(boxDirection);
-		
-		return (
-				state.isFree(destCell) // destination is free, and implicit, box and dest are neighbors
-				&& (agentCell.getNeighbour(agentDirection) == boxCell) // agent and box are neighbors
-				&& (agent.getColor().equals(box.getColor()))); 
-		
-	}
-
+	
 }
