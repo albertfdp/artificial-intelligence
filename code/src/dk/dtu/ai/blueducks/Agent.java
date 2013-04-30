@@ -57,7 +57,8 @@ public class Agent {
 	 */
 	public Action getNextAction() {
 		LevelMap map = LevelMap.getInstance();
-		State agentState = map.getCurrentState().duplicate();
+		State agentState = new State(map.getCellForAgent(this), null, null, this);
+		agentState.setBoxes(map.getCurrentState().getBoxes());
 		if (currentGoal == null) {
 			triggerReplanning();
 			if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {

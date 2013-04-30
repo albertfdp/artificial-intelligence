@@ -177,14 +177,14 @@ public class State extends AStarNode {
 	}
 
 	
-	/**
-	 * Duplicate - shallow copy of the object
-	 *
-	 * @return a copy of the state 
-	 */
-	public State duplicate() {
-		State st = new State(agentCell, previousAction, previousState, agent);
-		st.boxes = new HashMap<Cell, Box>(this.boxes);
-		return st;
-	}
+//	/**
+//	 * Duplicate - shallow copy of the object
+//	 *
+//	 * @return a copy of the state 
+//	 */
+//	public State duplicate() {
+//		State st = new State(agentCell, previousAction, previousState, agent);
+//		st.boxes = new HashMap<Cell, Box>(this.boxes);
+//		return st;
+//	}
 }
