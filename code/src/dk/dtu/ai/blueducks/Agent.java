@@ -8,6 +8,7 @@
 package dk.dtu.ai.blueducks;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
@@ -33,6 +34,9 @@ public class Agent {
 	Goal currentGoal;
 	int currentSubgoal;
 	int currentPositionInPath;
+	
+	/** The Constant logger. */
+	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
 
 	/**
 	 * Instantiates a new agent.
@@ -54,12 +58,27 @@ public class Agent {
 	public Action getNextAction() {
 		LevelMap map = LevelMap.getInstance();
 		State agentState = map.getCurrentState().duplicate();
-		if (currentGoal == null)
+		if (currentGoal == null) {
 			triggerReplanning();
+			if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
+				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal);
+				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState,
+						gtbGoal, new GoToBoxHeuristic());
+				currentPositionInPath = 0;
+				path.remove(0);
+			} else if (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) {
+				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoal);
+				path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState,
+						mbGoal, new MoveBoxHeuristic());
+				currentPositionInPath = 0;
+				path.remove(0);
+			}
+		}
 		if (currentGoal.isSatisfied(map.getCurrentState())) {
 			currentSubgoal++;
-			if (currentSubgoal == subgoals.size())
+			if (currentSubgoal == subgoals.size()) {
 				triggerReplanning();
+			}
 			if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
 				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal);
 				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState,
