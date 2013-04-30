@@ -64,7 +64,7 @@ public class MotherOdin {
 		int currentLoop = 0;
 		generateTopLevelGoals();
 		
-		while (currentLoop < 5) {
+		while (true) {
 			log.info("Starting loop " + (++currentLoop) + "...");
 			actions.clear();
 			// Get the actions from each agent

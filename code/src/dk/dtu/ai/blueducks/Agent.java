@@ -32,7 +32,7 @@ public class Agent {
 	List<State> path;
 	List<Goal> subgoals;
 	Goal currentGoal;
-	int currentSubgoal;
+	int currentSubgoalIndex;
 	int currentPositionInPath;
 	
 	/** The Constant logger. */
@@ -59,38 +59,36 @@ public class Agent {
 		LevelMap map = LevelMap.getInstance();
 		State agentState = new State(map.getCellForAgent(this), null, null, this);
 		agentState.setBoxes(map.getCurrentState().getBoxes());
-		
+		logger.info("CURRENT GOAL" + this.currentGoal);
 		if (currentGoal == null) {
 			triggerReplanning();
-			if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
-				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal);
-				logger.info("GOAL!!!!  " +gtbGoal.getFrom() +" " +  gtbGoal.getTo().x + " " + gtbGoal.getTo().y);
-				logger.info("State!!!!  " + agentState.getAgentCell());
+			if (subgoals.get(currentSubgoalIndex) instanceof GoToBoxGoal) {
+				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoalIndex);
 				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState,
 						gtbGoal, new GoToBoxHeuristic());
 				currentPositionInPath = 0;
 				path.remove(0);
-			} else if (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) {
-				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoal);
+			} else if (subgoals.get(currentSubgoalIndex) instanceof MoveBoxGoal) {
+				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoalIndex);
 				path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState,
 						mbGoal, new MoveBoxHeuristic());
 				currentPositionInPath = 0;
 				path.remove(0);
 			}
 		}
-		if (currentGoal.isSatisfied(map.getCurrentState())) {
-			currentSubgoal++;
-			if (currentSubgoal == subgoals.size()) {
+		if (subgoals.get(currentSubgoalIndex).isSatisfied(agentState)) {
+			currentSubgoalIndex++;
+			if (currentSubgoalIndex == subgoals.size()) {
 				triggerReplanning();
 			}
-			if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
-				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal);
+			if (subgoals.get(currentSubgoalIndex) instanceof GoToBoxGoal) {
+				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoalIndex);
 				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState,
 						gtbGoal, new GoToBoxHeuristic());
 				currentPositionInPath = 0;
 				path.remove(0);
-			} else if (subgoals.get(currentSubgoal) instanceof MoveBoxGoal) {
-				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoal);
+			} else if (subgoals.get(currentSubgoalIndex) instanceof MoveBoxGoal) {
+				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoalIndex);
 				path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState,
 						mbGoal, new MoveBoxHeuristic());
 				currentPositionInPath = 0;
@@ -112,7 +110,8 @@ public class Agent {
 	public void triggerReplanning() {
 		currentGoal = goalPlanner.getNextGoal(color, MotherOdin.getInstance().getTopLevelGoals());
 		subgoals = goalSplitter.getSubgoal(currentGoal, this);
-		currentSubgoal = 0;
+		currentSubgoalIndex = 0;
+		logger.info("Triggering replanning");
 	}
 
 	/**

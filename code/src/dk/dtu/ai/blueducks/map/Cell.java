@@ -60,11 +60,11 @@ public class Cell {
 		int xdiff = this.x - cell.x;
 		int ydiff = this.y - cell.y;
 
-		if (xdiff > 0) {
+		if (ydiff > 0) {
 			return Direction.W;
-		} else if (xdiff < 0) {
+		} else if (ydiff < 0) {
 			return Direction.E;
-		} else if (ydiff > 0) {
+		} else if (xdiff > 0) {
 			return Direction.N;
 		} else {
 			return Direction.S;

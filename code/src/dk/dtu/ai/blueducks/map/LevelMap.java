@@ -96,6 +96,7 @@ public class LevelMap {
 	 * @param cell the cell
 	 */
 	public void addCell(Cell cell, int x, int y) {
+		logger.info("Added Cell: " + x + " "+ y);
 		if (matrix == null || x >= matrix.length || matrix[0] == null || y >= matrix[0].length) {
 			logger.warning("Could not add cell on position " + x + " " + y
 					+ " as they exceed the declared size of the matrix");
@@ -114,7 +115,7 @@ public class LevelMap {
 	 */
 	public void addGoalCell(Cell cell, int x, int y, char id) {
 		this.addCell(cell, x, y);
-		logger.info("Added Cell: " + x + " "+ y);
+		logger.info("Added Cell FOR GOAL: " + x + " "+ y + " GOAL " + id);
 		List<Cell> list;
 		if(!goals.containsKey(id)) {
 			list = new ArrayList<Cell>();
