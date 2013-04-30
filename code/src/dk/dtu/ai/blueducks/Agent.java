@@ -59,10 +59,13 @@ public class Agent {
 		LevelMap map = LevelMap.getInstance();
 		State agentState = new State(map.getCellForAgent(this), null, null, this);
 		agentState.setBoxes(map.getCurrentState().getBoxes());
+		
 		if (currentGoal == null) {
 			triggerReplanning();
 			if (subgoals.get(currentSubgoal) instanceof GoToBoxGoal) {
 				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoal);
+				logger.info("GOAL!!!!  " +gtbGoal.getFrom() +" " +  gtbGoal.getTo().x + " " + gtbGoal.getTo().y);
+				logger.info("State!!!!  " + agentState.getAgentCell());
 				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState,
 						gtbGoal, new GoToBoxHeuristic());
 				currentPositionInPath = 0;

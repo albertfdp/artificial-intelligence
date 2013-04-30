@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
@@ -38,7 +39,8 @@ public class State extends AStarNode {
 	
 	/** The agent. */
 	Agent agent;
-	
+
+	private static final Logger log = Logger.getLogger(State.class.getSimpleName());
 	/**
 	 * Instantiates a new state.
 	 *
@@ -59,6 +61,8 @@ public class State extends AStarNode {
 	@Override
 	public List<AStarNode> getNeighbours() {
 		List<Action> actions = getPossibleActions();
+		
+		log.info("Possible Actions: " + actions );
 		List<AStarNode> nodes = new ArrayList<AStarNode>();
 		for (Action action : actions) {
 			nodes.add(action.getNextState(this));
@@ -176,6 +180,13 @@ public class State extends AStarNode {
 		return goal.isSatisfied(this);
 	}
 
+
+	@Override
+	public String toString() {
+		return "State [boxes=" + boxes + ", agentCell=" + agentCell + ", previousAction=" + previousAction
+				+ "]";
+	}
+
 	
 //	/**
 //	 * Duplicate - shallow copy of the object
@@ -187,4 +198,6 @@ public class State extends AStarNode {
 //		st.boxes = new HashMap<Cell, Box>(this.boxes);
 //		return st;
 //	}
+	
+	
 }

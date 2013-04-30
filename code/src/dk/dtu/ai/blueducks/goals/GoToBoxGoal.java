@@ -36,4 +36,10 @@ public class GoToBoxGoal extends Goal {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "GoToBoxGoal [from=" + from + ", to=" + to + "]";
+	}
+
+	
 }
