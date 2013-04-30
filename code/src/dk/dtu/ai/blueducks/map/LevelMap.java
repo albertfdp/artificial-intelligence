@@ -8,6 +8,8 @@
 package dk.dtu.ai.blueducks.map;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -22,34 +24,38 @@ public class LevelMap {
 
 	/** The map. */
 	private static LevelMap map;
-	
+
 	/** The matrix. */
 	private Cell[][] matrix;
-	
+
 	/** The agents. */
 	private Map<Cell, Agent> agents;
-	
+
 	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
-	
+
 	/** The goals. */
 	private Map<Character, Cell> goals;
-	
+
 	/** The width. */
 	private int width;
-	
+
 	/** The height. */
 	private int height;
-	
+
 	/** The current state. */
 	private State currentState;
-	
+
+	/** The boxes list. */
+	private List<Box> boxesList;
+
 	/**
 	 * Instantiates a new level map.
 	 */
 	private LevelMap() {
 		agents = new HashMap<Cell, Agent>(10);
 		goals = new HashMap<Character, Cell>();
+		boxesList = new LinkedList<>();
 	}
 
 	/**
@@ -80,7 +86,7 @@ public class LevelMap {
 			this.matrix[i] = new Cell[width];
 		}
 		Cell.map = this;
-		
+
 	}
 
 	/**
@@ -99,6 +105,7 @@ public class LevelMap {
 
 	/**
 	 * Adds a cell that is also a goal
+	 * 
 	 * @param cell
 	 * @param x
 	 * @param y
@@ -109,26 +116,31 @@ public class LevelMap {
 		goals.put(id, cell);
 	}
 
-	
 	/**
 	 * Attach agent.
-	 *
+	 * 
 	 * @param cell the cell
 	 * @param agent the agent
 	 */
 	public void attachAgent(Cell cell, Agent agent) {
 		agents.put(cell, agent);
 	}
-	
+
 	/**
 	 * Attach box.
-	 *
+	 * 
 	 * @param cell the cell
 	 * @param box the box
 	 */
 	public void attachBox(Cell cell, Box box) {
 		this.currentState.addBox(cell, box);
+		this.boxesList.add(box);
 	}
+
+	public List<Box> getBoxesList() {
+		return boxesList;
+	}
+
 	/**
 	 * Gets the cell at a given position.
 	 * 
@@ -150,10 +162,9 @@ public class LevelMap {
 		return goals;
 	}
 
-
 	/**
 	 * Gets the agents.
-	 *
+	 * 
 	 * @return the agents
 	 */
 	public Map<Cell, Agent> getAgents() {
@@ -162,17 +173,16 @@ public class LevelMap {
 
 	/**
 	 * Gets the width.
-	 *
+	 * 
 	 * @return the width
 	 */
 	public int getWidth() {
 		return width;
 	}
 
-
 	/**
 	 * Gets the height.
-	 *
+	 * 
 	 * @return the height
 	 */
 	public int getHeight() {
@@ -181,13 +191,13 @@ public class LevelMap {
 
 	/**
 	 * Gets the cell for a given agent.
-	 *
+	 * 
 	 * @param agent
 	 * @return the cell for the agent
 	 */
-	public Cell getCellForAgent(Agent agent){
-		for(Entry<Cell, Agent> e : agents.entrySet()){
-			if(e.getValue() == agent){
+	public Cell getCellForAgent(Agent agent) {
+		for (Entry<Cell, Agent> e : agents.entrySet()) {
+			if (e.getValue() == agent) {
 				return e.getKey();
 			}
 		}
@@ -196,7 +206,7 @@ public class LevelMap {
 
 	/**
 	 * Gets the current state.
-	 *
+	 * 
 	 * @return the current state
 	 */
 	public State getCurrentState() {
