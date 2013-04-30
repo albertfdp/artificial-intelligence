@@ -7,12 +7,16 @@
  */
 package dk.dtu.ai.blueducks;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
+import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 
 /**
@@ -29,6 +33,9 @@ public class MotherOdin {
 	/** The map. */
 	private LevelMap map = LevelMap.getInstance();
 
+	/** The top level goals. */
+	private List<Goal> topLevelGoals = new ArrayList<>();
+
 	/**
 	 * Gets the single instance of MotherOdin.
 	 * 
@@ -38,13 +45,25 @@ public class MotherOdin {
 		return mInstance;
 	}
 
+	public void generateTopLevelGoals() {
+		topLevelGoals.clear();
+		List<Box> boxes = map.getBoxesList();
+		for (Map.Entry<Character, List<Cell>> goalCells : map.getGoals().entrySet()) {
+			for (Cell cell : goalCells.getValue())
+				for (Box b : boxes)
+					if (b.getId() == goalCells.getKey())
+						topLevelGoals.add(new DeliverBoxGoal(b, cell));
+		}
+	}
+
 	/**
 	 * The main Running cycle of the app.
 	 */
 	public void run() {
 		List<Action> actions = new LinkedList<Action>();
 		int currentLoop = 0;
-
+		generateTopLevelGoals();
+		
 		while (currentLoop < 5) {
 			log.info("Starting loop " + (++currentLoop) + "...");
 			actions.clear();
@@ -75,8 +94,8 @@ public class MotherOdin {
 			}
 		}
 	}
-	
-	public List<Goal> getTopLevelGoals(){
-		return null;
+
+	public List<Goal> getTopLevelGoals() {
+		return topLevelGoals;
 	}
 }
