@@ -48,7 +48,7 @@ public class Agent {
 	public Agent(char id, String color) {
 		this.id = id;
 		this.color = color;
-		goalPlanner = new GoalPlanner(new ManhattanHeuristic());
+		goalPlanner = new GoalPlanner(this);
 		goalSplitter = new GoalSplitter();
 	}
 	
