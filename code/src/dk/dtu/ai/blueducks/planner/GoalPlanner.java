@@ -53,11 +53,11 @@ public class GoalPlanner {
 	 * @return Goal
 	 */
 	
-	public Goal getNextGoal(List<Goal> goalList) {
+	public Goal getNextGoal(String color, List<Goal> topLevelGoals) {
 		
 		Goal nextGoal = null;
 		
-		for(Goal goal : goalList){
+		for(Goal goal : generateAgentGoals(color, topLevelGoals)){
 			if(nextGoal == null)
 				nextGoal = goal;
 			else
