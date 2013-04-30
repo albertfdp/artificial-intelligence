@@ -7,7 +7,9 @@
  */
 package dk.dtu.ai.blueducks.map;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -33,7 +35,7 @@ public class LevelMap {
 	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
 	
 	/** The goals. */
-	private Map<Character, Cell> goals;
+	private Map<Character, List<Cell>> goals;
 	
 	/** The width. */
 	private int width;
@@ -49,7 +51,7 @@ public class LevelMap {
 	 */
 	private LevelMap() {
 		agents = new HashMap<Cell, Agent>(10);
-		goals = new HashMap<Character, Cell>();
+		goals = new HashMap<Character, List<Cell>>();
 	}
 
 	/**
@@ -106,7 +108,15 @@ public class LevelMap {
 	 */
 	public void addGoalCell(Cell cell, int x, int y, char id) {
 		this.addCell(cell, x, y);
-		goals.put(id, cell);
+		List<Cell> list;
+		if(!goals.containsKey(id)) {
+			list = new ArrayList<Cell>();
+			list.add(cell);
+			goals.put(id, list);
+		}else{
+			list = goals.get(id);
+			list.add(cell);
+		}
 	}
 
 	
@@ -146,7 +156,7 @@ public class LevelMap {
 	 * 
 	 * @return the goals
 	 */
-	public Map<Character, Cell> getGoals() {
+	public Map<Character, List<Cell>> getGoals() {
 		return goals;
 	}
 
