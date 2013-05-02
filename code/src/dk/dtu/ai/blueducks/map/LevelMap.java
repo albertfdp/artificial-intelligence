@@ -49,6 +49,9 @@ public class LevelMap {
 
 	/** The boxes list. */
 	private List<Box> boxesList;
+	
+	/** The betweenness centrality score for each free cell */
+	private Map<Cell, Double> betweennesScore;
 
 	/**
 	 * Instantiates a new level map.
@@ -87,9 +90,15 @@ public class LevelMap {
 			this.matrix[i] = new Cell[width];
 		}
 		Cell.map = this;
-
+		
+		// Analyze map
+		this.betweennesScore = MapAnalyzer.getBetweenessCentrality();
 	}
-
+	
+	public Map<Cell, Double> getBetweenessCentrality() {
+		return this.betweennesScore;
+	}
+	
 	/**
 	 * Adds a new cell- to WHERE
 	 * 
@@ -148,6 +157,17 @@ public class LevelMap {
 		logger.info("Attached box" + box.getId() +" to Cell: " + cell.x + " "+ cell.y);
 		this.currentState.addBox(cell, box);
 		this.boxesList.add(box);
+	}
+	
+	public List<Cell> getCells() {
+		List<Cell> cells = new ArrayList<Cell>();
+		for (int x = 0; x < matrix.length; x++) {
+			for (int y = 0; y < matrix[0].length; y++) {
+				if (matrix[x][y] != null)
+					cells.add(matrix[x][y]);
+			}
+		}
+		return cells;
 	}
 
 	public List<Box> getBoxesList() {

@@ -10,11 +10,8 @@ package dk.dtu.ai.blueducks.map;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
@@ -36,8 +33,6 @@ public class MapLoader {
 	private final static String REGEX_COLOR_DEFINITION = "^[a-z]+:\\s*[0-9A-Z](,\\s*[0-9A-Z])*\\s*$";
 	
 	private final static String DEFAULT_COLOR = "blue";
-	
-	private static final Logger log = Logger.getLogger(MapLoader.class.getSimpleName());
 
 	private static final String REGEX_FREE_CELL = "\\s";
 	
