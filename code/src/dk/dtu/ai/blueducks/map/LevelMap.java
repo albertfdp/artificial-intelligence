@@ -37,7 +37,7 @@ public class LevelMap {
 
 	/** The goals. */
 	private Map<Character, List<Cell>> goals;
-	
+
 	/** The width. */
 	private int width;
 
@@ -105,7 +105,7 @@ public class LevelMap {
 	 * @param cell the cell
 	 */
 	public void addCell(Cell cell, int x, int y) {
-		logger.info("Added Cell: " + x + " "+ y);
+		logger.info("Added Cell: " + x + " " + y);
 		if (matrix == null || x >= matrix.length || matrix[0] == null || y >= matrix[0].length) {
 			logger.warning("Could not add cell on position " + x + " " + y
 					+ " as they exceed the declared size of the matrix");
@@ -124,13 +124,13 @@ public class LevelMap {
 	 */
 	public void addGoalCell(Cell cell, int x, int y, char id) {
 		this.addCell(cell, x, y);
-		logger.info("Added Cell FOR GOAL: " + x + " "+ y + " GOAL " + id);
+		logger.info("Added Cell FOR GOAL: " + x + " " + y + " GOAL " + id);
 		List<Cell> list;
-		if(!goals.containsKey(id)) {
+		if (!goals.containsKey(id)) {
 			list = new ArrayList<Cell>();
 			list.add(cell);
 			goals.put(id, list);
-		}else{
+		} else {
 			list = goals.get(id);
 			list.add(cell);
 		}
@@ -143,7 +143,7 @@ public class LevelMap {
 	 * @param agent the agent
 	 */
 	public void attachAgent(Cell cell, Agent agent) {
-		logger.info("Attached agent" + agent.getId() +" to Cell: " + cell.x + " "+ cell.y);
+		logger.info("Attached agent" + agent.getId() + " to Cell: " + cell.x + " " + cell.y);
 		agents.put(cell, agent);
 	}
 
@@ -154,7 +154,7 @@ public class LevelMap {
 	 * @param box the box
 	 */
 	public void attachBox(Cell cell, Box box) {
-		logger.info("Attached box" + box.getId() +" to Cell: " + cell.x + " "+ cell.y);
+		logger.info("Attached box" + box.getId() + " to Cell: " + cell.x + " " + cell.y);
 		this.currentState.addBox(cell, box);
 		this.boxesList.add(box);
 	}
@@ -246,4 +246,10 @@ public class LevelMap {
 		return currentState;
 	}
 
+	/**
+	 * Execute a pre-analysis of the map.
+	 */
+	public void executeMapPreAnalysis() {
+		// TODO: Map preanalysis
+	}
 }
