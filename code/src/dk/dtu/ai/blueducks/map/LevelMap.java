@@ -90,9 +90,6 @@ public class LevelMap {
 			this.matrix[i] = new Cell[width];
 		}
 		Cell.map = this;
-		
-		// Analyze map
-		this.betweennesScore = MapAnalyzer.getBetweenessCentrality();
 	}
 	
 	public Map<Cell, Double> getBetweenessCentrality() {
@@ -250,6 +247,8 @@ public class LevelMap {
 	 * Execute a pre-analysis of the map.
 	 */
 	public void executeMapPreAnalysis() {
-		// TODO: Map preanalysis
+
+		// Analyze map
+		this.betweennesScore = MapAnalyzer.getBetweenessCentrality();
 	}
 }
