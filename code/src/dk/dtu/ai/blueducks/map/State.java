@@ -150,7 +150,7 @@ public class State extends AStarNode {
 	 */
 	public List<Action> getPossibleActions() {
 		List<Action> actions = new ArrayList<Action>();
-		List<Cell> neighbourCells = agentCell.getNeighbours();
+		List<Cell> neighbourCells = agentCell.getCellNeighbours();
 		log.info("AGENT CELL "+ agentCell);
 		for (Cell cell : neighbourCells) {
 			if (isFree(cell)) {
@@ -158,7 +158,7 @@ public class State extends AStarNode {
 				actions.add(new MoveAction(agentCell.getDirection(cell), agent));
 			} else {
 				if (boxes.keySet().contains(cell) && boxes.get(cell).getColor() == agent.getColor()) {
-					for (Cell neighbour : cell.getNeighbours()) {
+					for (Cell neighbour : cell.getCellNeighbours()) {
 						if (isFree(neighbour)) {
 							actions.add(new PushAction(agentCell.getDirection(cell), cell
 									.getDirection(neighbour), agent, boxes.get(cell)));

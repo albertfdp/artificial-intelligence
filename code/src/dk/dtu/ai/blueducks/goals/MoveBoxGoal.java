@@ -1,12 +1,9 @@
 package dk.dtu.ai.blueducks.goals;
 
-import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
-import dk.dtu.ai.blueducks.actions.Action;
-import dk.dtu.ai.blueducks.actions.PushAction;
 import dk.dtu.ai.blueducks.map.Cell;
-import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
+import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class MoveBoxGoal extends Goal {
 	
@@ -35,21 +32,8 @@ public class MoveBoxGoal extends Goal {
 	}
 	
 	@Override
-	public Action getAction(Cell currentCell, Cell nextCell, Agent agent) {
-		Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(what);
-		if (nextCell == boxCell) {
-			// FIXME how do I know where the agent moves 
-			// if the pathplanner gives me the next position of the box?
-			//return new PullAction(dirAgent, dirBox, agent, box)
-		} else {
-			return new PushAction(currentCell.getDirection(nextCell),
-					nextCell.getDirection(boxCell), agent, this.what);
-		}
-		return null;
-	}
-
-	@Override
-	public boolean isSatisfied(State state) {
+	public boolean isSatisfied(AStarNode node) {
+		State state = (State) node;
 		if (state.getCellForBox(what) == to)
 			return true;
 		return false;

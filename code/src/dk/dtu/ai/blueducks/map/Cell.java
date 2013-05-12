@@ -10,23 +10,31 @@ package dk.dtu.ai.blueducks.map;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.dtu.ai.blueducks.goals.CellPathGoal;
+import dk.dtu.ai.blueducks.goals.Goal;
+import dk.dtu.ai.blueducks.planner.AStarNode;
+
 /**
  * The Class Cell.
  */
-public class Cell {
-
-
+public class Cell extends AStarNode{
 
 	/** The Constant map. */
 	protected static LevelMap map;
 
 	public int x;
 	public int y;
+	public Cell previousCell;
+	public Direction dirFromPrev;
 
 	public Cell(int x, int y) {
 		super();
 		this.x = x;
 		this.y = y;
+		// not set yet (or maybe non-existent)
+		this.previousCell = null;
+		// not set yet (or maybe non-existent)
+		this.dirFromPrev = null;
 	}
 
 	/**
@@ -72,21 +80,79 @@ public class Cell {
 	}
 
 	/**
-	 * Gets the neighbours.
+	 * Gets the neighbours (Cells).
 	 * 
 	 * @return the neighbours
 	 */
-	public List<Cell> getNeighbours() {
+	public List<Cell> getCellNeighbours() {
 		List<Cell> neighbors = new ArrayList<Cell>();
+
 		neighbors.add(this.getNeighbour(Direction.N));
 		neighbors.add(this.getNeighbour(Direction.S));
 		neighbors.add(this.getNeighbour(Direction.E));
 		neighbors.add(this.getNeighbour(Direction.W));
 		return neighbors;
 	}
+	
+	/**
+	 * Gets the neighbours (AStarNodes).
+	 * 
+	 * @return the neighbours
+	 */
+	public List<AStarNode> getNeighbours() {
+		List<AStarNode> neighbors = new ArrayList<AStarNode>();
+		
+		Cell possibleN = this.getNeighbour(Direction.N);
+		// in case at that cell there is no wall
+		if(possibleN!=null) {
+			possibleN.previousCell = this;
+			possibleN.dirFromPrev = Direction.N;
+			neighbors.add(possibleN);
+		}
+		
+		Cell possibleS = this.getNeighbour(Direction.S);
+		// in case at that cell there is no wall
+		if(possibleS!=null) {
+			possibleS.previousCell = this;
+			possibleS.dirFromPrev = Direction.S;
+			neighbors.add(possibleS);
+		}
+		
+		Cell possibleE = this.getNeighbour(Direction.E);
+		// in case at that cell there is no wall
+		if(possibleE!=null) {
+			possibleE.previousCell = this;
+			possibleE.dirFromPrev = Direction.E;
+			neighbors.add(possibleE);
+		}
+		
+		Cell possibleW = this.getNeighbour(Direction.W);
+		// in case at that cell there is no wall
+		if(possibleW!=null) {
+			possibleW.previousCell = this;
+			possibleW.dirFromPrev = Direction.W;
+			neighbors.add(possibleW);
+		}
+		return neighbors;
+	}
 
 	@Override
 	public String toString() {
 		return "Cell[" + x + ", " + y + "]";
+	}
+
+	@Override
+	public AStarNode getPreviousNode() {
+		return this.previousCell;
+	}
+
+	@Override
+	public Object getEdgeFromPrevNode() {
+		return this.dirFromPrev;
+	}
+
+	@Override
+	public boolean satisfiesGoal(Goal goal) {
+		return goal.isSatisfied(this);
 	}
 }

@@ -1,10 +1,9 @@
 package dk.dtu.ai.blueducks.goals;
 
-import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
-import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.State;
+import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class DeliverBoxGoal extends Goal {
 	
@@ -33,13 +32,9 @@ public class DeliverBoxGoal extends Goal {
 	}
 
 	@Override
-	public Action getAction(Cell currentCell, Cell nextCell, Agent agent) {
-		return null;
-	}
-
-	@Override
-	public boolean isSatisfied(State state) {
+	public boolean isSatisfied(AStarNode node) {
 		// TODO: check also if the cell has already been satisfied by another box
+		State state = (State) node;
 		if (state.getCellForBox(what) == to)
 			return true;
 		
