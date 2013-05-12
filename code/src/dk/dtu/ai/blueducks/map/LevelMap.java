@@ -116,7 +116,7 @@ public class LevelMap {
 	}
 
 	
-	public void markAsFree(Cell cell){
+	public void markAsNotWall(Cell cell){
 		if(!verifiedCells.contains(cell))
 			this.verifiedCells.add(cell);
 	}

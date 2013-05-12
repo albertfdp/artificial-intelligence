@@ -51,6 +51,7 @@ public class MoveAction extends Action {
 		Map<Cell, Agent> agents = LevelMap.getInstance().getAgents();
 		agents.put(destCell, agent);
 		agents.remove(agentCell);
+		LevelMap.getInstance().markAsNotWall(destCell);
 			
 	}
 

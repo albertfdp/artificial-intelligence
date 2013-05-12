@@ -76,7 +76,7 @@ public class PushAction extends Action {
 		Map<Cell, Box> boxes = LevelMap.getInstance().getCurrentState().getBoxes();
 		boxes.put(destCell, box);
 		boxes.remove(boxCell);
-	
+		LevelMap.getInstance().markAsNotWall(destCell);
 	}
 	
 	@Override
