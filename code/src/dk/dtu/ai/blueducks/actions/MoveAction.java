@@ -8,11 +8,9 @@
 package dk.dtu.ai.blueducks.actions;
 
 
-import java.util.HashMap;
 import java.util.Map;
 
 import dk.dtu.ai.blueducks.Agent;
-import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
@@ -73,6 +71,13 @@ public class MoveAction extends Action {
 	@Override
 	public String toString() {
 		return "MoveAction [agentDirection=" + agentDirection + ", agent=" + agent + "]";
+	}
+	
+	public void invalidateAction(){
+		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
+		Cell destCell = agentCell.getNeighbour(agentDirection);
+		//TODO: continue
+		LevelMap.getInstance().setAsWall(destCell.x, destCell.y);
 	}
 
 }

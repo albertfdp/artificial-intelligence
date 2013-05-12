@@ -197,6 +197,10 @@ public class LevelMap {
 		}
 		return null;
 	}
+	
+	public void setAsWall(int x, int y){
+		matrix[x][y] = null;
+	}
 
 	/**
 	 * Gets the goals.

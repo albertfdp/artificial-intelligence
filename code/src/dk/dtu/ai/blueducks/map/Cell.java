@@ -10,7 +10,6 @@ package dk.dtu.ai.blueducks.map;
 import java.util.ArrayList;
 import java.util.List;
 
-import dk.dtu.ai.blueducks.goals.CellPathGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
