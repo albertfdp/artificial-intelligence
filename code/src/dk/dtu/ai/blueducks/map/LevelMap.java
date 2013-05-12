@@ -52,6 +52,9 @@ public class LevelMap {
 	
 	/** The betweenness centrality score for each free cell */
 	private Map<Cell, Double> betweennesScore;
+	
+	
+	private List<Cell> verifiedCells;
 
 	/**
 	 * Instantiates a new level map.
@@ -60,6 +63,7 @@ public class LevelMap {
 		agents = new HashMap<Cell, Agent>(10);
 		boxesList = new LinkedList<>();
 		goals = new HashMap<Character, List<Cell>>();
+		verifiedCells = new ArrayList<Cell>();
 	}
 
 	/**
@@ -111,6 +115,17 @@ public class LevelMap {
 		matrix[x][y] = cell;
 	}
 
+	
+	public void markAsFree(Cell cell){
+		if(!verifiedCells.contains(cell))
+			this.verifiedCells.add(cell);
+	}
+	
+	public boolean isVerified(Cell cell){
+		if(verifiedCells.contains(cell))
+			return true;
+		return false;
+	}
 	/**
 	 * Adds a cell that is also a goal
 	 * 

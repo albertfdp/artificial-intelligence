@@ -116,16 +116,20 @@ public class State extends AStarNode {
 		return agentCell;
 	}
 	
+
 	/**
-	 * Checks if a given cell is free.
+	 * Checks if is free.
 	 *
 	 * @param cell the cell
-	 * @return true, if is free
+	 * @return 0 if the cell is not free, 1 if the cell might be free, 2 if it's definitely free
 	 */
-	public boolean isFree(Cell cell) {
+	public int isFree(Cell cell) {
 		if(cell == null || cell == this.agentCell || boxes.keySet().contains(cell))
-			return false;
-		return true;
+			return 0;
+		//TODO: where will we use the fact that the cell might/ might not be free
+		if(LevelMap.getInstance().isVerified(cell))
+			return 2;
+		return 1;
 	}
 	
 	/**
@@ -153,19 +157,19 @@ public class State extends AStarNode {
 		List<Cell> neighbourCells = agentCell.getNeighbours();
 		log.info("AGENT CELL "+ agentCell);
 		for (Cell cell : neighbourCells) {
-			if (isFree(cell)) {
+			if (isFree(cell) != 0) {
 				log.info("ACTION "+ agentCell.getDirection(cell));
 				actions.add(new MoveAction(agentCell.getDirection(cell), agent));
 			} else {
 				if (boxes.keySet().contains(cell) && boxes.get(cell).getColor() == agent.getColor()) {
 					for (Cell neighbour : cell.getNeighbours()) {
-						if (isFree(neighbour)) {
+						if (isFree(neighbour) != 0) {
 							actions.add(new PushAction(agentCell.getDirection(cell), cell
 									.getDirection(neighbour), agent, boxes.get(cell)));
 						}
 					}
 					for (Cell myNeighbour : neighbourCells) {
-						if (isFree(myNeighbour)) {
+						if (isFree(myNeighbour) != 0) {
 							actions.add(new PullAction(agentCell.getDirection(myNeighbour), agentCell
 									.getDirection(cell), agent, boxes.get(cell)));
 						}
