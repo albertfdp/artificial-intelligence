@@ -127,7 +127,7 @@ public class State extends AStarNode {
 	 * @return 0 if the cell is not free, 1 if the cell might be free, 2 if it's definitely free
 	 */
 	public int isFree(Cell cell) {
-		if(cell == null || cell == this.agentCell || boxes.keySet().contains(cell))
+		if(cell == null || boxes.keySet().contains(cell))
 			return 0;
 		//TODO: where will we use the fact that the cell might/ might not be free
 		if(LevelMap.getInstance().isVerified(cell))
