@@ -9,9 +9,11 @@ package dk.dtu.ai.blueducks.map;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
@@ -65,7 +67,7 @@ public class State extends AStarNode {
 	public List<AStarNode> getNeighbours() {
 		List<Action> actions = getPossibleActions();
 		
-		log.info("Possible Actions: " + actions .get(0));
+		//log.info("Possible Actions: " + actions .get(0));
 		List<AStarNode> nodes = new ArrayList<AStarNode>();
 		for (Action action : actions) {
 			nodes.add(action.getNextState(this));
@@ -158,10 +160,11 @@ public class State extends AStarNode {
 	public List<Action> getPossibleActions() {
 		List<Action> actions = new ArrayList<Action>();
 		List<Cell> neighbourCells = agentCell.getCellNeighbours();
-		log.info("AGENT CELL "+ agentCell);
+		
+		//log.info("AGENT CELL "+ agentCell);
 		for (Cell cell : neighbourCells) {
 			if (isFree(cell) != 0) {
-				log.info("ACTION "+ agentCell.getDirection(cell));
+				//log.info("ACTION "+ agentCell.getDirection(cell));
 				actions.add(new MoveAction(agentCell.getDirection(cell), agent));
 			} else {
 				if (boxes.keySet().contains(cell) && boxes.get(cell).getColor() == agent.getColor()) {
@@ -193,9 +196,51 @@ public class State extends AStarNode {
 
 	@Override
 	public String toString() {
-		return "State [agentCell=" + agentCell + ", previousAction=" + previousAction
-				+ "]";
+		return "State [agentCell=" + agentCell + ", agent=" + agent
+				+ "boxes="+boxes.hashCode()+"]";
 	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 139;
+		int result = 1;
+		result = prime * result + ((agentCell == null) ? 0 : agentCell.hashCode());
+		result = prime * result + ((boxes == null) ? 0 : boxes.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		State other = (State) obj;
+		if (agentCell == null) {
+			if (other.agentCell != null)
+				return false;
+		} else if (!agentCell.equals(other.agentCell))
+			return false;
+		if (boxes == null) {
+			if (other.boxes != null)
+				return false;
+		} else {
+			for(Entry<Cell, Box> entry : boxes.entrySet()) {
+				if(!entry.getValue().equals(other.getBoxes().get(entry.getKey())))
+					return false;
+			}
+			//if(boxes.hashCode() != other.boxes.hashCode()){
+			//	return false;
+			//}
+		}
+		return true;
+	}
+
+
 
 	
 //	/**

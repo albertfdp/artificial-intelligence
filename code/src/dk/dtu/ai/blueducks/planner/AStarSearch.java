@@ -47,17 +47,17 @@ public class AStarSearch {
 				return AStarSearch.<NodeType> computePath(current);
 			closedSet.add(current);
 			openSet.remove(current);
-
+			log.info("THe state: " + current);
 			for (AStarNode _entity : current.getNeighbours()) {
 				NodeType entity = (NodeType) _entity;
 				float tentativeScore = current.g + DISTANCE_ONE;
-
+				
 				if (closedSet.contains(entity)) {
 					if (tentativeScore >= entity.g) {
 						continue;
 					}
 				}
-
+				
 				if (!openSet.contains(entity) || tentativeScore < entity.g) {
 					// update partial score from start to neighbor cell
 					entity.g = tentativeScore;
