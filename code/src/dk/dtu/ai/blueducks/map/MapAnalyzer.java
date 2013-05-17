@@ -1,3 +1,10 @@
+/*
+ * Artificial Intelligence and Multi-Agent Systems
+ * Denmarks Tehnical University
+ * 
+ * Blue Ducks
+ * Spring 2013
+ */
 package dk.dtu.ai.blueducks.map;
 
 import java.util.HashMap;
@@ -13,37 +20,51 @@ import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 
 public class MapAnalyzer {
 	
+	/** The analyzer. */
+	private static MapAnalyzer analyzer;
+	
 	private static final Logger log = Logger.getLogger(MapLoader.class.getSimpleName());
 	
-	private static Graph<Cell, String> getGraph(List<Cell> cells) {
-		
-		Graph<Cell, String> g = new UndirectedSparseGraph<Cell, String>();
+	private static Graph<Cell, String> graph;
+	
+	private MapAnalyzer() {
+		MapAnalyzer.graph = this.getGraph(LevelMap.getInstance().getCells());
+	}
+	
+	public static MapAnalyzer getInstance() {
+		if (MapAnalyzer.analyzer == null) {
+			MapAnalyzer.analyzer = new MapAnalyzer();
+		}
+		return MapAnalyzer.analyzer;
+	}
+	
+	private Graph<Cell, String> getGraph(List<Cell> cells) {
+		Graph<Cell, String> graph = new UndirectedSparseGraph<Cell, String>();
 		
 		for (Cell cell : cells) {
-			g.addVertex(cell);
+			graph.addVertex(cell);
 		}
 		
 		for (Cell cell : cells) {
 			for (Cell neighbour : cell.getCellNeighbours()) {
 				if (neighbour != null) {
-					g.addEdge(cell.toString() + "-" + neighbour.toString() + "-" + 
+					graph.addEdge(cell.toString() + "-" + neighbour.toString() + "-" + 
 							cell.getDirection(neighbour), cell, neighbour);
 				}
 			}
 		}
-		return g;
+		return graph;
 	}
 	
-	public static Map<Cell, Integer> getDegreeCentrality() {
+	public Map<Cell, Integer> getDegreeCentrality() {
 		Map<Cell, Integer> degrees = new HashMap<Cell, Integer>();
-		Graph<Cell, String> g = getGraph(LevelMap.getInstance().getCells());
-		for (Cell cell : g.getVertices()) {
-			degrees.put(cell, g.degree(cell));
+		for (Cell cell : graph.getVertices()) {
+			degrees.put(cell, graph.degree(cell));
 		}
 		return degrees;
 	}
 	
-	public static Map<Cell, Double> getNormalizedBetweenessCentrality() {
+	public Map<Cell, Double> getNormalizedBetweenessCentrality() {
 		Map<Cell, Double> scores = getBetweenessCentrality();
 		double highest = 0.0;
 		for (Entry<Cell, Double> entry : scores.entrySet()) {
@@ -58,24 +79,21 @@ public class MapAnalyzer {
 		return normalizedScores;
 	}
 	
-	public static Map<Cell, Double> getBetweenessCentrality() {
+	public Map<Cell, Double> getBetweenessCentrality() {
 		
 		Map<Cell, Double> scores = new HashMap<Cell, Double>();
 		
-		Graph<Cell, String> g = getGraph(LevelMap.getInstance().getCells());
-		
-		BetweennessCentrality<Cell, String> bc = new BetweennessCentrality<Cell, String>(g);
+		BetweennessCentrality<Cell, String> bc = new BetweennessCentrality<Cell, String>(graph);
 		bc.setRemoveRankScoresOnFinalize(false);
 		bc.evaluate();
-		for (Cell c : g.getVertices()) {
+		for (Cell c : graph.getVertices()) {
 			scores.put(c, bc.getVertexRankScore(c));
 		}
 		return scores;
 	}
 	
-	public static Map<Cell, Number> getDistances(Cell cell) {
-		Graph<Cell, String> g = getGraph(LevelMap.getInstance().getCells());
-		DijkstraShortestPath<Cell, String> dd = new DijkstraShortestPath<Cell, String>(g);
+	public Map<Cell, Number> getDistances(Cell cell) {
+		DijkstraShortestPath<Cell, String> dd = new DijkstraShortestPath<Cell, String>(graph);
 		return dd.getDistanceMap(cell);
 	}
 

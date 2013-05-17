@@ -55,6 +55,8 @@ public class LevelMap {
 	
 	private Map<Cell, Map<Cell, Number>> dijkstraDistances;
 	
+	private List<Cell> lockedCells;
+	
 	
 	private List<Cell> verifiedCells;
 
@@ -67,6 +69,7 @@ public class LevelMap {
 		goals = new HashMap<Character, List<Cell>>();
 		verifiedCells = new ArrayList<Cell>();
 		dijkstraDistances = new HashMap<Cell, Map<Cell, Number>>();
+		lockedCells = new ArrayList<Cell>();
 	}
 
 	/**
@@ -195,7 +198,7 @@ public class LevelMap {
 	 * @return the cell at
 	 */
 	public Cell getCellAt(int x, int y) {
-		if (x < this.height && y < this.width) {
+		if (x < this.height && x >= 0 && y < this.width && y >= 0) {
 			return matrix[x][y];
 		}
 		return null;
@@ -268,6 +271,20 @@ public class LevelMap {
 	public int getDijkstraDistance(Cell cellA, Cell cellB) {
 		return this.dijkstraDistances.get(cellA).get(cellB).intValue();
 	}
+	
+	public List<Cell> getLockedCells() {
+		return this.lockedCells;
+	}
+	
+	public void lockCell(Cell cell) {
+		if (!lockedCells.contains(cell))
+			this.lockedCells.add(cell);
+	}
+	
+	public void unlockCell(Cell cell) {
+		if (lockedCells.contains(cell))
+			this.lockedCells.remove(cell);
+	}
 
 	/**
 	 * Execute a pre-analysis of the map.
@@ -275,10 +292,10 @@ public class LevelMap {
 	public void executeMapPreAnalysis() {
 
 		// Analyze map
-		this.betweennesScore = MapAnalyzer.getNormalizedBetweenessCentrality();
+		this.betweennesScore = MapAnalyzer.getInstance().getNormalizedBetweenessCentrality();
 		// calculate distances
 		for (Cell cell : this.getCells()) {
-			dijkstraDistances.put(cell, MapAnalyzer.getDistances(cell));
+			dijkstraDistances.put(cell, MapAnalyzer.getInstance().getDistances(cell));
 		}
 	}
 }

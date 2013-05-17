@@ -10,6 +10,8 @@ package dk.dtu.ai.blueducks;
 
 public class Box {
 	
+	// TODO: should we add a unique id?
+	
 	private char id;
 	private String color;
 	

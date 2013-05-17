@@ -78,6 +78,13 @@ public class Agent {
 		logger.info("Current subgoal: " + subgoals.get(currentSubgoalIndex));
 		if (subgoals.get(currentSubgoalIndex).isSatisfied(agentState)) {
 			logger.info("Subgoal is satisfied.");
+			
+			// Lock the cell with the delivered box, so nobody moves it
+			if (subgoals.get(currentSubgoalIndex) instanceof MoveBoxGoal) {
+				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoalIndex);
+				LevelMap.getInstance().lockCell(mbGoal.getTo());
+			}
+			
 			currentSubgoalIndex++;
 			if (currentSubgoalIndex == subgoals.size()) {
 				logger.info("All subgoals are satisfied so top level goal is satisfied.");

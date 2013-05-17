@@ -20,16 +20,16 @@ import dk.dtu.ai.blueducks.map.State;
 public class PullAction extends Action {
 
 	/** The agent direction. */
-	Direction agentDirection;
+	private Direction agentDirection;
 
 	/** The box direction. */
-	Direction boxDirection;
+	private Direction boxDirection;
 
 	/** The agent. */
-	Agent agent;
+	private Agent agent;
 
 	/** The box. */
-	Box box;
+	private Box box;
 	
 	/**
 	 * Instantiates an action to push a box.
@@ -45,6 +45,61 @@ public class PullAction extends Action {
 		this.agent = agent;
 		this.box = box; 
 	}
+	
+	
+
+	/**
+	 * Gets the agent direction.
+	 *
+	 * @return the agent direction
+	 */
+	public Direction getAgentDirection() {
+		return agentDirection;
+	}
+
+
+
+	public void setAgentDirection(Direction agentDirection) {
+		this.agentDirection = agentDirection;
+	}
+
+
+
+	public Direction getBoxDirection() {
+		return boxDirection;
+	}
+
+
+
+	public void setBoxDirection(Direction boxDirection) {
+		this.boxDirection = boxDirection;
+	}
+
+
+
+	public Agent getAgent() {
+		return agent;
+	}
+
+
+
+	public void setAgent(Agent agent) {
+		this.agent = agent;
+	}
+
+
+
+	public Box getBox() {
+		return box;
+	}
+
+
+
+	public void setBox(Box box) {
+		this.box = box;
+	}
+
+
 
 	@Override
 	public String toCommandString() {

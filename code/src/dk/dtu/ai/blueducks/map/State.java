@@ -192,7 +192,7 @@ public class State extends AStarNode {
 	public boolean satisfiesGoal(Goal goal) {
 		return goal.isSatisfied(this);
 	}
-
+	
 
 	@Override
 	public String toString() {

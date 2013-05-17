@@ -1,5 +1,7 @@
 package dk.dtu.ai.blueducks.heuristics;
 
+import dk.dtu.ai.blueducks.actions.PullAction;
+import dk.dtu.ai.blueducks.actions.PushAction;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
@@ -29,6 +31,10 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 		
 		h = betweenness + distance;
 		
+		if (state.getEdgeFromPrevNode() instanceof PullAction || state.getEdgeFromPrevNode() instanceof PushAction) {
+			h += 1000; // TODO: to set correctly
+		}
+				
 		if (prevState != null) {
 			if (state.getBoxesInGoalCells().size() < prevState.getBoxesInGoalCells().size()) {
 				h += penaltyForUndoingGoals;

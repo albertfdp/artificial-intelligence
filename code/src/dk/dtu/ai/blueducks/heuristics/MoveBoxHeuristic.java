@@ -1,6 +1,9 @@
 package dk.dtu.ai.blueducks.heuristics;
 
+import dk.dtu.ai.blueducks.Box;
+import dk.dtu.ai.blueducks.actions.PullAction;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
+import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
 
@@ -29,11 +32,19 @@ public class MoveBoxHeuristic implements Heuristic<State, MoveBoxGoal> {
 		
 		h = betweenness + distance + goalCellBetweenness;
 		
-		if (prevState != null) {
-			if (state.getBoxesInGoalCells().size() < prevState.getBoxesInGoalCells().size()) {
+		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
+			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
+			Cell cell = prevState.getCellForBox(pullAction.getBox());
+			if (LevelMap.getInstance().getLockedCells().contains(cell)) {
 				h += penaltyForUndoingGoals;
 			}
 		}
+		
+//		if (prevState != null) {
+//			if (state.getBoxesInGoalCells().size() < prevState.getBoxesInGoalCells().size()) {
+//				h += penaltyForUndoingGoals;
+//			}
+//		}
 		return h;
 		
 	}
