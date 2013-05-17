@@ -22,7 +22,7 @@ public class MapAnalyzer {
 		}
 		
 		for (Cell cell : cells) {
-			for (Cell neighbour : cell.getNeighbours()) {
+			for (Cell neighbour : cell.getCellNeighbours()) {
 				if (neighbour != null) {
 					g.addEdge(cell.toString() + "-" + neighbour.toString() + "-" + 
 							cell.getDirection(neighbour), cell, neighbour);

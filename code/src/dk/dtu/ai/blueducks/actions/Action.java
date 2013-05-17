@@ -35,6 +35,8 @@ public abstract class Action {
 	 */
 	public abstract State getNextState(State state);
 	
+	
+	public abstract void invalidateAction();
 }
 
 

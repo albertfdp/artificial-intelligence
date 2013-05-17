@@ -88,5 +88,9 @@ public class PullAction extends Action {
 		return nextState;
 	}
 
-	
+	public void invalidateAction(){
+		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
+		Cell destCell = agentCell.getNeighbour(agentDirection);
+		LevelMap.getInstance().setAsWall(destCell.x, destCell.y);
+	}
 }

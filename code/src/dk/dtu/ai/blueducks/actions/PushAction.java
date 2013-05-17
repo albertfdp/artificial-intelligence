@@ -76,7 +76,7 @@ public class PushAction extends Action {
 		Map<Cell, Box> boxes = LevelMap.getInstance().getCurrentState().getBoxes();
 		boxes.put(destCell, box);
 		boxes.remove(boxCell);
-	
+		LevelMap.getInstance().markAsNotWall(destCell);
 	}
 	
 	@Override
@@ -98,5 +98,9 @@ public class PushAction extends Action {
 		return nextState;
 	}
 
-	
+	public void invalidateAction(){
+		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
+		Cell destCell = agentCell.getNeighbour(agentDirection);
+		LevelMap.getInstance().setAsWall(destCell.x, destCell.y);
+	}
 }

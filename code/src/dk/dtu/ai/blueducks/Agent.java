@@ -15,7 +15,6 @@ import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
 import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristic;
-import dk.dtu.ai.blueducks.heuristics.ManhattanHeuristic;
 import dk.dtu.ai.blueducks.heuristics.MoveBoxHeuristic;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
