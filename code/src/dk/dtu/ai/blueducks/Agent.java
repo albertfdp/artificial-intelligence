@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.actions.NoOpAction;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
@@ -22,25 +23,44 @@ import dk.dtu.ai.blueducks.planner.AStarSearch;
 import dk.dtu.ai.blueducks.planner.GoalPlanner;
 import dk.dtu.ai.blueducks.planner.GoalSplitter;
 
+/**
+ * The Class Agent.
+ */
 public class Agent {
 
+	/** The id. */
 	private char id;
+
+	/** The color. */
 	private String color;
+
+	/** The goal planner. */
 	private GoalPlanner goalPlanner;
+
+	/** The goal splitter. */
 	private GoalSplitter goalSplitter;
+
+	/** The path. */
 	List<State> path;
+
+	/** The subgoals. */
 	List<Goal> subgoals;
+
+	/** The current goal. */
 	Goal currentGoal;
+
+	/** The current subgoal index. */
 	int currentSubgoalIndex;
+
+	/** The current position in path. */
 	int currentPositionInPath;
 
 	/** The Constant logger. */
-	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
+	private static final Logger log = Logger.getLogger(LevelMap.class.getSimpleName());
 
 	/**
 	 * Instantiates a new agent.
 	 * 
-	 * @param initialCell the initial cell
 	 * @param id the id
 	 * @param color the color
 	 */
@@ -52,52 +72,62 @@ public class Agent {
 	}
 
 	/**
+	 * Gets the id.
+	 * 
+	 * @return the id
+	 * @returns the id (the letter of the agent)
+	 */
+	public char getId() {
+		return id;
+	}
+
+	/**
+	 * Gets the color.
+	 * 
+	 * @return the color
+	 * @returns the color of the agent
+	 */
+	public String getColor() {
+		return color;
+	}
+
+	/**
+	 * Gets the current goal.
+	 * 
+	 * @return the current goal
+	 */
+	public Goal getCurrentGoal() {
+		return currentGoal;
+	}
+
+	/**
+	 * Gets the next action.
+	 * 
+	 * @return the next action
 	 * @returns the next action the agent will have to perform
 	 */
-	public Action getNextAction() {
+	private Action getNextAction() {
+
 		LevelMap map = LevelMap.getInstance();
 		State agentState = new State(map.getCellForAgent(this), null, null, this);
 		agentState.setBoxes(map.getCurrentState().getBoxes());
-		logger.info("CURRENT GOAL" + this.currentGoal);
+
+		log.info("Top Level Goal:" + this.currentGoal);
 		if (currentGoal == null) {
-			triggerReplanning();
-			if (subgoals.get(currentSubgoalIndex) instanceof GoToBoxGoal) {
-				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoalIndex);
-				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState, gtbGoal,
-						new GoToBoxHeuristic());
-				currentPositionInPath = 0;
-				path.remove(0);
-			} else if (subgoals.get(currentSubgoalIndex) instanceof MoveBoxGoal) {
-				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoalIndex);
-				path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState, mbGoal,
-						new MoveBoxHeuristic());
-				currentPositionInPath = 0;
-				path.remove(0);
-			}
+			buildSubgoals();
+			replan(agentState);
 		}
-		logger.info("Current subgoal: " + subgoals.get(currentSubgoalIndex));
+		log.info("Current subgoal: " + subgoals.get(currentSubgoalIndex));
 		if (subgoals.get(currentSubgoalIndex).isSatisfied(agentState)) {
-			logger.info("Subgoal is satisfied.");
+			log.info("Subgoal is satisfied.");
 			currentSubgoalIndex++;
 			if (currentSubgoalIndex == subgoals.size()) {
-				logger.info("All subgoals are satisfied so top level goal is satisfied.");
-				triggerReplanning();
+				log.info("All subgoals are satisfied so top level goal is satisfied.");
+				triggerGoalPlanning();
 			}
-			if (subgoals.get(currentSubgoalIndex) instanceof GoToBoxGoal) {
-				GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoalIndex);
-				path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState, gtbGoal,
-						new GoToBoxHeuristic());
-				currentPositionInPath = 0;
-				path.remove(0);
-			} else if (subgoals.get(currentSubgoalIndex) instanceof MoveBoxGoal) {
-				MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoalIndex);
-				path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState, mbGoal,
-						new MoveBoxHeuristic());
-				currentPositionInPath = 0;
-				path.remove(0);
-			}
+			replan(agentState);
 		}
-		logger.info("Path: " + path);
+		log.info("Path: " + path);
 		State currentState = path.get(currentPositionInPath);
 		currentPositionInPath++;
 		return (Action) currentState.getEdgeFromPrevNode();
@@ -108,29 +138,59 @@ public class Agent {
 	 * Trigger replanning. This method should be called when something has happened and the agent
 	 * can't follow his plan and needs to recompute its goals.
 	 */
-	public void triggerReplanning() {
-		logger.info("Triggering replanning");
-		// Regenerate top level goals
-		MotherOdin.getInstance().generateTopLevelGoals();
-		// Pick a new goal
-		//currentGoal = goalPlanner.getNextGoal(color, MotherOdin.getInstance().getTopLevelGoals());
+
+	private void buildSubgoals() {
+		log.info("Triggering replanning");
+
+		currentGoal = MotherOdin.getInstance().getGoalForAgent(this);
 		subgoals = goalSplitter.getSubgoal(currentGoal, this);
 		currentSubgoalIndex = 0;
-
 	}
 
 	/**
-	 * @returns the id (the letter of the agent)
+	 * Replan.
+	 * 
+	 * @param agentState the agent state
 	 */
-	public char getId() {
-		return id;
+	private void replan(State agentState) {
+		if (subgoals.get(currentSubgoalIndex) instanceof GoToBoxGoal) {
+			GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoalIndex);
+			path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState, gtbGoal, new GoToBoxHeuristic());
+			currentPositionInPath = 0;
+			path.remove(0);
+		} else if (subgoals.get(currentSubgoalIndex) instanceof MoveBoxGoal) {
+			MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoalIndex);
+			path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState, mbGoal, new MoveBoxHeuristic());
+			currentPositionInPath = 0;
+			path.remove(0);
+		}
 	}
 
 	/**
-	 * @returns the color of the agent
+	 * Builds the plan.
 	 */
-	public String getColor() {
-		return color;
+	private void buildPlan() {
+		buildSubgoals();
+		State agentState = new State(LevelMap.getInstance().getCellForAgent(this), null, null, this);
+		replan(agentState);
 	}
 
+	/**
+	 * Request goals proposals. As a response to this method, the agent should respond with a
+	 * proposal using {@link MotherOdin#addAgentGoalsProposal(Agent, java.util.PriorityQueue)}.
+	 */
+	public void requestGoalsProposals() {
+		MotherOdin.getInstance().addAgentGoalsProposal(this,
+				goalPlanner.computeGoalCosts(MotherOdin.getInstance().getTopLevelGoals()));
+	}
+
+	/**
+	 * Request the plan of the agent. As a response to this method, the agent should respond with a
+	 * proposal using {@link MotherOdin#appendPlan(Agent, List)}.<br/>
+	 * <br/>
+	 * If the agent has no plan, he must append a plan with at least one {@link NoOpAction}.
+	 */
+	public void requestPlan() {
+
+	}
 }

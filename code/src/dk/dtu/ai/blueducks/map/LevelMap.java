@@ -23,6 +23,8 @@ import dk.dtu.ai.blueducks.Box;
  */
 public class LevelMap {
 
+	private LinkedList<Agent> agents;
+	
 	/** The map. */
 	private static LevelMap map;
 
@@ -30,7 +32,7 @@ public class LevelMap {
 	private Cell[][] matrix;
 
 	/** The agents. */
-	private Map<Cell, Agent> agents;
+	private Map<Cell, Agent> agentCells;
 
 	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
@@ -60,10 +62,11 @@ public class LevelMap {
 	 * Instantiates a new level map.
 	 */
 	private LevelMap() {
-		agents = new HashMap<Cell, Agent>(10);
+		agentCells = new HashMap<Cell, Agent>(10);
 		boxesList = new LinkedList<>();
 		goals = new HashMap<Character, List<Cell>>();
 		verifiedCells = new ArrayList<Cell>();
+		agents=new LinkedList<>();
 	}
 
 	/**
@@ -156,7 +159,8 @@ public class LevelMap {
 	 */
 	public void attachAgent(Cell cell, Agent agent) {
 		logger.info("Attached agent" + agent.getId() + " to Cell: " + cell.x + " " + cell.y);
-		agents.put(cell, agent);
+		agentCells.put(cell, agent);
+		agents.add(agent);
 	}
 
 	/**
@@ -217,6 +221,10 @@ public class LevelMap {
 	 * @return the agents
 	 */
 	public Map<Cell, Agent> getAgents() {
+		return agentCells;
+	}
+	
+	public LinkedList<Agent> getAgentsList(){
 		return agents;
 	}
 
@@ -245,7 +253,7 @@ public class LevelMap {
 	 * @return the cell for the agent
 	 */
 	public Cell getCellForAgent(Agent agent) {
-		for (Entry<Cell, Agent> e : agents.entrySet()) {
+		for (Entry<Cell, Agent> e : agentCells.entrySet()) {
 			if (e.getValue() == agent) {
 				return e.getKey();
 			}

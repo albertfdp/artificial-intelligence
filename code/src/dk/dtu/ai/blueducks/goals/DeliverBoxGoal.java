@@ -10,6 +10,37 @@ public class DeliverBoxGoal extends Goal {
 	private Box what;
 	private Cell to;
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((to == null) ? 0 : to.hashCode());
+		result = prime * result + ((what == null) ? 0 : what.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DeliverBoxGoal other = (DeliverBoxGoal) obj;
+		if (to == null) {
+			if (other.to != null)
+				return false;
+		} else if (!to.equals(other.to))
+			return false;
+		if (what == null) {
+			if (other.what != null)
+				return false;
+		} else if (!what.equals(other.what))
+			return false;
+		return true;
+	}
+
 	public Box getWhat() {
 		return what;
 	}
