@@ -113,7 +113,7 @@ public class Agent {
 		// Regenerate top level goals
 		MotherOdin.getInstance().generateTopLevelGoals();
 		// Pick a new goal
-		currentGoal = goalPlanner.getNextGoal(color, MotherOdin.getInstance().getTopLevelGoals());
+		//currentGoal = goalPlanner.getNextGoal(color, MotherOdin.getInstance().getTopLevelGoals());
 		subgoals = goalSplitter.getSubgoal(currentGoal, this);
 		currentSubgoalIndex = 0;
 

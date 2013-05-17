@@ -19,6 +19,7 @@ import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
+import dk.dtu.ai.blueducks.map.State;
 
 /**
  * The Class MotherOdin.
@@ -106,7 +107,33 @@ public class MotherOdin {
 		}
 	}
 
+	/**
+	 * Gets all the current top level goals in the system.
+	 *
+	 * @return the top level goals
+	 */
 	public List<Goal> getTopLevelGoals() {
 		return topLevelGoals;
 	}
+	
+	/**
+	 * Called when an agent finishes a top level goal.
+	 *
+	 * @param agent the agent
+	 * @param goal the goal
+	 */
+	public void finishedTopLevelGoal(Agent agent, Goal goal){
+		generateTopLevelGoals();
+	}
+
+	/**
+	 * Appends the plan of a given agent.
+	 *
+	 * @param agent the agent
+	 * @param plan the plan
+	 */
+	public void appendPlan(Agent agent, List<State> plan){
+		
+	}
+	
 }
