@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import edu.uci.ics.jung.algorithms.importance.BetweennessCentrality;
+import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 
@@ -57,7 +58,11 @@ public class MapAnalyzer {
 		return scores;
 	}
 	
-	
+	public static int getDistance(Cell cellA, Cell cellB) {
+		Graph<Cell, String> g = getGraph(LevelMap.getInstance().getCells());
+		DijkstraShortestPath<Cell, String> dd = new DijkstraShortestPath<Cell, String>(g);
+		return dd.getDistance(cellA, cellB).intValue();
+	}
 	
 
 }

@@ -33,6 +33,7 @@ public class ClearPathGoal extends Goal {
 
 	@Override
 	public boolean isSatisfied(AStarNode node) {
+		// TODO: the agent and the box can be in the path
 		State state = (State) node;
 		for (Cell cell : cells) {
 			if (state.isFree(cell) > 0) { // 0 means occupied
