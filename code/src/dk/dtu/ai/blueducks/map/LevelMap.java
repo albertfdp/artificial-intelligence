@@ -53,6 +53,8 @@ public class LevelMap {
 	/** The betweenness centrality score for each free cell */
 	private Map<Cell, Double> betweennesScore;
 	
+	private Map<Cell, Map<Cell, Number>> dijkstraDistances;
+	
 	
 	private List<Cell> verifiedCells;
 
@@ -64,6 +66,7 @@ public class LevelMap {
 		boxesList = new LinkedList<>();
 		goals = new HashMap<Character, List<Cell>>();
 		verifiedCells = new ArrayList<Cell>();
+		dijkstraDistances = new HashMap<Cell, Map<Cell, Number>>();
 	}
 
 	/**
@@ -261,6 +264,10 @@ public class LevelMap {
 	public State getCurrentState() {
 		return currentState;
 	}
+	
+	public int getDijkstraDistance(Cell cellA, Cell cellB) {
+		return this.dijkstraDistances.get(cellA).get(cellB).intValue();
+	}
 
 	/**
 	 * Execute a pre-analysis of the map.
@@ -268,6 +275,10 @@ public class LevelMap {
 	public void executeMapPreAnalysis() {
 
 		// Analyze map
-		this.betweennesScore = MapAnalyzer.getBetweenessCentrality();
+		this.betweennesScore = MapAnalyzer.getNormalizedBetweenessCentrality();
+		// calculate distances
+		for (Cell cell : this.getCells()) {
+			dijkstraDistances.put(cell, MapAnalyzer.getDistances(cell));
+		}
 	}
 }
