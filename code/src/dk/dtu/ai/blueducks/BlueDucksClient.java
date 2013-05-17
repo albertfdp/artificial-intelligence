@@ -18,6 +18,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.MapLoader;
 
 /**
@@ -40,6 +41,8 @@ public class BlueDucksClient {
 
 		// Read empty new line
 		in.readLine();
+		
+		LevelMap.getInstance().executeMapPreAnalysis();
 	}
 
 	/**

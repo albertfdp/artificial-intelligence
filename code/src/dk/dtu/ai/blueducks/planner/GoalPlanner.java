@@ -1,83 +1,86 @@
+/*
+ * Artificial Intelligence and Multi-Agent Systems
+ * Denmarks Tehnical University
+ * 
+ * Blue Ducks
+ * Spring 2013
+ */
 package dk.dtu.ai.blueducks.planner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
-import dk.dtu.ai.blueducks.heuristics.Heuristic;
-import dk.dtu.ai.blueducks.heuristics.ManhattanHeuristic;
-import dk.dtu.ai.blueducks.map.Cell;
-import dk.dtu.ai.blueducks.map.LevelMap;
+import dk.dtu.ai.blueducks.heuristics.GoalPlannerHeuristic;
 
 public class GoalPlanner {
 
-	// private ArrayList<Goal> goalList;
-	private LevelMap map;
-	private Heuristic<Cell, Cell> heuristic;
 	private Agent agent;
 
 	public GoalPlanner(Agent agent) {
 		super();
-		this.map = LevelMap.getInstance();
-		this.heuristic = new ManhattanHeuristic();
 		this.agent = agent;
 
 	}
 
 	/**
-	 * Generates a list with all the possible goals
+	 * Generates a list with all the possible goals.
 	 * 
+	 * @param topLevelGoals the top level goals
+	 * @return the list
 	 */
-	public List<Goal> generateAgentGoals(String color, List<Goal> topLevelGoals) {
-		// TODO:
+	public List<Goal> generateAgentGoals(List<Goal> topLevelGoals) {
 		List<Goal> agentGoals = new ArrayList<Goal>();
 
 		for (Goal g : topLevelGoals) {
 			DeliverBoxGoal deliverBoxg = (DeliverBoxGoal) g;
-			if (deliverBoxg.getWhat().getColor().equals(color))
+			if (deliverBoxg.getWhat().getColor().equals(agent.getColor()))
 				agentGoals.add(deliverBoxg);
 		}
 
 		return agentGoals;
-
 	}
 
-	/*
-	 * /** Get the next Goal, now choose one randomly
+	/**
+	 * Compute goal costs.
 	 * 
-	 * @return Goal
+	 * @param topLevelGoals the top level goals
+	 * @return the hash map
 	 */
+	public PriorityQueue<GoalCost> computeGoalCosts(List<Goal> topLevelGoals) {
+		List<Goal> possibleGoals = generateAgentGoals(topLevelGoals);
+		PriorityQueue<GoalCost> queue = new PriorityQueue<>(possibleGoals.size());
 
-	public Goal getNextGoal(String color, List<Goal> topLevelGoals) {
-
-		Goal nextGoal = null;
-
-		for (Goal goal : generateAgentGoals(color, topLevelGoals)) {
-			if (nextGoal == null)
-				nextGoal = goal;
-			else
-				nextGoal = bestGoal(goal, nextGoal);
+		for (Goal goal : possibleGoals) {
+			float cost = GoalPlannerHeuristic.getHeuristicValue(agent, goal);
+			queue.add(new GoalCost(cost, goal));
 		}
-		return nextGoal;
+
+		return queue;
 	}
 
-	private Goal bestGoal(Goal g1, Goal g2) {
+	public class GoalCost implements Comparable<GoalCost> {
+		public float cost;
 
-		DeliverBoxGoal deliverBoxg1 = (DeliverBoxGoal) g1;
-		DeliverBoxGoal deliverBoxg2 = (DeliverBoxGoal) g2;
+		public Goal goal;
 
-		float heuristicG1 = this.heuristic.getHeuristicValue(map.getCellForAgent(agent), map
-				.getCurrentState().getCellForBox(deliverBoxg1.getWhat()));
+		public GoalCost(float cost, Goal goal) {
+			super();
+			this.cost = cost;
+			this.goal = goal;
+		}
 
-		float heuristicG2 = this.heuristic.getHeuristicValue(map.getCellForAgent(agent), map
-				.getCurrentState().getCellForBox(deliverBoxg2.getWhat()));
-
-		if (heuristicG1 < heuristicG2)
-			return g1;
-
-		return g2;
+		@Override
+		public int compareTo(GoalCost o) {
+			if (this.cost < o.cost)
+				return -1;
+			else if (this.cost == o.cost)
+				return 0;
+			else
+				return 1;
+		}
 	}
-
 }

@@ -41,6 +41,9 @@ public class State extends AStarNode {
 	
 	/** The agent. */
 	Agent agent;
+	
+	/** The boxes in goal cell. */
+	List<Box> boxesInGoalCell = new ArrayList<Box>(); 
 
 	private static final Logger log = Logger.getLogger(State.class.getSimpleName());
 	/**
@@ -250,6 +253,16 @@ public class State extends AStarNode {
 //		st.boxes = new HashMap<Cell, Box>(this.boxes);
 //		return st;
 //	}
+	
+	public List<Box> getBoxesInGoalCells() {
+		for (Entry<Cell, Box> ent : boxes.entrySet()) {
+			Box box= ent.getValue();
+			if (LevelMap.getInstance().getGoals().get(box.getId()).contains(ent.getKey())) {
+				boxesInGoalCell.add(ent.getValue());
+			}
+		}
+		return boxesInGoalCell;
+	}
 	
 	
 }

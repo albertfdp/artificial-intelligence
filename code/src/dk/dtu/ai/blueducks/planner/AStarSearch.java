@@ -39,7 +39,7 @@ public class AStarSearch {
 		// in the "to explore" set there is in the beginning just the cell with which we begin
 		openSet.add(begin);
 		begin.g = 0;
-		begin.f = heuristic.getHeuristicValue(begin, end);
+		begin.f = heuristic.getHeuristicValue(begin, end, null);
 
 		while (!openSet.isEmpty()) {
 			NodeType current = openSet.peek();
@@ -63,7 +63,7 @@ public class AStarSearch {
 					entity.g = tentativeScore;
 
 					// update estimated score till goal for neighbor cell
-					entity.f = entity.g + heuristic.getHeuristicValue(entity, end);
+					entity.f = entity.g + heuristic.getHeuristicValue(entity, end, current);
 
 					if (!openSet.contains(entity)) {
 						openSet.add(entity);

@@ -3,9 +3,11 @@ package dk.dtu.ai.blueducks.map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import edu.uci.ics.jung.algorithms.importance.BetweennessCentrality;
+import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 
@@ -41,6 +43,21 @@ public class MapAnalyzer {
 		return degrees;
 	}
 	
+	public static Map<Cell, Double> getNormalizedBetweenessCentrality() {
+		Map<Cell, Double> scores = getBetweenessCentrality();
+		double highest = 0.0;
+		for (Entry<Cell, Double> entry : scores.entrySet()) {
+			if (entry.getValue() > highest)
+				highest = entry.getValue();
+		}
+		Map<Cell, Double> normalizedScores = new HashMap<Cell, Double>();
+		for (Entry<Cell, Double> entry : scores.entrySet()) {
+			log.info("SCORE: " + entry.getKey().toString() + " " + entry.getValue() / highest);
+			normalizedScores.put(entry.getKey(), entry.getValue() / highest);
+		}
+		return normalizedScores;
+	}
+	
 	public static Map<Cell, Double> getBetweenessCentrality() {
 		
 		Map<Cell, Double> scores = new HashMap<Cell, Double>();
@@ -52,12 +69,14 @@ public class MapAnalyzer {
 		bc.evaluate();
 		for (Cell c : g.getVertices()) {
 			scores.put(c, bc.getVertexRankScore(c));
-			log.info("SCORE\t" + c.toString() + "\t" + bc.getVertexRankScore(c));
 		}
 		return scores;
 	}
 	
-	
-	
+	public static Map<Cell, Number> getDistances(Cell cell) {
+		Graph<Cell, String> g = getGraph(LevelMap.getInstance().getCells());
+		DijkstraShortestPath<Cell, String> dd = new DijkstraShortestPath<Cell, String>(g);
+		return dd.getDistanceMap(cell);
+	}
 
 }
