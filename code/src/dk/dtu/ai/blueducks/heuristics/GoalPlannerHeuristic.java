@@ -23,10 +23,12 @@ public class GoalPlannerHeuristic {
 		DeliverBoxGoal dbg=(DeliverBoxGoal) goal;
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
 		Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(dbg.getWhat());
+		Cell goalCell = dbg.getTo();
 
 		float distance = 100000;
 		if (boxCell != null) { 
 			distance = LevelMap.getInstance().getDijkstraDistance(agentCell, boxCell);
+			distance += LevelMap.getInstance().getDijkstraDistance(boxCell, goalCell);
 		}
 		
 		// TODO: Add more stuff

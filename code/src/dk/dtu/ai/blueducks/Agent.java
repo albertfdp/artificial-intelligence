@@ -105,6 +105,7 @@ public class Agent {
 			}
 		}
 		logger.info("Path: " + path);
+		// FIXME: path is only size 2 and currentPositionInPath has value 2
 		State currentState = path.get(currentPositionInPath);
 		currentPositionInPath++;
 		return (Action) currentState.getEdgeFromPrevNode();
