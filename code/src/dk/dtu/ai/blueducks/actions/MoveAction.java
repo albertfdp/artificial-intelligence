@@ -14,6 +14,7 @@ import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
+import dk.dtu.ai.blueducks.map.MultiAgentState;
 import dk.dtu.ai.blueducks.map.State;
 
 /**
@@ -79,6 +80,24 @@ public class MoveAction extends Action {
 		Cell destCell = agentCell.getNeighbour(agentDirection);
 		//TODO: continue
 		LevelMap.getInstance().setAsWall(destCell.x, destCell.y);
+	}
+
+	@Override
+	public boolean isInConflict(MultiAgentState state, Action otherAction) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isApplicable(MultiAgentState state) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void execute(MultiAgentState state) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
