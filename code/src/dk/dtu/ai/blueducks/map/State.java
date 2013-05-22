@@ -9,9 +9,11 @@ package dk.dtu.ai.blueducks.map;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
@@ -24,6 +26,8 @@ import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class State extends AStarNode {
+	
+	public enum CellVisibility {FREE, NOT_FREE, POSSIBLY_FREE};
 	
 	/** The boxes. */
 	private Map<Cell, Box> boxes;
@@ -39,6 +43,9 @@ public class State extends AStarNode {
 	
 	/** The agent. */
 	Agent agent;
+	
+	/** The boxes in goal cell. */
+	List<Box> boxesInGoalCell = new ArrayList<Box>(); 
 
 	private static final Logger log = Logger.getLogger(State.class.getSimpleName());
 	/**
@@ -62,7 +69,7 @@ public class State extends AStarNode {
 	public List<AStarNode> getNeighbours() {
 		List<Action> actions = getPossibleActions();
 		
-		log.info("Possible Actions: " + actions .get(0));
+		//log.info("Possible Actions: " + actions .get(0));
 		List<AStarNode> nodes = new ArrayList<AStarNode>();
 		for (Action action : actions) {
 			nodes.add(action.getNextState(this));
@@ -121,15 +128,15 @@ public class State extends AStarNode {
 	 * Checks if is free.
 	 *
 	 * @param cell the cell
-	 * @return 0 if the cell is not free, 1 if the cell might be free, 2 if it's definitely free
+	 * @return the celll visibility
 	 */
-	public int isFree(Cell cell) {
-		if(cell == null || cell == this.agentCell || boxes.keySet().contains(cell))
-			return 0;
+	public CellVisibility isFree(Cell cell) {
+		if(cell == null || boxes.containsKey(cell))
+			return CellVisibility.NOT_FREE;
 		//TODO: where will we use the fact that the cell might/ might not be free
 		if(LevelMap.getInstance().isVerified(cell))
-			return 2;
-		return 1;
+			return CellVisibility.FREE;
+		return CellVisibility.POSSIBLY_FREE;
 	}
 	
 	/**
@@ -155,22 +162,24 @@ public class State extends AStarNode {
 	public List<Action> getPossibleActions() {
 		List<Action> actions = new ArrayList<Action>();
 		List<Cell> neighbourCells = agentCell.getCellNeighbours();
-		log.info("AGENT CELL "+ agentCell);
+		
+		//log.info("AGENT CELL "+ agentCell);
 		for (Cell cell : neighbourCells) {
-			if (isFree(cell) != 0) {
-				log.info("ACTION "+ agentCell.getDirection(cell));
+			if (isFree(cell) != CellVisibility.NOT_FREE) {
+				//log.info("ACTION "+ agentCell.getDirection(cell));
 				actions.add(new MoveAction(agentCell.getDirection(cell), agent));
 			} else {
-				if (boxes.keySet().contains(cell) && boxes.get(cell).getColor() == agent.getColor()) {
+				//TODO: Optimize to only use boxes.get(cell) once to not compute hash twice
+				if (boxes.containsKey(cell) && boxes.get(cell).getColor() == agent.getColor()) {
 
 					for (Cell neighbour : cell.getCellNeighbours()) {
-						if (isFree(neighbour) != 0) {
+						if (isFree(neighbour) != CellVisibility.NOT_FREE) {
 							actions.add(new PushAction(agentCell.getDirection(cell), cell
 									.getDirection(neighbour), agent, boxes.get(cell)));
 						}
 					}
 					for (Cell myNeighbour : neighbourCells) {
-						if (isFree(myNeighbour) != 0) {
+						if (isFree(myNeighbour) != CellVisibility.NOT_FREE) {
 							actions.add(new PullAction(agentCell.getDirection(myNeighbour), agentCell
 									.getDirection(cell), agent, boxes.get(cell)));
 						}
@@ -186,13 +195,55 @@ public class State extends AStarNode {
 	public boolean satisfiesGoal(Goal goal) {
 		return goal.isSatisfied(this);
 	}
-
+	
 
 	@Override
 	public String toString() {
-		return "State [agentCell=" + agentCell + ", previousAction=" + previousAction
-				+ "]";
+		return "State [agentCell=" + agentCell + ", agent=" + agent
+				+ "boxes="+boxes.hashCode()+"]";
 	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 139;
+		int result = 1;
+		result = prime * result + ((agentCell == null) ? 0 : agentCell.hashCode());
+		result = prime * result + ((boxes == null) ? 0 : boxes.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		State other = (State) obj;
+		if (agentCell == null) {
+			if (other.agentCell != null)
+				return false;
+		} else if (!agentCell.equals(other.agentCell))
+			return false;
+		if (boxes == null) {
+			if (other.boxes != null)
+				return false;
+		} else {
+			for(Entry<Cell, Box> entry : boxes.entrySet()) {
+				if(!entry.getValue().equals(other.getBoxes().get(entry.getKey())))
+					return false;
+			}
+			//if(boxes.hashCode() != other.boxes.hashCode()){
+			//	return false;
+			//}
+		}
+		return true;
+	}
+
+
 
 	
 //	/**
@@ -205,6 +256,16 @@ public class State extends AStarNode {
 //		st.boxes = new HashMap<Cell, Box>(this.boxes);
 //		return st;
 //	}
+	
+	public List<Box> getBoxesInGoalCells() {
+		for (Entry<Cell, Box> ent : boxes.entrySet()) {
+			Box box= ent.getValue();
+			if (LevelMap.getInstance().getGoals().get(box.getId()).contains(ent.getKey())) {
+				boxesInGoalCell.add(ent.getValue());
+			}
+		}
+		return boxesInGoalCell;
+	}
 	
 	
 }

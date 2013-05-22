@@ -102,40 +102,6 @@ public class Agent {
 		return currentGoal;
 	}
 
-	// /**
-	// * Gets the next action.
-	// *
-	// * @return the next action
-	// * @returns the next action the agent will have to perform
-	// */
-	// private Action getNextAction() {
-	//
-	// LevelMap map = LevelMap.getInstance();
-	// State agentState = new State(map.getCellForAgent(this), null, null, this);
-	// agentState.setBoxes(map.getCurrentState().getBoxes());
-	//
-	// log.info("Top Level Goal:" + this.currentGoal);
-	// if (currentGoal == null) {
-	// buildSubgoals();
-	// replan(agentState);
-	// }
-	// log.info("Current subgoal: " + subgoals.get(currentSubgoalIndex));
-	// if (subgoals.get(currentSubgoalIndex).isSatisfied(agentState)) {
-	// log.info("Subgoal is satisfied.");
-	// currentSubgoalIndex++;
-	// if (currentSubgoalIndex == subgoals.size()) {
-	// log.info("All subgoals are satisfied so top level goal is satisfied.");
-	// triggerGoalPlanning();
-	// }
-	// replan(agentState);
-	// }
-	// log.info("Path: " + path);
-	// State currentState = path.get(currentPositionInPath);
-	// currentPositionInPath++;
-	// return (Action) currentState.getEdgeFromPrevNode();
-	//
-	// }
-
 	/**
 	 * Compute the plan states and actions for a given goal starting from a given state.
 	 * 

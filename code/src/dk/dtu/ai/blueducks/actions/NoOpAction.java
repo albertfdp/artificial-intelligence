@@ -7,6 +7,7 @@
  */
 package dk.dtu.ai.blueducks.actions;
 
+import dk.dtu.ai.blueducks.map.MultiAgentState;
 import dk.dtu.ai.blueducks.map.State;
 
 
@@ -30,5 +31,21 @@ public class NoOpAction extends Action {
 		return state;
 	}
 	public void invalidateAction(){
+	}
+
+	@Override
+	public boolean isInConflict(MultiAgentState state, Action otherAction) {
+		return false;
+	}
+
+	@Override
+	public boolean isApplicable(MultiAgentState state) {
+		return true;
+	}
+
+	@Override
+	public void execute(MultiAgentState state) {
+		// TODO Auto-generated method stub
+		
 	}
 }

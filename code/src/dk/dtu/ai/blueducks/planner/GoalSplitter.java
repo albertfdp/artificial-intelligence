@@ -2,18 +2,19 @@ package dk.dtu.ai.blueducks.planner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
-import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
-import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
-import dk.dtu.ai.blueducks.goals.Goal;
-import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
+import dk.dtu.ai.blueducks.goals.*;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 
 public class GoalSplitter {
+	
+	/** The Constant logger. */
+	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
 
 	/**
 	 * Split the goal into subgoals
@@ -24,16 +25,58 @@ public class GoalSplitter {
 	 */
 	public List<Goal> getSubgoal(Goal goal, Agent agent) {
 		List<Goal> subgoals = new ArrayList<Goal>();
-		Cell goalCell = ((DeliverBoxGoal) goal).getTo();
+		
+		if (goal instanceof DeliverBoxGoal) {
+			subgoals = splitDeliverBoxGoal((DeliverBoxGoal) goal, agent);
+		} else if (goal instanceof ClearPathGoal) {
+			subgoals = splitClearPathGoal((ClearPathGoal) goal, agent);
+		}
+		return subgoals;
+	}
+	
+	private List<Goal> splitClearPathGoal(ClearPathGoal cpg, Agent agent) {
+		List<Goal> subgoals = new ArrayList<Goal>();
+		
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
-		Box b = ((DeliverBoxGoal) goal).getWhat();
-		Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(b);
-
+		
+		// get the list of cells to be cleared
+		Set<Cell> cellsToBeCleared = cpg.getCells();
+		
+		// get the box to be cleared, if any
+		Box boxToClear = cpg.getBox();
+		
+		// go to box
+		if (boxToClear != null) {
+			Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(boxToClear);
+			if (!agentCell.getNeighbours().contains(boxToClear))
+				subgoals.add((Goal) new GoToBoxGoal(agentCell, boxCell));
+			subgoals.add((Goal) new ClearBoxGoal(boxToClear, cellsToBeCleared));
+		}
+		subgoals.add((Goal) new ClearAgentGoal(cellsToBeCleared));		
+		
+		return subgoals;
+	}
+	
+	private List<Goal> splitDeliverBoxGoal(DeliverBoxGoal dbg, Agent agent) {
+		List<Goal> subgoals = new ArrayList<Goal>();
+		
+		Cell goalCell = dbg.getTo();
+		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
+		Box box = dbg.getWhat();
+		Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(box);
+		
+		// if the agent and the box are not neighbours, it is a GoToBoxGoal
 		if (!agentCell.getNeighbours().contains(boxCell))
+			// check if the path to the box is clean, and otherwise, clean it or ask for help
+			
+			
 			subgoals.add((Goal) new GoToBoxGoal(agentCell, boxCell));
-
-		subgoals.add((Goal) new MoveBoxGoal(b, goalCell));
-		Logger.getLogger(GoalSplitter.class.getSimpleName()).info("Split " + goal + " in: " + subgoals);
+		
+		// check if the path from the box to the goal is clean, and clean it or ask for help
+		
+		
+		subgoals.add((Goal) new MoveBoxGoal(box, goalCell));
+		Logger.getLogger(GoalSplitter.class.getSimpleName()).info("Split " + dbg + " in: " + subgoals);
 
 		return subgoals;
 	}

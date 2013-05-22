@@ -7,8 +7,11 @@
  */
 package dk.dtu.ai.blueducks.goals;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.State;
 import dk.dtu.ai.blueducks.planner.AStarNode;
@@ -17,30 +20,43 @@ public class ClearPathGoal extends Goal {
 	
 	
 	/** The cells that need to be cleared. */
-	private List<Cell> cells; 
+	private Set<Cell> cells; 
 	
-	public ClearPathGoal(List<Cell> cells) {
-		this.cells = cells;
-	}
-	
-	public List<Cell> getCells() {
+	public Set<Cell> getCells() {
 		return cells;
 	}
 
-	public void setCells(List<Cell> cells) {
+	public void setCells(Set<Cell> cells) {
 		this.cells = cells;
 	}
 
+	/** The box which should cleared. */
+	private Box box;
+	
+	public Box getBox() {
+		return box;
+	}
+
+	public void setBox(Box box) {
+		this.box = box;
+	}
+
+	public ClearPathGoal(Box box, List<Cell> cells) {
+		this.box = box;
+		this.cells = new HashSet<Cell>(cells);
+	}
+	
 	@Override
 	public boolean isSatisfied(AStarNode node) {
 		State state = (State) node;
-		for (Cell cell : cells) {
-			if (state.isFree(cell) > 0) { // 0 means occupied
-				return false;
-			}
-		}
+		
+		if (box != null && cells.contains(state.getCellForBox(box)))
+			return false;
+		
+		if (cells.contains(state.getAgentCell()))
+			return false;
+		
 		return true;
-	}
-	
+	}	
 
 }

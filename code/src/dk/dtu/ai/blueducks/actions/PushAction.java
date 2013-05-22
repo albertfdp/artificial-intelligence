@@ -16,7 +16,9 @@ import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
+import dk.dtu.ai.blueducks.map.MultiAgentState;
 import dk.dtu.ai.blueducks.map.State;
+import dk.dtu.ai.blueducks.map.State.CellVisibility;
 
 /**
  * The Push Action.
@@ -49,6 +51,14 @@ public class PushAction extends Action {
 		this.boxDirection = dirBox;
 		this.agent = agent;
 		this.box = box;
+	}
+	
+	public Box getBox() {
+		return box;
+	}
+	
+	public Direction getBoxDirection() {
+		return boxDirection;
 	}
 
 	/* (non-Javadoc)
@@ -102,5 +112,58 @@ public class PushAction extends Action {
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
 		Cell destCell = agentCell.getNeighbour(agentDirection);
 		LevelMap.getInstance().setAsWall(destCell.x, destCell.y);
+	}
+
+	public Cell getDestCell(MultiAgentState state, Box b, Direction boxDir){
+		return state.getCellForBox(b).getNeighbour(boxDir);
+	}
+	
+	@Override
+	public boolean isInConflict(MultiAgentState state, Action otherAction) {
+		
+		Cell destCell = getDestCell(state,box,boxDirection);
+		
+		if (!isApplicable(state))
+			return false;
+		
+		if ((otherAction instanceof MoveAction) && 
+				(destCell == ((MoveAction)otherAction).getDestCell(state,((MoveAction)otherAction).getAgent()
+						,((MoveAction)otherAction).getAgentDirection()))){
+			return false;
+		}
+		
+		if ((otherAction instanceof PullAction) && 
+				((destCell == ((PullAction)otherAction).getDestCell(state,((PullAction)otherAction).getAgent()
+						, ((PullAction)otherAction).getAgentDirection())) || (getBox() == ((PullAction)otherAction).getBox()))){
+			return false;		
+		}
+		
+		if ((otherAction instanceof PushAction) && 
+				(destCell == ((PushAction)otherAction).getDestCell(state,((PushAction)otherAction).getBox()
+						,((PushAction)otherAction).getBoxDirection()))){
+			return false;		
+		}
+		return true;
+	}
+
+	@Override
+	public boolean isApplicable(MultiAgentState state) {
+		Cell agentCell = state.getCellForAgent(agent);
+		Cell boxCell = state.getCellForBox(box);
+		Cell destBoxCell = boxCell.getNeighbour(boxDirection);
+		
+		if ((boxCell.getCellNeighbours().contains(agentCell)) &&
+				(state.isFree(destBoxCell) == CellVisibility.FREE) &&
+				(box.getColor().equals(agent.getColor()))){
+			return true;
+		}
+		
+		return false;
+	}
+
+	@Override
+	public void execute(MultiAgentState state) {
+		// TODO Auto-generated method stub
+		
 	}
 }
