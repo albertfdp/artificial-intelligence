@@ -16,6 +16,7 @@ import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.MultiAgentState;
 import dk.dtu.ai.blueducks.map.State;
+import dk.dtu.ai.blueducks.map.State.CellVisibility;
 
 /**
  * The Class MoveAction.
@@ -37,6 +38,14 @@ public class MoveAction extends Action {
 		super();
 		this.agentDirection = dirAgent;
 		this.agent = agent; 
+	}
+
+	public Direction getAgentDirection() {
+		return agentDirection;
+	}
+
+	public Agent getAgent() {
+		return agent;
 	}
 
 	@Override
@@ -81,16 +90,45 @@ public class MoveAction extends Action {
 		//TODO: continue
 		LevelMap.getInstance().setAsWall(destCell.x, destCell.y);
 	}
+	
+	public Cell getDestCell(MultiAgentState state, Agent a, Direction agentDir){
+		return state.getCellForAgent(a).getNeighbour(agentDir);
+	}
 
 	@Override
-	public boolean isInConflict(MultiAgentState state, Action otherAction) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isInConflict(MultiAgentState state, Action otherAction) {		
+		Cell destCell = getDestCell(state,agent,agentDirection);
+		
+		if (!isApplicable(state))
+			return false;
+		
+		if ((otherAction instanceof MoveAction) && 
+				(destCell == ((MoveAction)otherAction).getDestCell(state,((MoveAction)otherAction).getAgent()
+						,((MoveAction)otherAction).getAgentDirection()))){
+			return false;		
+		}
+		
+		if ((otherAction instanceof PullAction) && 
+				(destCell == ((PullAction)otherAction).getDestCell(state,((PullAction)otherAction).getAgent()
+						,((PullAction)otherAction).getAgentDirection()))){
+			return false;		
+		}
+		
+		if ((otherAction instanceof PushAction) && 
+				(destCell == ((PushAction)otherAction).getDestCell(state,((PushAction)otherAction).getBox()
+						,((PushAction)otherAction).getBoxDirection()))){
+			return false;		
+		}
+		return true;
 	}
 
 	@Override
 	public boolean isApplicable(MultiAgentState state) {
-		// TODO Auto-generated method stub
+		Cell agentCell = state.getCellForAgent(agent);
+		Cell destCell = agentCell.getNeighbour(agentDirection);
+		
+		if (state.isFree(destCell) == CellVisibility.FREE)
+			return true;
 		return false;
 	}
 
