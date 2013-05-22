@@ -9,10 +9,12 @@ package dk.dtu.ai.blueducks.map;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
@@ -54,12 +56,11 @@ public class LevelMap {
 
 	/** The betweenness centrality score for each free cell */
 	private Map<Cell, Double> betweennesScore;
-	
+
 	private Map<Cell, Map<Cell, Number>> dijkstraDistances;
-	
-	private List<Cell> lockedCells;
-	
-	
+
+	private Set<Cell> lockedCells;
+
 	private List<Cell> verifiedCells;
 
 	/**
@@ -72,7 +73,7 @@ public class LevelMap {
 		verifiedCells = new ArrayList<Cell>();
 		agents = new ArrayList<Agent>();
 		dijkstraDistances = new HashMap<Cell, Map<Cell, Number>>();
-		lockedCells = new ArrayList<Cell>();
+		lockedCells = new HashSet<Cell>();
 	}
 
 	/**
@@ -220,7 +221,7 @@ public class LevelMap {
 	public Map<Character, List<Cell>> getGoals() {
 		return goals;
 	}
-	
+
 	public boolean isGoal(Cell cell) {
 		for (Entry<Character, List<Cell>> goal : goals.entrySet()) {
 			if (goal.getValue().contains(cell))
@@ -283,23 +284,21 @@ public class LevelMap {
 	public State getCurrentState() {
 		return currentState;
 	}
-	
+
 	public int getDijkstraDistance(Cell cellA, Cell cellB) {
 		return this.dijkstraDistances.get(cellA).get(cellB).intValue();
 	}
-	
-	public List<Cell> getLockedCells() {
+
+	public Set<Cell> getLockedCells() {
 		return this.lockedCells;
 	}
-	
+
 	public void lockCell(Cell cell) {
-		if (!lockedCells.contains(cell))
-			this.lockedCells.add(cell);
+		this.lockedCells.add(cell);
 	}
-	
+
 	public void unlockCell(Cell cell) {
-		if (lockedCells.contains(cell))
-			this.lockedCells.remove(cell);
+		this.lockedCells.remove(cell);
 	}
 
 	/**

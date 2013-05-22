@@ -40,6 +40,10 @@ public class GoalPlannerHeuristic {
 			distance += LevelMap.getInstance().getDijkstraDistance(boxCell, goalCell);
 		}
 		
+		if (LevelMap.getInstance().getLockedCells().contains(boxCell)) {
+			distance += 100000;
+		}
+		
 		List<Cell> goalNeighbours = goalCell.getCellNeighbours();
 		
 		for (Cell neighbour : goalNeighbours) {

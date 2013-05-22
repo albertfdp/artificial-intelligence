@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.goals.Goal;
@@ -31,17 +32,24 @@ public class AStarSearch {
 		Set<NodeType> closedSet;
 		PriorityQueue<NodeType> openSet;
 
-		log.finest("Starting Path Planning from " + begin + " to " + end);
+		if (log.isLoggable(Level.FINE))
+			log.fine("Starting Path Planning from " + begin + " for " + end);
 		// empty set for already explored cells
-		closedSet = new HashSet<>();
-		openSet = new PriorityQueue<>();
+		closedSet = new HashSet<>(100000);
+		openSet = new PriorityQueue<>(100000);
 
 		// in the "to explore" set there is in the beginning just the cell with which we begin
 		openSet.add(begin);
 		begin.g = 0;
 		begin.f = heuristic.getHeuristicValue(begin, end, null);
+		int loopCount = 0;
 
 		while (!openSet.isEmpty()) {
+			if (log.isLoggable(Level.INFO)) {
+				loopCount++;
+				if ((loopCount % 5000) == 0)
+					log.info("Expanded " + loopCount + " states. OpenSet size: " + openSet.size());
+			}
 			NodeType current = openSet.peek();
 			if (current.satisfiesGoal(end))
 				return AStarSearch.<NodeType> computePath(current);
@@ -50,13 +58,13 @@ public class AStarSearch {
 			for (AStarNode _entity : current.getNeighbours()) {
 				NodeType entity = (NodeType) _entity;
 				float tentativeScore = current.g + DISTANCE_ONE;
-				
+
 				if (closedSet.contains(entity)) {
 					if (tentativeScore >= entity.g) {
 						continue;
 					}
 				}
-				
+
 				if (!openSet.contains(entity) || tentativeScore < entity.g) {
 					// update partial score from start to neighbor cell
 					entity.g = tentativeScore;

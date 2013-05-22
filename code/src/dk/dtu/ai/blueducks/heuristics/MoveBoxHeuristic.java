@@ -35,6 +35,7 @@ public class MoveBoxHeuristic implements Heuristic<State, MoveBoxGoal> {
 		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
 			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
 			Cell cell = prevState.getCellForBox(pullAction.getBox());
+			//TODO: Why is this different from the one one GoToBox?
 			if (LevelMap.getInstance().getLockedCells().contains(cell)) {
 				h += penaltyForUndoingGoals;
 			}

@@ -173,6 +173,7 @@ public class MotherOdin {
 	 */
 	public void finishedTopLevelGoal(Agent agent, Goal goal) {
 		log.info(agent + " completed goal: " + goal);
+		LevelMap.getInstance().lockCell(((DeliverBoxGoal) goal).getTo());
 		generateTopLevelGoals();
 		if (topLevelGoals.size() > 0) {
 			for (Agent a : LevelMap.getInstance().getAgentsList())
