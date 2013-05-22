@@ -32,6 +32,8 @@ public class MotherOdin {
 	/** The Constant log. */
 	private static final Logger log = Logger.getLogger(MotherOdin.class.getSimpleName());
 
+	ArrayList<Agent> agents;
+
 	/** The instance. */
 	private static MotherOdin mInstance = new MotherOdin();
 
@@ -47,7 +49,7 @@ public class MotherOdin {
 	/** The agents' goals. */
 	private HashMap<Agent, Goal> agentsGoals = new HashMap<>();
 
-	private HashMap<Agent, LinkedList<Action>> plans = new HashMap<>();
+	private List<LinkedList<Action>> plans;
 
 	/**
 	 * Gets the single instance of MotherOdin.
@@ -60,8 +62,12 @@ public class MotherOdin {
 
 	public MotherOdin() {
 		super();
-		for (Agent a : LevelMap.getInstance().getAgentsList())
-			plans.put(a, new LinkedList<Action>());
+		agents = LevelMap.getInstance().getAgentsList();
+		// Init the plans list
+		plans = new ArrayList<LinkedList<Action>>();
+		for (int i = 0; i < agents.size(); i++)
+			plans.add(new LinkedList<Action>());
+
 	}
 
 	/**
@@ -104,16 +110,17 @@ public class MotherOdin {
 			log.info("Starting loop " + (++currentLoop) + "...");
 
 			// Check if any agent is out of actions
-			for (Entry<Agent, LinkedList<Action>> entry : plans.entrySet())
-				if (entry.getValue().isEmpty()) {
-					entry.getKey().requestPlan();
+			for (int agent = 0; agent < plans.size(); agent++)
+				if (plans.get(agent).isEmpty()) {
+					agents.get(agent).requestPlan();
 				}
 			// TODO: Wait for synchronization when using multi-threading
+			mergePlans();
 
 			// Build the joint action
 			List<Action> actions = new LinkedList<>();
-			for (Agent a : LevelMap.getInstance().getAgentsList())
-				actions.add(plans.get(a).remove());
+			for (int agent = 0; agent < agents.size(); agent++)
+				actions.add(plans.get(agent).remove());
 
 			// Send the joint actions to the server
 			BlueDucksClient.sendJointAction(actions);
@@ -134,12 +141,16 @@ public class MotherOdin {
 			// Notify the agents that something has changed
 			if (!jointActionSuccessful) {
 				log.info("Triggering agent replanning!");
-				for (Agent a : LevelMap.getInstance().getAgentsList())
+				for (int a = 0; a < agents.size(); a++)
 					// By clearing the plan, a new plan will be requested at the beginning of the
 					// next loop
 					plans.get(a).clear();
 			}
 		}
+	}
+
+	private void mergePlans() {
+		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -168,13 +179,13 @@ public class MotherOdin {
 	 * @param agent the agent
 	 * @param plan the plan
 	 */
-	public void appendPlan(Agent agent, List<Action> plan) {
-		plans.get(agent).addAll(plan);
+	public synchronized void appendPlan(Agent agent, List<Action> plan) {
+		plans.get(agent.getId()).addAll(plan);
 	}
 
 	/**
 	 * Adds the agent's goals proposal.
-	 *
+	 * 
 	 * @param agent the agent
 	 * @param costs the costs
 	 */

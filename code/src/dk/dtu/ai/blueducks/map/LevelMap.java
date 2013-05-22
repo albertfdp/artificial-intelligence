@@ -23,8 +23,8 @@ import dk.dtu.ai.blueducks.Box;
  */
 public class LevelMap {
 
-	private LinkedList<Agent> agents;
-	
+	private ArrayList<Agent> agents;
+
 	/** The map. */
 	private static LevelMap map;
 
@@ -51,11 +51,10 @@ public class LevelMap {
 
 	/** The boxes list. */
 	private List<Box> boxesList;
-	
+
 	/** The betweenness centrality score for each free cell */
 	private Map<Cell, Double> betweennesScore;
-	
-	
+
 	private List<Cell> verifiedCells;
 
 	/**
@@ -66,7 +65,7 @@ public class LevelMap {
 		boxesList = new LinkedList<>();
 		goals = new HashMap<Character, List<Cell>>();
 		verifiedCells = new ArrayList<Cell>();
-		agents=new LinkedList<>();
+		agents = new ArrayList<Agent>();
 	}
 
 	/**
@@ -98,11 +97,11 @@ public class LevelMap {
 		}
 		Cell.map = this;
 	}
-	
+
 	public Map<Cell, Double> getBetweenessCentrality() {
 		return this.betweennesScore;
 	}
-	
+
 	/**
 	 * Adds a new cell- to WHERE
 	 * 
@@ -118,17 +117,17 @@ public class LevelMap {
 		matrix[x][y] = cell;
 	}
 
-	
-	public void markAsNotWall(Cell cell){
-		if(!verifiedCells.contains(cell))
+	public void markAsNotWall(Cell cell) {
+		if (!verifiedCells.contains(cell))
 			this.verifiedCells.add(cell);
 	}
-	
-	public boolean isVerified(Cell cell){
-		if(verifiedCells.contains(cell))
+
+	public boolean isVerified(Cell cell) {
+		if (verifiedCells.contains(cell))
 			return true;
 		return false;
 	}
+
 	/**
 	 * Adds a cell that is also a goal
 	 * 
@@ -160,7 +159,7 @@ public class LevelMap {
 	public void attachAgent(Cell cell, Agent agent) {
 		logger.info("Attached agent" + agent.getId() + " to Cell: " + cell.x + " " + cell.y);
 		agentCells.put(cell, agent);
-		agents.add(agent);
+		agents.add(agent.getId(), agent);
 	}
 
 	/**
@@ -174,7 +173,7 @@ public class LevelMap {
 		this.currentState.addBox(cell, box);
 		this.boxesList.add(box);
 	}
-	
+
 	public List<Cell> getCells() {
 		List<Cell> cells = new ArrayList<Cell>();
 		for (int x = 0; x < matrix.length; x++) {
@@ -201,8 +200,8 @@ public class LevelMap {
 		}
 		return null;
 	}
-	
-	public void setAsWall(int x, int y){
+
+	public void setAsWall(int x, int y) {
 		matrix[x][y] = null;
 	}
 
@@ -223,8 +222,8 @@ public class LevelMap {
 	public Map<Cell, Agent> getAgents() {
 		return agentCells;
 	}
-	
-	public LinkedList<Agent> getAgentsList(){
+
+	public ArrayList<Agent> getAgentsList() {
 		return agents;
 	}
 
