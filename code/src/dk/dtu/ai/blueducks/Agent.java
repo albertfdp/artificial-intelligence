@@ -9,6 +9,7 @@ package dk.dtu.ai.blueducks;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +27,7 @@ import dk.dtu.ai.blueducks.map.State;
 import dk.dtu.ai.blueducks.planner.AStarSearch;
 import dk.dtu.ai.blueducks.planner.GoalPlanner;
 import dk.dtu.ai.blueducks.planner.GoalSplitter;
+import dk.dtu.ai.blueducks.planner.GoalPlanner.GoalCost;
 
 /**
  * The Class Agent.
@@ -33,7 +35,11 @@ import dk.dtu.ai.blueducks.planner.GoalSplitter;
 public class Agent {
 
 	/** The id. */
-	private char id;
+	private int id;
+
+	public int getId() {
+		return id;
+	}
 
 	/** The color. */
 	private String color;
@@ -66,21 +72,11 @@ public class Agent {
 	 * @param color the color
 	 */
 	public Agent(char id, String color) {
-		this.id = id;
+		this.id = id - '0';
 		this.color = color;
 		this.goalPlanner = new GoalPlanner(this);
 		this.goalSplitter = new GoalSplitter();
 		this.log = Logger.getLogger("Agent " + id);
-	}
-
-	/**
-	 * Gets the id.
-	 * 
-	 * @return the id
-	 * @returns the id (the letter of the agent)
-	 */
-	public char getId() {
-		return id;
 	}
 
 	/**
@@ -110,10 +106,10 @@ public class Agent {
 	private List<State> computePlanStates(Goal goal, State agentState) {
 		List<State> path = null;
 		if (goal instanceof GoToBoxGoal) {
-			GoToBoxGoal gtbGoal = (GoToBoxGoal) subgoals.get(currentSubgoalIndex);
+			GoToBoxGoal gtbGoal = (GoToBoxGoal) goal;
 			path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState, gtbGoal, new GoToBoxHeuristic());
 		} else if (goal instanceof MoveBoxGoal) {
-			MoveBoxGoal mbGoal = (MoveBoxGoal) subgoals.get(currentSubgoalIndex);
+			MoveBoxGoal mbGoal = (MoveBoxGoal) goal;
 			path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState, mbGoal, new MoveBoxHeuristic());
 		}
 		return path;
@@ -144,12 +140,16 @@ public class Agent {
 		// If there are no more subgoals that need to be satisfied
 		if (currentSubgoalIndex >= this.subgoals.size()) {
 			log.info("Finished planning for all subgoals.");
-			MotherOdin.getInstance().finishedTopLevelGoal(this);
+			MotherOdin.getInstance().finishedTopLevelGoal(this, this.currentGoal);
+			return;
 		}
 
 		// Replan
 		State agentState = new State(LevelMap.getInstance().getCellForAgent(this), null, null, this);
-		Goal subgoal = subgoals.get(currentSubgoalIndex);
+		agentState.setBoxes(LevelMap.getInstance().getCurrentState().getBoxes());
+		Goal subgoal = subgoals.get(currentSubgoalIndex++);
+		if (log.isLoggable(Level.FINER))
+			log.finer("\tCurrent subgoal: " + subgoal);
 		List<State> plan = computePlanStates(subgoal, agentState);
 		plan.remove(0);
 		List<Action> actions = new LinkedList<Action>();
@@ -166,8 +166,16 @@ public class Agent {
 	 * proposal using {@link MotherOdin#addAgentGoalsProposal(Agent, java.util.PriorityQueue)}.
 	 */
 	public void requestGoalsProposals() {
-		MotherOdin.getInstance().addAgentGoalsProposal(this,
-				goalPlanner.computeGoalCosts(MotherOdin.getInstance().getTopLevelGoals()));
+		log.fine("Request for Goals Proposals received.");
+		PriorityQueue<GoalCost> proposals = goalPlanner.computeGoalCosts(MotherOdin.getInstance()
+				.getTopLevelGoals());
+		if (log.isLoggable(Level.FINEST))
+			log.finest("Goals proposals: " + proposals);
+		MotherOdin.getInstance().addAgentGoalsProposal(this, proposals);
 	}
 
+	@Override
+	public String toString() {
+		return "Agent" + id;
+	}
 }

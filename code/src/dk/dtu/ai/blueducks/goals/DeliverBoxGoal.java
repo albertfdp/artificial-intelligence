@@ -74,7 +74,7 @@ public class DeliverBoxGoal extends Goal {
 
 	@Override
 	public String toString() {
-		return "DeliverBoxGoal [what=" + what + ", to=" + to + "]";
+		return "DeliverBoxGoal [what=" + what.getId() + ", to=" + to + "]";
 	}
 
 }

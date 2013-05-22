@@ -81,7 +81,7 @@ public class MoveAction extends Action {
 
 	@Override
 	public String toString() {
-		return "MoveAction [agentDirection=" + agentDirection + ", agent=" + agent + "]";
+		return "MoveAction ["+agent+", aDir=" + agentDirection + "]";
 	}
 	
 	public void invalidateAction(){

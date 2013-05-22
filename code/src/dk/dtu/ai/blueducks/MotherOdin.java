@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.actions.NoOpAction;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.map.Cell;
@@ -44,7 +45,7 @@ public class MotherOdin {
 	private List<Goal> topLevelGoals = new ArrayList<>();
 
 	/** The goal costs. */
-	private HashMap<Agent, PriorityQueue<GoalCost>> goalCosts;
+	private HashMap<Agent, PriorityQueue<GoalCost>> goalCosts = new HashMap<>();
 
 	/** The agents' goals. */
 	private HashMap<Agent, Goal> agentsGoals = new HashMap<>();
@@ -120,7 +121,10 @@ public class MotherOdin {
 			// Build the joint action
 			List<Action> actions = new LinkedList<>();
 			for (int agent = 0; agent < agents.size(); agent++)
-				actions.add(plans.get(agent).remove());
+				if (plans.get(agent).peek() != null)
+					actions.add(plans.get(agent).remove());
+				else
+					actions.add(new NoOpAction());
 
 			// Send the joint actions to the server
 			BlueDucksClient.sendJointAction(actions);
@@ -167,9 +171,16 @@ public class MotherOdin {
 	 * 
 	 * @param agent the agent
 	 */
-	public void finishedTopLevelGoal(Agent agent) {
+	public void finishedTopLevelGoal(Agent agent, Goal goal) {
+		log.info(agent + " completed goal: " + goal);
 		generateTopLevelGoals();
-		assignAgentsGoals();
+		if (topLevelGoals.size() > 0) {
+			for (Agent a : LevelMap.getInstance().getAgentsList())
+				a.requestGoalsProposals();
+			// TODO: Wait for synchronization when using multi-threading
+			assignAgentsGoals();
+		} else
+			log.info("No more top level goals.");
 	}
 
 	/**
@@ -224,10 +235,12 @@ public class MotherOdin {
 					agentsGoals.put(agent, goalCosts.get(agent).peek().goal);
 			}
 		}
+		if (log.isLoggable(Level.FINE))
+			log.fine("Assigned goals to agents: " + agentsGoals);
 
 		for (Entry<Agent, Goal> e : agentsGoals.entrySet()) {
 			// If the goals for any of the agent has been changed, request a new plan from him.
-			if (!e.getKey().getCurrentGoal().equals(e.getValue())) {
+			if (!e.getValue().equals(e.getKey().getCurrentGoal())) {
 				e.getKey().requestPlan();
 			}
 		}

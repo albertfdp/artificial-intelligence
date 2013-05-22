@@ -7,21 +7,19 @@
  */
 package dk.dtu.ai.blueducks;
 
-
 public class Box {
-	
+
 	// TODO: should we add a unique id?
-	
+
 	private char id;
 	private String color;
-	
+
 	@Override
 	public String toString() {
-		return "Box [id=" + id + ", color=" + color + "]";
+		return "Box[" + id + "]";
 	}
 
-	public Box(char id, String color) 
-	{
+	public Box(char id, String color) {
 		this.id = id;
 		this.color = color;
 	}

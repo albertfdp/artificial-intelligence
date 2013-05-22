@@ -47,7 +47,6 @@ public class AStarSearch {
 				return AStarSearch.<NodeType> computePath(current);
 			closedSet.add(current);
 			openSet.remove(current);
-			log.info("THe state: " + current);
 			for (AStarNode _entity : current.getNeighbours()) {
 				NodeType entity = (NodeType) _entity;
 				float tentativeScore = current.g + DISTANCE_ONE;

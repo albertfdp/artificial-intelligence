@@ -206,4 +206,12 @@ public class PullAction extends Action {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+
+	@Override
+	public String toString() {
+		return "PullAction ["+ agent + ", " + box + ", aDir=" + agentDirection
+				+ ", bDir=" + boxDirection + "]";
+	}
 }

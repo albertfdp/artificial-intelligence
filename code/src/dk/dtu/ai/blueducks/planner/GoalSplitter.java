@@ -76,7 +76,6 @@ public class GoalSplitter {
 		
 		
 		subgoals.add((Goal) new MoveBoxGoal(box, goalCell));
-		Logger.getLogger(GoalSplitter.class.getSimpleName()).info("Split " + dbg + " in: " + subgoals);
 
 		return subgoals;
 	}
