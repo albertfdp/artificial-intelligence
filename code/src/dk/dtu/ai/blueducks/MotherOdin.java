@@ -166,9 +166,8 @@ public class MotherOdin {
 	 * Called when an agent finishes a top level goal.
 	 * 
 	 * @param agent the agent
-	 * @param goal the goal
 	 */
-	public void finishedTopLevelGoal(Agent agent, Goal goal) {
+	public void finishedTopLevelGoal(Agent agent) {
 		generateTopLevelGoals();
 		assignAgentsGoals();
 	}
