@@ -12,6 +12,7 @@ import java.util.List;
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.State;
+import dk.dtu.ai.blueducks.map.State.CellVisibility;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class ClearPathGoal extends Goal {
@@ -50,7 +51,7 @@ public class ClearPathGoal extends Goal {
 		State state = (State) node;
 		for (Cell cell : cells) {
 			// if cell is occupied and it is not the agent cell
-			if (state.isFree(cell) > 0 && (cell != state.getAgentCell())) { // 0 means occupied
+			if (state.isFree(cell) !=CellVisibility.NOT_FREE && (cell != state.getAgentCell())) { // 0 means occupied
 				// TODO: if the agent cannot move the box, then he can't do anything, so it's satisfied
 				// FIXME: how I do that
 				return false;

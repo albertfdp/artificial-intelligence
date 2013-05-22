@@ -27,6 +27,8 @@ import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class State extends AStarNode {
 	
+	public enum CellVisibility {FREE, NOT_FREE, POSSIBLY_FREE};
+	
 	/** The boxes. */
 	private Map<Cell, Box> boxes;
 	
@@ -126,15 +128,15 @@ public class State extends AStarNode {
 	 * Checks if is free.
 	 *
 	 * @param cell the cell
-	 * @return 0 if the cell is not free, 1 if the cell might be free, 2 if it's definitely free
+	 * @return the celll visibility
 	 */
-	public int isFree(Cell cell) {
-		if(cell == null || boxes.keySet().contains(cell))
-			return 0;
+	public CellVisibility isFree(Cell cell) {
+		if(cell == null || boxes.containsKey(cell))
+			return CellVisibility.NOT_FREE;
 		//TODO: where will we use the fact that the cell might/ might not be free
 		if(LevelMap.getInstance().isVerified(cell))
-			return 2;
-		return 1;
+			return CellVisibility.FREE;
+		return CellVisibility.POSSIBLY_FREE;
 	}
 	
 	/**
@@ -163,20 +165,20 @@ public class State extends AStarNode {
 		
 		//log.info("AGENT CELL "+ agentCell);
 		for (Cell cell : neighbourCells) {
-			if (isFree(cell) != 0) {
+			if (isFree(cell) != CellVisibility.NOT_FREE) {
 				//log.info("ACTION "+ agentCell.getDirection(cell));
 				actions.add(new MoveAction(agentCell.getDirection(cell), agent));
 			} else {
 				if (boxes.keySet().contains(cell) && boxes.get(cell).getColor() == agent.getColor()) {
 
 					for (Cell neighbour : cell.getCellNeighbours()) {
-						if (isFree(neighbour) != 0) {
+						if (isFree(neighbour) != CellVisibility.NOT_FREE) {
 							actions.add(new PushAction(agentCell.getDirection(cell), cell
 									.getDirection(neighbour), agent, boxes.get(cell)));
 						}
 					}
 					for (Cell myNeighbour : neighbourCells) {
-						if (isFree(myNeighbour) != 0) {
+						if (isFree(myNeighbour) != CellVisibility.NOT_FREE) {
 							actions.add(new PullAction(agentCell.getDirection(myNeighbour), agentCell
 									.getDirection(cell), agent, boxes.get(cell)));
 						}
