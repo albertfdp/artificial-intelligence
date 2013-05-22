@@ -17,6 +17,7 @@ import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.MultiAgentState;
 import dk.dtu.ai.blueducks.map.State;
+import dk.dtu.ai.blueducks.map.State.CellVisibility;
 
 public class PullAction extends Action {
 
@@ -151,17 +152,50 @@ public class PullAction extends Action {
 	}
 
 
+	public Cell getDestCell(MultiAgentState state, Agent a, Direction agentDir){
+		return state.getCellForAgent(a).getNeighbour(agentDir);
+	}
 
 	@Override
 	public boolean isInConflict(MultiAgentState state, Action otherAction) {
-		// TODO Auto-generated method stub
-		return false;
+		Cell destCell = getDestCell(state,agent,agentDirection);
+		
+		if (!isApplicable(state))
+			return false;
+		
+		if ((otherAction instanceof MoveAction) && 
+				(destCell == ((MoveAction)otherAction).getDestCell(state,((MoveAction)otherAction).getAgent()
+						,((MoveAction)otherAction).getAgentDirection()))){
+			return false;		
+		}
+		
+		if ((otherAction instanceof PullAction) && 
+				((destCell == ((PullAction)otherAction).getDestCell(state,((PullAction)otherAction).getAgent()
+						,((PullAction)otherAction).getAgentDirection())) || (getBox() == ((PullAction)otherAction).getBox()))){		
+			return false;		
+		}
+		
+		if ((otherAction instanceof PushAction) && 
+				((destCell == ((PushAction)otherAction).getDestCell(state,((PushAction)otherAction).getBox()
+						, ((PushAction)otherAction).getBoxDirection())) || (getBox() == ((PushAction)otherAction).getBox()))){
+			return false;		
+		}
+		return true;
 	}
 
 
 	@Override
 	public boolean isApplicable(MultiAgentState state) {
-		// TODO Auto-generated method stub
+		Cell agentCell = state.getCellForAgent(agent);
+		Cell boxCell = state.getCellForBox(box);
+		Cell destAgentCell = agentCell.getNeighbour(agentDirection);
+		
+		if ((boxCell.getCellNeighbours().contains(agentCell)) &&
+				(state.isFree(destAgentCell) == CellVisibility.FREE) &&
+				(box.getColor().equals(agent.getColor()))){
+			return true;
+		}
+		
 		return false;
 	}
 

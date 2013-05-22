@@ -35,14 +35,12 @@ public class NoOpAction extends Action {
 
 	@Override
 	public boolean isInConflict(MultiAgentState state, Action otherAction) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isApplicable(MultiAgentState state) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
