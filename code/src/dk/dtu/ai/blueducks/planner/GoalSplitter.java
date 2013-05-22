@@ -2,6 +2,7 @@ package dk.dtu.ai.blueducks.planner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
@@ -38,24 +39,20 @@ public class GoalSplitter {
 		
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
 		
-		// move to all the boxes that are in the path, and move them to the closest cleared cell
-		List<Cell> cellsToBeClean = cpg.getCells();
+		// get the list of cells to be cleared
+		Set<Cell> cellsToBeCleared = cpg.getCells();
 		
-		// get the box that the agent wants to clean
-		Box box = cpg.getBox();
-		Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(box);
+		// get the box to be cleared, if any
+		Box boxToClear = cpg.getBox();
 		
-		// find the closest free cell to the box which is not in the cellsToBeClean
-		// FIXME: how to
-		Cell goalBoxCell;
-		Cell goalAgentCell;
-		
-		if (!agentCell.getNeighbours().contains(boxCell))
-			subgoals.add((Goal) new GoToBoxGoal(agentCell, boxCell));
-		
-		// MoveBoxToGoal
-		
-		// FIXME: MoveToGoal ????
+		// go to box
+		if (boxToClear != null) {
+			Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(boxToClear);
+			if (!agentCell.getNeighbours().contains(boxToClear))
+				subgoals.add((Goal) new GoToBoxGoal(agentCell, boxCell));
+			subgoals.add((Goal) new ClearBoxGoal(boxToClear, cellsToBeCleared));
+		}
+		subgoals.add((Goal) new ClearAgentGoal(cellsToBeCleared));		
 		
 		return subgoals;
 	}

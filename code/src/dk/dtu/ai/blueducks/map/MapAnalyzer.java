@@ -25,10 +25,16 @@ public class MapAnalyzer {
 	
 	private static final Logger log = Logger.getLogger(MapLoader.class.getSimpleName());
 	
-	private static Graph<Cell, String> graph;
+	private static Graph<Cell, CellEdge> graph;
+	
+	private static DijkstraShortestPath<Cell, CellEdge> dd;
+	
+	private static Map<Cell, Double> nbc;
 	
 	private MapAnalyzer() {
 		MapAnalyzer.graph = this.getGraph(LevelMap.getInstance().getCells());
+		MapAnalyzer.nbc = getNormalizedBetweenessCentrality();
+		MapAnalyzer.dd = new DijkstraShortestPath<Cell, CellEdge>(graph);
 	}
 	
 	public static MapAnalyzer getInstance() {
@@ -38,9 +44,9 @@ public class MapAnalyzer {
 		return MapAnalyzer.analyzer;
 	}
 	
-	private Graph<Cell, String> getGraph(List<Cell> cells) {
-		Graph<Cell, String> graph = new UndirectedSparseGraph<Cell, String>();
-		
+	private Graph<Cell, CellEdge> getGraph(List<Cell> cells) {
+		Graph<Cell, CellEdge> graph = new UndirectedSparseGraph<Cell, CellEdge>();
+		log.info("Constructing graph ....");
 		for (Cell cell : cells) {
 			graph.addVertex(cell);
 		}
@@ -48,8 +54,7 @@ public class MapAnalyzer {
 		for (Cell cell : cells) {
 			for (Cell neighbour : cell.getCellNeighbours()) {
 				if (neighbour != null) {
-					graph.addEdge(cell.toString() + "-" + neighbour.toString() + "-" + 
-							cell.getDirection(neighbour), cell, neighbour);
+					graph.addEdge(new CellEdge(cell, neighbour), cell, neighbour);
 				}
 			}
 		}
@@ -65,25 +70,28 @@ public class MapAnalyzer {
 	}
 	
 	public Map<Cell, Double> getNormalizedBetweenessCentrality() {
-		Map<Cell, Double> scores = getBetweenessCentrality();
-		double highest = 0.0;
-		for (Entry<Cell, Double> entry : scores.entrySet()) {
-			if (entry.getValue() > highest)
-				highest = entry.getValue();
+		if (nbc == null) {
+			Map<Cell, Double> scores = getBetweenessCentrality();
+			double highest = 0.0;
+			for (Entry<Cell, Double> entry : scores.entrySet()) {
+				if (entry.getValue() > highest)
+					highest = entry.getValue();
+			}
+			Map<Cell, Double> normalizedScores = new HashMap<Cell, Double>();
+			for (Entry<Cell, Double> entry : scores.entrySet()) {
+				log.info("SCORE: " + entry.getKey().toString() + " " + entry.getValue() / highest);
+				normalizedScores.put(entry.getKey(), entry.getValue() / highest);
+			}
+			return normalizedScores;
 		}
-		Map<Cell, Double> normalizedScores = new HashMap<Cell, Double>();
-		for (Entry<Cell, Double> entry : scores.entrySet()) {
-			log.info("SCORE: " + entry.getKey().toString() + " " + entry.getValue() / highest);
-			normalizedScores.put(entry.getKey(), entry.getValue() / highest);
-		}
-		return normalizedScores;
+		return nbc;
 	}
 	
 	public Map<Cell, Double> getBetweenessCentrality() {
 		
 		Map<Cell, Double> scores = new HashMap<Cell, Double>();
-		
-		BetweennessCentrality<Cell, String> bc = new BetweennessCentrality<Cell, String>(graph);
+		log.info("Computing betweenness centrality");
+		BetweennessCentrality<Cell, CellEdge> bc = new BetweennessCentrality<Cell, CellEdge>(graph);
 		bc.setRemoveRankScoresOnFinalize(false);
 		bc.evaluate();
 		for (Cell c : graph.getVertices()) {
@@ -93,8 +101,11 @@ public class MapAnalyzer {
 	}
 	
 	public Map<Cell, Number> getDistances(Cell cell) {
-		DijkstraShortestPath<Cell, String> dd = new DijkstraShortestPath<Cell, String>(graph);
 		return dd.getDistanceMap(cell);
+	}
+	
+	public List<CellEdge> getPath(Cell cellA, Cell cellB) {
+		return dd.getPath(cellA, cellB);
 	}
 
 }

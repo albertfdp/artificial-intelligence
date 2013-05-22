@@ -1,6 +1,5 @@
 package dk.dtu.ai.blueducks.heuristics;
 
-import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.actions.PullAction;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
 import dk.dtu.ai.blueducks.map.Cell;
@@ -31,6 +30,7 @@ public class MoveBoxHeuristic implements Heuristic<State, MoveBoxGoal> {
 		
 		
 		h = betweenness + distance + goalCellBetweenness;
+		
 		
 		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
 			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();

@@ -7,7 +7,9 @@
  */
 package dk.dtu.ai.blueducks.goals;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
@@ -18,8 +20,16 @@ public class ClearPathGoal extends Goal {
 	
 	
 	/** The cells that need to be cleared. */
-	private List<Cell> cells; 
+	private Set<Cell> cells; 
 	
+	public Set<Cell> getCells() {
+		return cells;
+	}
+
+	public void setCells(Set<Cell> cells) {
+		this.cells = cells;
+	}
+
 	/** The box which should cleared. */
 	private Box box;
 	
@@ -33,31 +43,20 @@ public class ClearPathGoal extends Goal {
 
 	public ClearPathGoal(Box box, List<Cell> cells) {
 		this.box = box;
-		this.cells = cells;
+		this.cells = new HashSet<Cell>(cells);
 	}
 	
-	public List<Cell> getCells() {
-		return cells;
-	}
-
-	public void setCells(List<Cell> cells) {
-		this.cells = cells;
-	}
-
 	@Override
 	public boolean isSatisfied(AStarNode node) {
-		// TODO: the agent and the box can be in the path
 		State state = (State) node;
-		for (Cell cell : cells) {
-			// if cell is occupied and it is not the agent cell
-			if (state.isFree(cell) > 0 && (cell != state.getAgentCell())) { // 0 means occupied
-				// TODO: if the agent cannot move the box, then he can't do anything, so it's satisfied
-				// FIXME: how I do that
-				return false;
-			}
-		}
+		
+		if (box != null && cells.contains(state.getCellForBox(box)))
+			return false;
+		
+		if (cells.contains(state.getAgentCell()))
+			return false;
+		
 		return true;
-	}
-	
+	}	
 
 }

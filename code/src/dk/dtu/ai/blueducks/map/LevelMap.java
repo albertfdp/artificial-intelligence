@@ -216,6 +216,14 @@ public class LevelMap {
 	public Map<Character, List<Cell>> getGoals() {
 		return goals;
 	}
+	
+	public boolean isGoal(Cell cell) {
+		for (Entry<Character, List<Cell>> goal : goals.entrySet()) {
+			if (goal.getValue().contains(cell))
+				return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Gets the agents.
