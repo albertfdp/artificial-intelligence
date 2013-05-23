@@ -122,11 +122,14 @@ public class MapAnalyzer {
 	}
 	
 	public Map<Cell, Number> getDistances(Cell cell) {
-		MapAnalyzer.dd = new DijkstraShortestPath<Cell, CellEdge>(graph);
+		if (MapAnalyzer.dd == null)
+			MapAnalyzer.dd = new DijkstraShortestPath<Cell, CellEdge>(graph);
 		return dd.getDistanceMap(cell);
 	}
 	
 	public List<CellEdge> getPath(Cell cellA, Cell cellB) {
+		if (MapAnalyzer.dd == null)
+			MapAnalyzer.dd = new DijkstraShortestPath<Cell, CellEdge>(graph);
 		return dd.getPath(cellA, cellB);
 	}
 

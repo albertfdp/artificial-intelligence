@@ -3,43 +3,41 @@ package dk.dtu.ai.blueducks.heuristics;
 import dk.dtu.ai.blueducks.actions.PullAction;
 import dk.dtu.ai.blueducks.actions.PushAction;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
+import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
 
 public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 
-//	@Override
-//	public float getHeuristicValue(State state, GoToBoxGoal goal) {
-//		float distance = Math.abs(goal.getTo().x - state.getAgentCell().x)
-//				+ Math.abs(goal.getTo().y - state.getAgentCell().y);
-//		if (state.getEdgeFromPrevNode() instanceof PullAction)
-//			distance += 2;
-//		if (state.getEdgeFromPrevNode() instanceof PushAction)
-//			distance += 1;
-//
-//		return distance;
-//	}
-	
 	@Override
 	public float getHeuristicValue(State state, GoToBoxGoal goal, State prevState) {
 		float h;
-		int penaltyForUndoingGoals = 100000;
 		
-		float betweenness = LevelMap.getInstance().getBetweenessCentrality().get(state.getAgentCell()).floatValue();
+		// betweenness in [0, 1]
+		float agentCellBetweenness = LevelMap.getInstance().getBetweenessCentrality().get(state.getAgentCell()).floatValue();
+		float goalCellBetweenness = LevelMap.getInstance().getBetweenessCentrality().get(goal.getTo()).floatValue();
+		
+		// distance on a map
 		float distance = LevelMap.getInstance().getDistance(state.getAgentCell(), goal.getTo());
 		
 		
-		h = betweenness + distance;
+		h = agentCellBetweenness + goalCellBetweenness + distance;
 		
-		if (state.getEdgeFromPrevNode() instanceof PullAction || state.getEdgeFromPrevNode() instanceof PushAction) {
-			h += 1000; // TODO: to set correctly
-		}
-				
-		if (prevState != null) {
-			if (state.getBoxesInGoalCells().size() < prevState.getBoxesInGoalCells().size()) {
-				h += penaltyForUndoingGoals;
+		// penalize undoing goals
+		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
+			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
+			Cell boxCell = prevState.getCellForBox(pullAction.getBox());
+			if (LevelMap.getInstance().getLockedCells().contains(boxCell)) {
+				h += Heuristic.PENALTY_UNDO_GOAL;
+			}
+		} else if (prevState != null && state.getEdgeFromPrevNode() instanceof PushAction) {
+			PushAction pushAction = (PushAction) state.getEdgeFromPrevNode();
+			Cell boxCell = prevState.getCellForBox(pushAction.getBox());
+			if (LevelMap.getInstance().getLockedCells().contains(boxCell)) {
+				h += Heuristic.PENALTY_UNDO_GOAL;
 			}
 		}
+				
 		return h;
 		
 	}

@@ -67,9 +67,6 @@ public class GoalSplitter {
 		
 		// if the agent and the box are not neighbours, it is a GoToBoxGoal
 		if (!agentCell.getNeighbours().contains(boxCell))
-			// check if the path to the box is clean, and otherwise, clean it or ask for help
-			
-			
 			subgoals.add((Goal) new GoToBoxGoal(agentCell, boxCell));
 		
 		// check if the path from the box to the goal is clean, and clean it or ask for help
