@@ -36,8 +36,8 @@ public class GoalPlannerHeuristic {
 
 		float distance = 100000;
 		if (boxCell != null) { 
-			distance = LevelMap.getInstance().getDijkstraDistance(agentCell, boxCell);
-			distance += LevelMap.getInstance().getDijkstraDistance(boxCell, goalCell);
+			distance = LevelMap.getInstance().getDistance(agentCell, boxCell);
+			distance += LevelMap.getInstance().getDistance(boxCell, goalCell);
 		}
 		
 		if (LevelMap.getInstance().getLockedCells().contains(boxCell)) {
@@ -47,7 +47,7 @@ public class GoalPlannerHeuristic {
 		List<Cell> goalNeighbours = goalCell.getCellNeighbours();
 		
 		for (Cell neighbour : goalNeighbours) {
-			Map<Cell, Double> nbc = MapAnalyzer.getInstance().getNormalizedBetweenessCentrality();
+			Map<Cell, Double> nbc = LevelMap.getInstance().getBetweenessCentrality();
 						
 			if (neighbour != null && (MapAnalyzer.getInstance().getDegreeCentrality().get(goalCell) == 2)
 					&& LevelMap.getInstance().isGoal(neighbour) && (nbc.get(neighbour) < nbc.get(goalCell))) {

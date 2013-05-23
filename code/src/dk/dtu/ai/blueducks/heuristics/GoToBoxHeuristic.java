@@ -26,7 +26,7 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 		int penaltyForUndoingGoals = 100000;
 		
 		float betweenness = LevelMap.getInstance().getBetweenessCentrality().get(state.getAgentCell()).floatValue();
-		float distance = LevelMap.getInstance().getDijkstraDistance(state.getAgentCell(), goal.getTo());
+		float distance = LevelMap.getInstance().getDistance(state.getAgentCell(), goal.getTo());
 		
 		
 		h = betweenness + distance;

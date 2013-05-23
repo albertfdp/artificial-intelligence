@@ -25,16 +25,14 @@ public class MapAnalyzer {
 	
 	private static final Logger log = Logger.getLogger(MapLoader.class.getSimpleName());
 	
-	private static Graph<Cell, CellEdge> graph;
+	public static Graph<Cell, CellEdge> graph;
 	
 	private static DijkstraShortestPath<Cell, CellEdge> dd;
 	
 	private static Map<Cell, Double> nbc;
 	
 	private MapAnalyzer() {
-		MapAnalyzer.graph = this.getGraph(LevelMap.getInstance().getCells());
-		MapAnalyzer.nbc = getNormalizedBetweenessCentrality();
-		MapAnalyzer.dd = new DijkstraShortestPath<Cell, CellEdge>(graph);
+		MapAnalyzer.graph = this.computeGraph(LevelMap.getInstance().getCells());
 	}
 	
 	public static MapAnalyzer getInstance() {
@@ -44,7 +42,7 @@ public class MapAnalyzer {
 		return MapAnalyzer.analyzer;
 	}
 	
-	private Graph<Cell, CellEdge> getGraph(List<Cell> cells) {
+	private Graph<Cell, CellEdge> computeGraph(List<Cell> cells) {
 		Graph<Cell, CellEdge> graph = new UndirectedSparseGraph<Cell, CellEdge>();
 		log.info("Constructing graph ....");
 		for (Cell cell : cells) {
@@ -67,6 +65,17 @@ public class MapAnalyzer {
 			degrees.put(cell, graph.degree(cell));
 		}
 		return degrees;
+	}
+	
+	public Map<Cell, Double> getDefaultBetweennessCentrality() {
+		if (nbc == null) {
+			Map<Cell, Double> scores = new HashMap<Cell, Double>();
+			for (Cell cell : graph.getVertices()) {
+				scores.put(cell, 1.00);
+			}
+			return scores;
+		}
+		return nbc;
 	}
 	
 	public Map<Cell, Double> getNormalizedBetweenessCentrality() {
@@ -100,7 +109,20 @@ public class MapAnalyzer {
 		return scores;
 	}
 	
+	public Map<Cell, Number> getManhattanDistances(Cell cellA) {
+		Map<Cell, Number> distanceMap = new HashMap<Cell, Number>();
+		for (Cell cellB : graph.getVertices()) {
+			distanceMap.put(cellB, getManhattanDistance(cellA, cellB));
+		}
+		return distanceMap;
+	}
+	
+	public Number getManhattanDistance(Cell cellA, Cell cellB) {
+		return (Number) (Math.abs(cellA.x - cellB.x) + Math.abs(cellA.y - cellB.y));
+	}
+	
 	public Map<Cell, Number> getDistances(Cell cell) {
+		MapAnalyzer.dd = new DijkstraShortestPath<Cell, CellEdge>(graph);
 		return dd.getDistanceMap(cell);
 	}
 	

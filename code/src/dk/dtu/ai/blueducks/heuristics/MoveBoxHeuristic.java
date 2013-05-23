@@ -24,7 +24,7 @@ public class MoveBoxHeuristic implements Heuristic<State, MoveBoxGoal> {
 		//betweenness in [0,1]
 		float betweenness = LevelMap.getInstance().getBetweenessCentrality().get(state.getAgentCell()).floatValue();
 		//actual distance on map
-		float distance = LevelMap.getInstance().getDijkstraDistance(state.getAgentCell(), goal.getTo());
+		float distance = LevelMap.getInstance().getDistance(state.getAgentCell(), goal.getTo());
 		//betweenness in [0,1]
 		float goalCellBetweenness = LevelMap.getInstance().getBetweenessCentrality().get(goal.getTo()).floatValue();
 		

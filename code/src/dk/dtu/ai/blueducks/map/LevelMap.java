@@ -57,11 +57,13 @@ public class LevelMap {
 	/** The betweenness centrality score for each free cell */
 	private Map<Cell, Double> betweennesScore;
 
-	private Map<Cell, Map<Cell, Number>> dijkstraDistances;
+	private Map<Cell, Map<Cell, Number>> distances;
 
 	private Set<Cell> lockedCells;
 
 	private List<Cell> verifiedCells;
+	
+	private final static int MAX_NUMBER_VERTEX = 1225;
 
 	/**
 	 * Instantiates a new level map.
@@ -72,7 +74,7 @@ public class LevelMap {
 		goals = new HashMap<Character, List<Cell>>();
 		verifiedCells = new ArrayList<Cell>();
 		agents = new ArrayList<Agent>();
-		dijkstraDistances = new HashMap<Cell, Map<Cell, Number>>();
+		distances = new HashMap<Cell, Map<Cell, Number>>();
 		lockedCells = new HashSet<Cell>();
 	}
 
@@ -285,8 +287,8 @@ public class LevelMap {
 		return currentState;
 	}
 
-	public int getDijkstraDistance(Cell cellA, Cell cellB) {
-		return this.dijkstraDistances.get(cellA).get(cellB).intValue();
+	public int getDistance(Cell cellA, Cell cellB) {
+		return this.distances.get(cellA).get(cellB).intValue();
 	}
 
 	public Set<Cell> getLockedCells() {
@@ -306,11 +308,21 @@ public class LevelMap {
 	 */
 	public void executeMapPreAnalysis() {
 
-		// Analyze map
-		this.betweennesScore = MapAnalyzer.getInstance().getNormalizedBetweenessCentrality();
+		MapAnalyzer.getInstance();
 		// calculate distances
-		for (Cell cell : this.getCells()) {
-			dijkstraDistances.put(cell, MapAnalyzer.getInstance().getDistances(cell));
+		if (MapAnalyzer.graph.getVertexCount() < MAX_NUMBER_VERTEX) {			
+			logger.info("Using betweennes centrality and dijkstra distances for improving performance ... ");
+			// Analyze map
+			this.betweennesScore = MapAnalyzer.getInstance().getNormalizedBetweenessCentrality();
+			for (Cell cell : this.getCells()) {
+				distances.put(cell, MapAnalyzer.getInstance().getDistances(cell));
+			}
+		} else {
+			logger.info("Using manhattan distances for improving computing time ... ");
+			this.betweennesScore = MapAnalyzer.getInstance().getDefaultBetweennessCentrality();
+			for (Cell cell : this.getCells()) {
+				distances.put(cell, MapAnalyzer.getInstance().getManhattanDistances(cell));
+			}
 		}
 	}
 }
