@@ -145,6 +145,9 @@ public class MotherOdin {
 			// Notify the agents that something has changed
 			if (!jointActionSuccessful) {
 				log.info("Triggering agent replanning!");
+				//TODO: Optimize this... 
+				generateTopLevelGoals();
+				assignAgentsGoals();
 				for (int a = 0; a < agents.size(); a++)
 					// By clearing the plan, a new plan will be requested at the beginning of the
 					// next loop
@@ -242,6 +245,7 @@ public class MotherOdin {
 		for (Entry<Agent, Goal> e : agentsGoals.entrySet()) {
 			// If the goals for any of the agent has been changed, request a new plan from him.
 			if (!e.getValue().equals(e.getKey().getCurrentGoal())) {
+				log.info("Assigned new goal to "+e.getKey());
 				e.getKey().requestPlan();
 			}
 		}

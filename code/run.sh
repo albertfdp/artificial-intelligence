@@ -1,5 +1,5 @@
 #!/bin/bash
-LEVEL="levels/FOSAanagram.lvl"
+LEVEL="levels/FOSAchoice.lvl"
 if [ $# == '1' ]
 then
     if [[ "$1" = "debug" ]]
