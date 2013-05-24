@@ -27,7 +27,7 @@ public class ClearBoxGoal extends Goal {
 		if (cells.contains(state.getCellForBox(box)))
 			return false;
 		
-		return false;
+		return true;
 	}
 
 }
