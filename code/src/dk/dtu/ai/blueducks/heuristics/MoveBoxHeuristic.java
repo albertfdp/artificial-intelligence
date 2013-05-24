@@ -1,6 +1,5 @@
 package dk.dtu.ai.blueducks.heuristics;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.actions.PullAction;
@@ -17,33 +16,61 @@ public class MoveBoxHeuristic implements Heuristic<State, MoveBoxGoal> {
 	
 	@Override
 	public float getHeuristicValue(State state, MoveBoxGoal goal, State prevState) {
-		float h;
 		
-		// betweenness in [0, 1]
-		float agentCellBetweenness = LevelMap.getInstance().getBetweenessCentrality().get(state.getAgentCell()).floatValue();
-		float boxCellBetweenness = LevelMap.getInstance().getBetweenessCentrality().get(state.getCellForBox(goal.getWhat())).floatValue();
-		float goalCellBetweenness = LevelMap.getInstance().getBetweenessCentrality().get(goal.getTo()).floatValue();
+		float h = 0;
 		
-		// distance on a map
-		float distance = LevelMap.getInstance().getDistance(state.getAgentCell(), goal.getTo());
+		float a0 = 10;
+		float a1 = 1;
+		float a2 = 1;
+		float a3 = 1;
 		
-		h = agentCellBetweenness + boxCellBetweenness + goalCellBetweenness + distance;
+		// cell where the agent is
+		Cell cellAgent = state.getAgentCell();
 		
+		// cell of the box
+		Cell cellBox = state.getCellForBox(goal.getWhat());
+		
+		// cell of the goal
+		Cell cellGoal = goal.getTo();
+		
+		float betweennessAgent = LevelMap.getInstance().getBetweenessCentrality().get(cellAgent).floatValue();
+		float betweennessBox = LevelMap.getInstance().getBetweenessCentrality().get(cellBox).floatValue();
+		float betweennessGoal = LevelMap.getInstance().getBetweenessCentrality().get(cellGoal).floatValue();
+		
+		float distance = LevelMap.getInstance().getDistance(cellAgent, cellGoal);
+		
+		h = a0 * betweennessAgent + + a1 * betweennessBox + a2 * betweennessGoal + a3 * distance;
+				
 		// penalize undoing goals
 		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
 			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
-			Cell boxCell = prevState.getCellForBox(pullAction.getBox());
-			if (LevelMap.getInstance().getLockedCells().contains(boxCell)) {
-				h += Heuristic.PENALTY_UNDO_GOAL;
+			if (pullAction.getBox() != goal.getWhat()) {
+				Cell boxCell = prevState.getCellForBox(pullAction.getBox());
+				
+				// penalize undoing goals
+				if (LevelMap.getInstance().getLockedCells().contains(boxCell)) {
+					h += Heuristic.PENALTY_UNDO_GOAL;
+				}
+				
+				// don't put the box in a high betweenness cell
+				float betweennessCellBox = LevelMap.getInstance().getBetweenessCentrality().get(boxCell).floatValue();
+				h += 1000 * betweennessCellBox;
+				
 			}
+			
 		} else if (prevState != null && state.getEdgeFromPrevNode() instanceof PushAction) {
 			PushAction pushAction = (PushAction) state.getEdgeFromPrevNode();
-			Cell boxCell = prevState.getCellForBox(pushAction.getBox());
-			if (LevelMap.getInstance().getLockedCells().contains(boxCell)) {
-				h += Heuristic.PENALTY_UNDO_GOAL;
+			if (pushAction.getBox() != goal.getWhat()) {
+				Cell boxCell = prevState.getCellForBox(pushAction.getBox());
+				if (LevelMap.getInstance().getLockedCells().contains(boxCell)) {
+					h += Heuristic.PENALTY_UNDO_GOAL;
+				}
+				// don't put the box in a high betweenness cell
+				float betweennessCellBox = LevelMap.getInstance().getBetweenessCentrality().get(boxCell).floatValue();
+				h += 1000 * betweennessCellBox;
 			}
 		}
-		
+				
 		return h;
 	}
 	

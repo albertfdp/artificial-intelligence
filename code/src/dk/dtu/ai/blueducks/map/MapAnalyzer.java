@@ -123,12 +123,14 @@ public class MapAnalyzer {
 	
 	public Map<Cell, Number> getDistances(Cell cell) {
 		if (MapAnalyzer.dd == null)
+			log.info("Computing Dijkstra Shortest Path ...");
 			MapAnalyzer.dd = new DijkstraShortestPath<Cell, CellEdge>(graph);
 		return dd.getDistanceMap(cell);
 	}
 	
 	public List<CellEdge> getPath(Cell cellA, Cell cellB) {
 		if (MapAnalyzer.dd == null)
+			log.info("Computing Dijkstra Shortest Path ...");
 			MapAnalyzer.dd = new DijkstraShortestPath<Cell, CellEdge>(graph);
 		return dd.getPath(cellA, cellB);
 	}

@@ -63,7 +63,7 @@ public class LevelMap {
 
 	private List<Cell> verifiedCells;
 	
-	private final static int MAX_NUMBER_VERTEX = 1225;
+	private final static int MAX_NUMBER_VERTEX = 60 * 60;
 
 	/**
 	 * Instantiates a new level map.
@@ -73,7 +73,7 @@ public class LevelMap {
 		boxesList = new LinkedList<>();
 		goals = new HashMap<Character, List<Cell>>();
 		verifiedCells = new ArrayList<Cell>();
-		agents = new ArrayList<Agent>();
+		agents = new ArrayList<Agent>(10);
 		distances = new HashMap<Cell, Map<Cell, Number>>();
 		lockedCells = new HashSet<Cell>();
 	}

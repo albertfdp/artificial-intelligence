@@ -98,6 +98,7 @@ public class GoalPlannerHeuristic {
 		float a2 = 1;
 		float a3 = 100;
 		float a4 = 1;
+		float a5 = 0;
 		
 		DeliverBoxGoal deliverBoxGoal = (DeliverBoxGoal) goal;
 		
@@ -113,8 +114,8 @@ public class GoalPlannerHeuristic {
 		float distanceAgentBox = LevelMap.getInstance().getDistance(agentCell, boxCell);
 		float distanceBoxGoal = LevelMap.getInstance().getDistance(boxCell, goalCell);
 		
-		float betweennessBox = (float) LevelMap.getInstance().getBetweenessCentrality().get(boxCell).floatValue();
-		float betweennessGoal = (float) LevelMap.getInstance().getBetweenessCentrality().get(goalCell).floatValue();
+		float betweennessBox = LevelMap.getInstance().getBetweenessCentrality().get(boxCell).floatValue();
+		float betweennessGoal = LevelMap.getInstance().getBetweenessCentrality().get(goalCell).floatValue();
 		
 		// check if resolving this goal, locks other goals
 		float lockingGoal = 0;
@@ -125,7 +126,13 @@ public class GoalPlannerHeuristic {
 			}
 		}
 		
-		h = a0 * distanceAgentBox + a1 * betweennessBox + a2 * distanceBoxGoal + a3 * betweennessGoal + a4 * lockingGoal;
+		// check that we are not undoing one solved goal
+		if (LevelMap.getInstance().getLockedCells().contains(boxCell)) {
+			a5 = 1;
+		}
+		
+		h = a0 * distanceAgentBox + a1 * betweennessBox + a2 * distanceBoxGoal + a3 * betweennessGoal + a4 * lockingGoal
+				+ a5 * Heuristic.PENALTY_UNDO_GOAL;
 		logger.info(deliverBoxGoal.toString() + " => " + h);
 //		logger.info("h = " + " + " + a0 * distanceAgentBox + " + " 
 //				+ a1 * betweennessBox + " + " + a2 * distanceBoxGoal + " + " 
