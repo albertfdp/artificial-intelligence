@@ -18,6 +18,8 @@ public class PlanMerger {
 	 * @param step - the current depth of the plan (e.g. step 3 - we're trying to see what actions from step 3 can be done) 
 	 * @return true if is successful in merging the plans or false otherwise
 	 */
+	// TODO - limit the go back
+	// TODO - keep track of the most advanced point where it failed
 	static boolean mergePlans(Action[][] actions, PlanNode current, int step) {
 		// we will keep a list of pairs of actions which are conflicting in the state
 		List<Conflict> conflictingAgents = new ArrayList<Conflict>();
@@ -33,7 +35,7 @@ public class PlanMerger {
 			conflictFound = false;
 			
 			// we duplicate state
-			MultiAgentState duplicatedState = current.getState();
+			MultiAgentState duplicatedState = new MultiAgentState(current.getState().getAgents(), current.getState().getBoxes());
 			
 			// we try to add actions of the active agents and see if we have conflicts
 			for(short i=0;i<activeAgents.length;i++) {
@@ -59,8 +61,13 @@ public class PlanMerger {
 			
 			// if we can move on to next step (no conflict was found at this one)
 			if(conflictFound == false) {
-				PlanNode next = new PlanNode(duplicatedState, activeAgents, current);
-				mergePlans(actions, next, step+1);
+				if(step < actions.length - 1) {
+					PlanNode next = new PlanNode(duplicatedState, activeAgents, current);
+					return mergePlans(actions, next, step+1);
+				}
+				else {
+					return true;
+				}
 			}
 			else {
 				// get the next option
