@@ -26,10 +26,28 @@ public class PlanMerger {
 		log.config("Loaded options for " + AGENTS_COUNT + " agents.");
 	}
 
-	private static int getNextOptionIndex(int currentOptionsPos) {
+	private static int getNextOptionIndex(int currentOptionsPos, List<Conflict> conflictingAgents) {
 		if (currentOptionsPos >= mergeOptions.length)
 			return NO_MORE_OPTIONS;
-		return currentOptionsPos + 1;
+	
+		boolean[] activeAgents;
+		boolean conflict = true;
+		
+		// we consider the next position to start the testing
+		currentOptionsPos++;
+		
+		// we don't consider possibilities which we already know would be conflicting
+		while (conflict == true) {
+			conflict = false;
+			activeAgents = mergeOptions[currentOptionsPos];
+			for(Conflict c: conflictingAgents)
+				if(activeAgents[c.agent1]==true && activeAgents[c.agent2]==true) {
+					currentOptionsPos++;
+					conflict = true;
+					break;
+				}
+		}
+		return currentOptionsPos;
 	}
 
 	/**
@@ -140,7 +158,7 @@ public class PlanMerger {
 				return mergePlans(actions, nextAgentCurrentActionIndex, next, step + 1);
 			} else {
 				// get the next option
-				currentOptionsIndex = getNextOptionIndex(currentOptionsIndex);
+				currentOptionsIndex = getNextOptionIndex(currentOptionsIndex, conflictingAgents);
 			}
 		}
 		log.info("Plan merge not possible.");
