@@ -7,10 +7,16 @@
  */
 package dk.dtu.ai.blueducks.map;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import edu.uci.ics.jung.algorithms.importance.BetweennessCentrality;
@@ -120,6 +126,80 @@ public class MapAnalyzer {
 	public Number getManhattanDistance(Cell cellA, Cell cellB) {
 		return (Number) (Math.abs(cellA.x - cellB.x) + Math.abs(cellA.y - cellB.y));
 	}
+		
+	public Set<Set<Cell>> getNeighbourGoals(List<Cell> goals) {
+		Set<Set<Cell>> groupsGoals = new HashSet<Set<Cell>>();
+		for (Cell goal : goals) {
+			Set<Cell> neighbourGoals = new HashSet<Cell>();
+			neighbourGoals.add(goal);
+			for (Cell neighbourCell : goal.getCellNeighbours()) {
+				if (goals.contains(neighbourCell))
+					neighbourGoals.add(neighbourCell);
+			}
+			groupsGoals.add(neighbourGoals);
+		}
+		
+		Set<Set<Cell>> uniqueGoals = mergeListsCells(groupsGoals);
+		
+		return uniqueGoals;
+	}
+	
+	private Set<Set<Cell>> mergeListsCells(Set<Set<Cell>> groups) {
+		Set<Set<Cell>> merged = new HashSet<Set<Cell>>();
+		for (Set<Cell> groupA : groups) {
+			boolean alreadyMerged = false;
+			for (Set<Cell> mergedGroups : merged) {
+				if (mergedGroups.containsAll(groupA)) {
+					alreadyMerged = true;
+					break;
+				}
+			}
+			if (alreadyMerged)
+				continue;
+			Set<Cell> union = new HashSet<Cell>(groupA);
+			for (Set<Cell> groupB : groups) {
+				Set<Cell> intersection = new HashSet<Cell>(union);
+				intersection.retainAll(groupB);
+				if (intersection.size() > 0) {
+					union.addAll(groupB);
+				} 
+			}
+			merged.add(union);
+		}
+		return merged;
+	}
+	
+	
+//	public List<Cell> getGoalsRow(Cell goal, List<Cell> goals) {
+//		List<Cell> row = new ArrayList<Cell>();
+//		
+//		List<Cell> goalNeighbours = new ArrayList<Cell>();
+//		for (Cell cell : goal.getCellNeighbours()) {
+//			if (goals.contains(cell))
+//				goalNeighbours.add(cell);
+//		}
+//		
+//		row.add(goal);
+//		for (Cell cell : goalNeighbours) {
+//			if (!row.contains(cell))
+//				row.add(cell);
+//		}
+//		
+//		Collections.sort(row, new Comparator<Cell>() {
+//
+//			@Override
+//			public int compare(Cell o1, Cell o2) {
+//				
+//				Map<Cell, Double> nbc = LevelMap.getInstance().getBetweenessCentrality();
+//				double bc1 = nbc.get(o1).doubleValue();
+//				double bc2 = nbc.get(o2).doubleValue();
+//				
+//				return bc1 < bc2 ? -1 : bc1 > bc2 ? 1 : 0;
+//			}
+//			
+//		});
+//		return row;
+//	}
 	
 	public Map<Cell, Number> getDistances(Cell cell) {
 		if (MapAnalyzer.dd == null)

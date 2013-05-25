@@ -127,13 +127,13 @@ public class PushAction extends Action {
 		Cell destCell = getDestCell(state, box, boxDirection);
 
 		if (!isApplicable(state))
-			return false;
+			return true;
 
 		if ((otherAction instanceof MoveAction)
 				&& (destCell == ((MoveAction) otherAction)
 						.getDestCell(state, ((MoveAction) otherAction).getAgent(),
 								((MoveAction) otherAction).getAgentDirection()))) {
-			return false;
+			return true;
 		}
 
 		if ((otherAction instanceof PullAction)
@@ -141,15 +141,15 @@ public class PushAction extends Action {
 						.getDestCell(state, ((PullAction) otherAction).getAgent(),
 								((PullAction) otherAction).getAgentDirection())) || (getBox() == ((PullAction) otherAction)
 						.getBox()))) {
-			return false;
+			return true;
 		}
 
 		if ((otherAction instanceof PushAction)
 				&& (destCell == ((PushAction) otherAction).getDestCell(state,
 						((PushAction) otherAction).getBox(), ((PushAction) otherAction).getBoxDirection()))) {
-			return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	@Override
