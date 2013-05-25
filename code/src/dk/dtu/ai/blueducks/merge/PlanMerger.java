@@ -3,8 +3,11 @@ package dk.dtu.ai.blueducks.merge;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +29,7 @@ public class PlanMerger {
 		log.config("Loaded options for " + AGENTS_COUNT + " agents.");
 	}
 
-	private static int getNextOptionIndex(int currentOptionsPos, List<Conflict> conflictingAgents,
+	private static int getNextOptionIndex(int currentOptionsPos, Set<Conflict> conflictingAgents,
 			boolean[] applicableActions) {
 		if (currentOptionsPos >= mergeOptions.length)
 			return NO_MORE_OPTIONS;
@@ -109,7 +112,7 @@ public class PlanMerger {
 		}
 
 		// we will keep a list of pairs of actions which are conflicting in the state
-		List<Conflict> conflictingAgents = new ArrayList<Conflict>();
+		Set<Conflict> conflictingAgents = new LinkedHashSet<>();
 
 		// keeps track if there is a conflict found when trying to execute the actions for this step
 		boolean conflictFound;
@@ -118,12 +121,11 @@ public class PlanMerger {
 		boolean[] activeAgents;
 		int currentOptionsIndex = -1;
 
-		//check applicable actions
+		// check applicable actions
 		boolean[] applicableActions = getApplicableActions(agentsActions, current.getState());
 
-		currentOptionsIndex = getNextOptionIndex(-1, Collections.<Conflict> emptyList(), applicableActions);
+		currentOptionsIndex = getNextOptionIndex(-1, Collections.<Conflict> emptySet(), applicableActions);
 
-		// TODO: Move the conflicts checking at the beginning
 		while (currentOptionsIndex != NO_MORE_OPTIONS) {
 			activeAgents = mergeOptions[currentOptionsIndex];
 
@@ -223,6 +225,27 @@ public class PlanMerger {
 			super();
 			this.agent1 = agent1;
 			this.agent2 = agent2;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + agent1;
+			result = prime * result + agent2;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			Conflict other = (Conflict) obj;
+			if (agent1 != other.agent1)
+				return false;
+			if (agent2 != other.agent2)
+				return false;
+			return true;
 		}
 	}
 }
