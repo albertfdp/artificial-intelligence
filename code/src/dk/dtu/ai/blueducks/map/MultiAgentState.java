@@ -82,4 +82,10 @@ public class MultiAgentState {
 		return CellVisibility.POSSIBLY_FREE;
 	}
 
+
+	@Override
+	public String toString() {
+		return "MultiAgentState [boxes=" + boxes + ", agents=" + agents + "]";
+	}
+
 }

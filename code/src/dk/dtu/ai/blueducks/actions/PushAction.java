@@ -159,7 +159,7 @@ public class PushAction extends Action {
 		Cell destBoxCell = boxCell.getNeighbour(boxDirection);
 
 		if ((boxCell.getCellNeighbours().contains(agentCell))
-				&& (state.isFree(destBoxCell) == CellVisibility.FREE)
+				&& (state.isFree(destBoxCell) != CellVisibility.NOT_FREE)
 				&& (box.getColor().equals(agent.getColor()))) {
 			return true;
 		}

@@ -128,7 +128,7 @@ public class MoveAction extends Action {
 		Cell agentCell = state.getCellForAgent(agent);
 		Cell destCell = agentCell.getNeighbour(agentDirection);
 		
-		if (state.isFree(destCell) == CellVisibility.FREE)
+		if (state.isFree(destCell) != CellVisibility.NOT_FREE)
 			return true;
 		return false;
 	}

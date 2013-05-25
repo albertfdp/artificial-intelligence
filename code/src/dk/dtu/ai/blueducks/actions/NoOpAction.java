@@ -47,4 +47,9 @@ public class NoOpAction extends Action {
 	public void execute(MultiAgentState state) {
 		return;
 	}
+
+	@Override
+	public String toString() {
+		return "NoOpAction";
+	}
 }

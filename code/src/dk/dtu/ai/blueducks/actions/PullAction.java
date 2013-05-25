@@ -191,7 +191,7 @@ public class PullAction extends Action {
 		Cell destAgentCell = agentCell.getNeighbour(agentDirection);
 		
 		if ((boxCell.getCellNeighbours().contains(agentCell)) &&
-				(state.isFree(destAgentCell) == CellVisibility.FREE) &&
+				(state.isFree(destAgentCell) != CellVisibility.NOT_FREE) &&
 				(box.getColor().equals(agent.getColor()))){
 			return true;
 		}

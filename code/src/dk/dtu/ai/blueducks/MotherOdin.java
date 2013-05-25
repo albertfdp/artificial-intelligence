@@ -53,7 +53,9 @@ public class MotherOdin {
 	/** The agents' goals. */
 	private HashMap<Agent, Goal> agentsGoals = new HashMap<>();
 
-	private List<LinkedList<Action>> plans;
+	private List<LinkedList<Action>> unmergedPlans;
+
+	private List<LinkedList<Action>> mergedPlans;
 
 	/**
 	 * Gets the single instance of MotherOdin.
@@ -68,9 +70,12 @@ public class MotherOdin {
 		super();
 		agents = LevelMap.getInstance().getAgentsList();
 		// Init the plans list
-		plans = new ArrayList<LinkedList<Action>>();
+		unmergedPlans = new ArrayList<LinkedList<Action>>();
 		for (int i = 0; i < agents.size(); i++)
-			plans.add(new LinkedList<Action>());
+			unmergedPlans.add(new LinkedList<Action>());
+		mergedPlans = new ArrayList<LinkedList<Action>>();
+		for (int i = 0; i < agents.size(); i++)
+			mergedPlans.add(new LinkedList<Action>());
 
 	}
 
@@ -109,13 +114,14 @@ public class MotherOdin {
 		// TODO: Wait for synchronization when using multi-threading
 		assignAgentsGoals();
 		// TODO: Wait for synchronization when using multi-threading
+		mergePlans();
 
 		while (true) {
 			log.info("Starting loop " + (++currentLoop) + "...");
 
 			// Check if any agent is out of actions
-			for (int agent = 0; agent < plans.size(); agent++)
-				if (plans.get(agent).isEmpty()) {
+			for (int agent = 0; agent < mergedPlans.size(); agent++)
+				if (mergedPlans.get(agent).isEmpty()) {
 					agents.get(agent).requestPlan();
 				}
 			// TODO: Wait for synchronization when using multi-threading
@@ -124,8 +130,10 @@ public class MotherOdin {
 			// Build the joint action
 			List<Action> actions = new LinkedList<>();
 			for (int agent = 0; agent < agents.size(); agent++)
-				if (plans.get(agent).peek() != null)
-					actions.add(plans.get(agent).remove());
+				if (mergedPlans.get(agent).peek() != null)
+				{
+					actions.add(mergedPlans.get(agent).remove());
+				}
 				else
 					actions.add(new NoOpAction());
 
@@ -154,7 +162,7 @@ public class MotherOdin {
 				for (int a = 0; a < agents.size(); a++)
 					// By clearing the plan, a new plan will be requested at the beginning of the
 					// next loop
-					plans.get(a).clear();
+					mergedPlans.get(a).clear();
 			}
 		}
 	}
@@ -164,13 +172,20 @@ public class MotherOdin {
 		// Prepare actions
 		Action[][] actions = new Action[agents.size()][];
 		int index = 0;
-		for (List<Action> agentPlan : plans)
+		for (List<Action> agentPlan : unmergedPlans)
 			actions[index++] = (Action[]) agentPlan.toArray(new Action[agentPlan.size()]);
 		// Prepare multiagent state
 		MultiAgentState startState = new MultiAgentState(LevelMap.getInstance().getAgents(), LevelMap
 				.getInstance().getCurrentState().getBoxes());
+		// Prepare start indexes
+		short[] agentsCurrentActionsIndex = new short[agents.size()];
 		// Start the merging
-		PlanMerger.mergePlans(actions, new PlanMergeNode(startState, null, null), 0);
+		PlanMerger.mergePlans(actions, agentsCurrentActionsIndex, new PlanMergeNode(
+				startState, null, null), 0);
+	}
+
+	public void setMergedPlan(List<LinkedList<Action>> mergedPlan) {
+		this.mergedPlans = mergedPlan;
 	}
 
 	/**
@@ -207,7 +222,7 @@ public class MotherOdin {
 	 * @param plan the plan
 	 */
 	public synchronized void appendPlan(Agent agent, List<Action> plan) {
-		plans.get(agent.getId()).addAll(plan);
+		unmergedPlans.get(agent.getId()).addAll(plan);
 	}
 
 	/**
@@ -241,7 +256,7 @@ public class MotherOdin {
 				for (Agent other : LevelMap.getInstance().getAgentsList())
 					if (other != agent) {
 						GoalCost gc = goalCosts.get(other).peek();
-						if (bestGoal.goal == gc.goal && gc.cost < bestGoal.cost) {
+						if (bestGoal.goal == gc.goal && gc.cost <= bestGoal.cost) {
 							goalCosts.get(agent).remove();
 							done = false;
 							break;
