@@ -161,26 +161,26 @@ public class PullAction extends Action {
 		Cell destCell = getDestCell(state,agent,agentDirection);
 		
 		if (!isApplicable(state))
-			return false;
+			return true;
 		
 		if ((otherAction instanceof MoveAction) && 
 				(destCell == ((MoveAction)otherAction).getDestCell(state,((MoveAction)otherAction).getAgent()
 						,((MoveAction)otherAction).getAgentDirection()))){
-			return false;		
+			return true;		
 		}
 		
 		if ((otherAction instanceof PullAction) && 
 				((destCell == ((PullAction)otherAction).getDestCell(state,((PullAction)otherAction).getAgent()
 						,((PullAction)otherAction).getAgentDirection())) || (getBox() == ((PullAction)otherAction).getBox()))){		
-			return false;		
+			return true;		
 		}
 		
 		if ((otherAction instanceof PushAction) && 
 				((destCell == ((PushAction)otherAction).getDestCell(state,((PushAction)otherAction).getBox()
 						, ((PushAction)otherAction).getBoxDirection())) || (getBox() == ((PushAction)otherAction).getBox()))){
-			return false;		
+			return true;		
 		}
-		return true;
+		return false;
 	}
 
 
@@ -191,7 +191,7 @@ public class PullAction extends Action {
 		Cell destAgentCell = agentCell.getNeighbour(agentDirection);
 		
 		if ((boxCell.getCellNeighbours().contains(agentCell)) &&
-				(state.isFree(destAgentCell) == CellVisibility.FREE) &&
+				(state.isFree(destAgentCell) != CellVisibility.NOT_FREE) &&
 				(box.getColor().equals(agent.getColor()))){
 			return true;
 		}
@@ -203,7 +203,12 @@ public class PullAction extends Action {
 
 	@Override
 	public void execute(MultiAgentState state) {
-		// TODO Auto-generated method stub
+		Cell boxCell = state.getCellForBox(box);
+		Cell agentCell = state.getCellForAgent(agent);
+		Cell destCell = agentCell.getNeighbour(agentDirection);
+		 
+		state.changeAgentPosition(destCell, agentCell, agent);
+		state.changeBoxPosition(agentCell, boxCell, box);
 		
 	}
 

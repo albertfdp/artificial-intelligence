@@ -11,6 +11,7 @@ package dk.dtu.ai.blueducks.actions;
 import java.util.Map;
 
 import dk.dtu.ai.blueducks.Agent;
+import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
@@ -100,26 +101,26 @@ public class MoveAction extends Action {
 		Cell destCell = getDestCell(state,agent,agentDirection);
 		
 		if (!isApplicable(state))
-			return false;
+			return true;
 		
 		if ((otherAction instanceof MoveAction) && 
 				(destCell == ((MoveAction)otherAction).getDestCell(state,((MoveAction)otherAction).getAgent()
 						,((MoveAction)otherAction).getAgentDirection()))){
-			return false;		
+			return true;		
 		}
 		
 		if ((otherAction instanceof PullAction) && 
 				(destCell == ((PullAction)otherAction).getDestCell(state,((PullAction)otherAction).getAgent()
 						,((PullAction)otherAction).getAgentDirection()))){
-			return false;		
+			return true;		
 		}
 		
 		if ((otherAction instanceof PushAction) && 
 				(destCell == ((PushAction)otherAction).getDestCell(state,((PushAction)otherAction).getBox()
 						,((PushAction)otherAction).getBoxDirection()))){
-			return false;		
+			return true;		
 		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -127,15 +128,18 @@ public class MoveAction extends Action {
 		Cell agentCell = state.getCellForAgent(agent);
 		Cell destCell = agentCell.getNeighbour(agentDirection);
 		
-		if (state.isFree(destCell) == CellVisibility.FREE)
+		if (state.isFree(destCell) != CellVisibility.NOT_FREE)
 			return true;
 		return false;
 	}
 
 	@Override
 	public void execute(MultiAgentState state) {
-		// TODO Auto-generated method stub
-		
+		Cell agentCell = state.getCellForAgent(agent);
+		Cell destCell = agentCell.getNeighbour(agentDirection);
+		 
+		state.changeAgentPosition(destCell, agentCell, agent);
+
 	}
 
 }
