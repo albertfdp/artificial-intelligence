@@ -74,8 +74,8 @@ public class MoveAction extends Action {
 	@Override
 	public State getNextState(State state) {
 		Cell nextCell = state.getAgentCell().getNeighbour(agentDirection);
-		State nextState = new State(nextCell, this, state, agent);
-		nextState.setBoxes(state.getBoxes());
+		State nextState = new State(nextCell, this, state, agent, state.getBoxes());
+		nextState.movedAgentFrom(state.getAgentCell());
 		return nextState;	
 	}
 

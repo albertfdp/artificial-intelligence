@@ -87,7 +87,7 @@ public class LevelMap {
 	public static LevelMap getInstance() {
 		if (LevelMap.map == null) {
 			LevelMap.map = new LevelMap();
-			map.currentState = new State(null, null, null, null);
+			map.currentState = new State(null, null, null, null, null);
 		}
 		return LevelMap.map;
 	}
@@ -178,10 +178,17 @@ public class LevelMap {
 	 * @param cell the cell
 	 * @param box the box
 	 */
-	public void attachBox(Cell cell, Box box) {
-		logger.info("Attached box" + box.getId() + " to Cell: " + cell.x + " " + cell.y);
-		this.currentState.addBox(cell, box);
-		this.boxesList.add(box);
+	public void attachBoxes(Map<Cell, Box> boxes) {
+
+		
+		for(Entry<Cell, Box> entry : boxes.entrySet()) {
+			this.boxesList.add(entry.getValue());
+			entry.getValue().computePowerHashValue();
+		}
+		for(Agent agent : agents) {
+			agent.computePowerHashValue();
+		}
+		this.currentState.setBoxes(boxes);
 	}
 
 	public List<Cell> getCells() {

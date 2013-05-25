@@ -73,6 +73,7 @@ public class MapLoader {
 		Map<Character, String> colors = readColorDefinition(colorsSb.toString());
 		Scanner scan = new Scanner(mapSb.toString());
 		int x = 0;
+		Map<Cell, Box> boxes = new HashMap<Cell, Box>();
 		while (scan.hasNextLine()) {
 			String l = scan.nextLine();
 			
@@ -85,7 +86,8 @@ public class MapLoader {
 					map.attachAgent(cell, new Agent(c, color));
 				} else if (isBox(c)) {
 					map.addCell(cell, x, y);
-					map.attachBox(cell, new Box(c, color));
+					boxes.put(cell, new Box(c, color));
+					//map.attachBox(cell, new Box(c, color));
 				} else if (isGoalCell(c)) {
 					map.addGoalCell(cell, x, y, Character.toUpperCase(c));
 				} else if (isFreeCell(c)) {
@@ -96,7 +98,7 @@ public class MapLoader {
 			x++;
 		}
 		scan.close();
-		
+		map.attachBoxes(boxes);
 //		//TODO: change the logging
 //		for (Entry<Cell, Agent> e : map.getAgents().entrySet()) {
 //			Agent a = e.getValue();

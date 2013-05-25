@@ -9,11 +9,9 @@ package dk.dtu.ai.blueducks.map;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
@@ -48,25 +46,49 @@ public class State extends AStarNode {
 
 	/** The boxes in goal cell. */
 	List<Box> boxesInGoalCell = new ArrayList<Box>();
+	
+	private int computedHashCode;
 
 	private static final Logger log = Logger.getLogger(State.class.getSimpleName());
 
 	/**
 	 * Instantiates a new state.
-	 * 
+	 *
 	 * @param agentCell the agent cell
 	 * @param previousAction the previous action
 	 * @param previousState the previous state
 	 * @param agent the agent
+	 * @param map the map
 	 */
-	public State(Cell agentCell, Action previousAction, State previousState, Agent agent) {
-		boxes = new HashMap<Cell, Box>();
+	public State(Cell agentCell, Action previousAction, State previousState, Agent agent, Map<Cell, Box> map){
+		if(map != null )
+			this.boxes = new HashMap<Cell, Box>(map);
+		else
+			this.boxes = new HashMap<Cell, Box>();
 		this.agentCell = agentCell;
 		this.previousAction = previousAction;
 		this.previousState = previousState;
 		this.agent = agent;
+		if(previousState == null) {
+			computeHashCode();
+		}
+		else { 
+			this.computedHashCode = previousState.hashCode();
+		}
 	}
 
+	public void computeHashCode(){
+		this.computedHashCode = 0;
+		log.info("Compute HASH code");
+		for(Entry<Cell, Box> entry : this.boxes.entrySet()) {
+			this.computedHashCode = this.computedHashCode + entry.getValue().powerHashValue * entry.getKey().uniqueId;
+		}
+		if(agent != null)
+			this.computedHashCode = this.computedHashCode + agent.powerHashValue * agentCell.uniqueId;
+		
+	}
+	
+	
 	@Override
 	public List<AStarNode> getNeighbours() {
 		List<Action> actions = getPossibleActions();
@@ -96,6 +118,8 @@ public class State extends AStarNode {
 	 */
 	public void setBoxes(Map<Cell, Box> boxes) {
 		this.boxes = boxes;
+		log.info("SET BOXES");
+		computeHashCode();
 	}
 
 	/**
@@ -107,17 +131,31 @@ public class State extends AStarNode {
 		return boxes;
 	}
 
-	/**
-	 * Adds the box.
-	 * 
-	 * @param cell the cell
-	 * @param box the box
-	 */
-	public void addBox(Cell cell, Box box) {
-		boxes.put(cell, box);
+//	/**
+//	 * Adds the box.
+//	 * 
+//	 * @param cell the cell
+//	 * @param box the box
+//	 */
+//	//public void addBox(Cell cell, Box box) {
+//	//	boxes.put(cell, box);
+//
+//	//}
 
+	
+	public void movedBox(Box box, Cell orig, Cell dest) {
+		//log.info("BOX1 " + box + "ORIG " + orig + "DEST " + dest);
+		this.computedHashCode = this.computedHashCode  - box.powerHashValue * orig.uniqueId;
+		this.computedHashCode = this.computedHashCode  + box.powerHashValue * dest.uniqueId;
+		this.boxes.put(dest, box);
+		this.boxes.remove(orig);
+		//log.info("MOVED BOX " + this.computedHashCode);
 	}
-
+	
+	public void movedAgentFrom(Cell orig) {
+		this.computedHashCode = this.computedHashCode - agent.powerHashValue * orig.uniqueId;
+		this.computedHashCode = this.computedHashCode  + agent.powerHashValue * agentCell.uniqueId;
+	}
 	/**
 	 * @returns the cell of the agent associated with the state
 	 */
@@ -205,11 +243,8 @@ public class State extends AStarNode {
 
 	@Override
 	public int hashCode() {
-		final int prime = 139;
-		int result = 1;
-		result = prime * result + ((agentCell == null) ? 0 : agentCell.hashCode());
-		result = prime * result + ((boxes == null) ? 0 : boxes.hashCode());
-		return result;
+
+		return computedHashCode;
 	}
 
 	@Override

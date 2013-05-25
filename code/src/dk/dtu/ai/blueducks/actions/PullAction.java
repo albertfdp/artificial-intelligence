@@ -8,7 +8,6 @@
 package dk.dtu.ai.blueducks.actions;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
@@ -128,20 +127,11 @@ public class PullAction extends Action {
 	@Override
 	public State getNextState(State state) {
 		Cell agentCell = state.getAgentCell();
-		Cell destCell = agentCell.getNeighbour(agentDirection);
+		Cell agentDestCell = agentCell.getNeighbour(agentDirection);
 		
-		State nextState = new State(destCell, this, state, agent);
-		Map<Cell, Box> boxes = state.getBoxes();
-		
-		// TODO: improve 	
-		for (Entry<Cell, Box> e : boxes.entrySet()) {
-			if (e.getValue() != box) {
-				nextState.addBox(e.getKey(), e.getValue());
-			} else {
-				nextState.addBox(agentCell, box);
-			}
-		}
-		
+		State nextState = new State(agentDestCell, this, state, agent, state.getBoxes());
+		nextState.movedBox(box, agentCell.getNeighbour(boxDirection), agentCell);
+		nextState.movedAgentFrom(agentCell);
 		return nextState;
 	}
 

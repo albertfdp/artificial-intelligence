@@ -22,6 +22,7 @@ import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
 import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristic;
 import dk.dtu.ai.blueducks.heuristics.MoveBoxHeuristic;
+import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
 import dk.dtu.ai.blueducks.planner.AStarSearch;
@@ -65,6 +66,12 @@ public class Agent {
 	/** The Constant logger. */
 	private final Logger log;
 
+	
+	public static int noOfAgents = 0;
+	
+	public int uniqueId;
+	
+	public int powerHashValue;
 	/**
 	 * Instantiates a new agent.
 	 * 
@@ -77,6 +84,8 @@ public class Agent {
 		this.goalPlanner = new GoalPlanner(this);
 		this.goalSplitter = new GoalSplitter();
 		this.log = Logger.getLogger("Agent " + id);
+		this.uniqueId = Agent.noOfAgents;
+		Agent.noOfAgents ++;
 	}
 
 	/**
@@ -145,8 +154,8 @@ public class Agent {
 		}
 
 		// Replan
-		State agentState = new State(LevelMap.getInstance().getCellForAgent(this), null, null, this);
-		agentState.setBoxes(LevelMap.getInstance().getCurrentState().getBoxes());
+		State agentState = new State(LevelMap.getInstance().getCellForAgent(this), null, null, this, LevelMap.getInstance().getCurrentState().getBoxes());
+		
 		Goal subgoal = subgoals.get(currentSubgoalIndex++);
 		if (log.isLoggable(Level.FINER))
 			log.finer("\tCurrent subgoal: " + subgoal);
@@ -177,5 +186,11 @@ public class Agent {
 	@Override
 	public String toString() {
 		return "Agent" + id;
+	}
+
+	public void computePowerHashValue() {
+		// TODO Auto-generated method stub
+		powerHashValue = (int) Math.pow(Cell.noOfCells, (this.uniqueId + Box.noOfBoxes));
+		log.info("Power hash value: " + this.powerHashValue);
 	}
 }
