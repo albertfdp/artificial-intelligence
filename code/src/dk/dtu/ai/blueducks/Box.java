@@ -54,6 +54,7 @@ public class Box {
 	}
 
 	public void computePowerHashValue() {
+		log.info("NUMBER OF CELLS: " + Cell.noOfCells);
 		this.powerHashValue = (int) Math.pow(Cell.noOfCells, this.uniqueId);
 
 		log.info("Box " + this.uniqueId + " Power hash value: " + this.powerHashValue);

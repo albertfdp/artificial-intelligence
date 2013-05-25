@@ -61,10 +61,12 @@ public class State extends AStarNode {
 	 * @param map the map
 	 */
 	public State(Cell agentCell, Action previousAction, State previousState, Agent agent, Map<Cell, Box> map){
-		if(map != null )
-			this.boxes = new HashMap<Cell, Box>(map);
-		else
-			this.boxes = new HashMap<Cell, Box>();
+	//	if(map != null )
+	//		this.boxes = new HashMap<Cell, Box>(map);
+	//	else
+		this.boxes = new HashMap<Cell, Box>();
+		if(map!= null)
+			this.boxes.putAll(map);
 		this.agentCell = agentCell;
 		this.previousAction = previousAction;
 		this.previousState = previousState;

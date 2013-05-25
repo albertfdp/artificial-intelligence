@@ -80,17 +80,21 @@ public class MapLoader {
 			for (int y = 0; y < l.length(); y++) {
 				char c = l.charAt(y);
 				String color = (colors.get(c) == null) ? DEFAULT_COLOR : colors.get(c);
-				Cell cell = new Cell(x, y);
+				
 				if (isAgent(c)) {
+					Cell cell = new Cell(x, y);
 					map.addCell(cell, x, y);
 					map.attachAgent(cell, new Agent(c, color));
 				} else if (isBox(c)) {
+					Cell cell = new Cell(x, y);
 					map.addCell(cell, x, y);
 					boxes.put(cell, new Box(c, color));
 					//map.attachBox(cell, new Box(c, color));
 				} else if (isGoalCell(c)) {
+					Cell cell = new Cell(x, y);
 					map.addGoalCell(cell, x, y, Character.toUpperCase(c));
 				} else if (isFreeCell(c)) {
+					Cell cell = new Cell(x, y);
 					map.addCell(cell, x, y);
 				}
 			}
