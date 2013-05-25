@@ -169,8 +169,13 @@ public class PushAction extends Action {
 
 	@Override
 	public void execute(MultiAgentState state) {
-		// TODO Auto-generated method stub
-
+		Cell boxCell = state.getCellForBox(box);
+		Cell agentCell = state.getCellForAgent(agent);
+		Cell destCell = boxCell.getNeighbour(boxDirection);
+		
+		state.changeBoxPosition(destCell, boxCell, box);
+		state.changeAgentPosition(boxCell, agentCell, agent);
+		
 	}
 
 	@Override

@@ -203,7 +203,12 @@ public class PullAction extends Action {
 
 	@Override
 	public void execute(MultiAgentState state) {
-		// TODO Auto-generated method stub
+		Cell boxCell = state.getCellForBox(box);
+		Cell agentCell = state.getCellForAgent(agent);
+		Cell destCell = agentCell.getNeighbour(agentDirection);
+		 
+		state.changeAgentPosition(destCell, agentCell, agent);
+		state.changeBoxPosition(agentCell, boxCell, box);
 		
 	}
 
