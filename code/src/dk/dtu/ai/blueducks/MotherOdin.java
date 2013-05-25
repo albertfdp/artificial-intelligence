@@ -175,6 +175,10 @@ public class MotherOdin {
 	private void mergePlans() {
 		if(!needMerging)
 			return;
+		if(agents.size()==1){
+			mergedPlans=unmergedPlans;
+		}
+		
 		log.info("Starting plan merging...");
 		// Prepare actions
 		Action[][] actions = new Action[agents.size()][];
