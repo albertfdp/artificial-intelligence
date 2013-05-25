@@ -1,4 +1,4 @@
-package dk.dtu.ai.blueducks;
+package dk.dtu.ai.blueducks.merge;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class PlanMerger {
 	 */
 	// TODO - limit the go back
 	// TODO - keep track of the most advanced point where it failed
-	static boolean mergePlans(Action[][] actions, PlanNode current, int step) {
+	static boolean mergePlans(Action[][] actions, PlanMergeNode current, int step) {
 		// we will keep a list of pairs of actions which are conflicting in the state
 		List<Conflict> conflictingAgents = new ArrayList<Conflict>();
 		// keeps track if there is a conflict found when trying to execute the actions for this step
@@ -62,7 +62,7 @@ public class PlanMerger {
 			// if we can move on to next step (no conflict was found at this one)
 			if(conflictFound == false) {
 				if(step < actions.length - 1) {
-					PlanNode next = new PlanNode(duplicatedState, activeAgents, current);
+					PlanMergeNode next = new PlanMergeNode(duplicatedState, activeAgents, current);
 					return mergePlans(actions, next, step+1);
 				}
 				else {

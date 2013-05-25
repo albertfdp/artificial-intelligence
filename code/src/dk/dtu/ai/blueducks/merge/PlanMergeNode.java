@@ -1,13 +1,13 @@
-package dk.dtu.ai.blueducks;
+package dk.dtu.ai.blueducks.merge;
 
 import dk.dtu.ai.blueducks.map.MultiAgentState;
 
-public class PlanNode {
+public class PlanMergeNode {
 	private MultiAgentState state;
 	private boolean[] activeAgents;
-	private PlanNode prev;
+	private PlanMergeNode prev;
 
-	public PlanNode(MultiAgentState state, boolean[] activeAgents, PlanNode prev) {
+	public PlanMergeNode(MultiAgentState state, boolean[] activeAgents, PlanMergeNode prev) {
 		this.state = state;
 		this.prev = prev;
 		this.activeAgents = activeAgents;
@@ -21,7 +21,7 @@ public class PlanNode {
 		return activeAgents;
 	}
 	
-	public PlanNode getPrevNode() {
+	public PlanMergeNode getPrevNode() {
 		return prev;
 	}
 }
