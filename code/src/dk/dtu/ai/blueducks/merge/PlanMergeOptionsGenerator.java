@@ -1,3 +1,10 @@
+/*
+ * Artificial Intelligence and Multi-Agent Systems
+ * Denmarks Tehnical University
+ * 
+ * Blue Ducks
+ * Spring 2013
+ */
 package dk.dtu.ai.blueducks.merge;
 
 import java.io.FileNotFoundException;
@@ -6,21 +13,44 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * The PlanMergeOptions Generator.
+ */
 public class PlanMergeOptionsGenerator {
 
+	/** The results. */
 	List<boolean[]> results;
 
-	private List<boolean[]> generateAll(int size) {
+	/**
+	 * Generate all the options.
+	 * 
+	 * @param maxNumberOfAgents the size
+	 * @return the list
+	 */
+	private List<boolean[]> generateAll(int maxNumberOfAgents) {
 		results = new LinkedList<boolean[]>();
-		for (int level = 0; level < size; level++)
-			generateLevel(level, size);
+		for (int level = 0; level < maxNumberOfAgents; level++)
+			generateLevel(level, maxNumberOfAgents);
 		return results;
 	}
 
-	private void generateLevel(int level, int size) {
-		generateOptions(new boolean[size], 0, level);
+	/**
+	 * Generate level.
+	 * 
+	 * @param level the level
+	 * @param maxNumberOfAgents the max number of agents
+	 */
+	private void generateLevel(int level, int maxNumberOfAgents) {
+		generateOptions(new boolean[maxNumberOfAgents], 0, level);
 	}
 
+	/**
+	 * Generate options.
+	 * 
+	 * @param option the option
+	 * @param currentIndex the current index
+	 * @param level the level
+	 */
 	private void generateOptions(boolean[] option, int currentIndex, int level) {
 		// System.out.println(currentIndex + "|" + level + ":" + Arrays.toString(option));
 		// Generate with true and check if it's valid
@@ -46,10 +76,22 @@ public class PlanMergeOptionsGenerator {
 
 	}
 
+	/**
+	 * Found option.
+	 * 
+	 * @param option the option
+	 */
 	private void foundOption(boolean[] option) {
 		results.add(Arrays.copyOf(option, option.length));
 	}
 
+	/**
+	 * Checks if is option valid.
+	 * 
+	 * @param option the option
+	 * @param level the level
+	 * @return true, if is option valid
+	 */
 	private boolean isOptionValid(boolean[] option, int level) {
 		int count = 0;
 		for (boolean b : option)
@@ -61,6 +103,13 @@ public class PlanMergeOptionsGenerator {
 			return true;
 	}
 
+	/**
+	 * Format array.
+	 * 
+	 * @param arrayIndex the array index
+	 * @param results the results
+	 * @return the string
+	 */
 	private static String formatArray(int arrayIndex, List<boolean[]> results) {
 		StringBuilder res = new StringBuilder();
 		res.append("\t\tOPTIONS[" + arrayIndex + "] = ").append("new boolean[][] {\n");
@@ -72,6 +121,12 @@ public class PlanMergeOptionsGenerator {
 		return res.toString();
 	}
 
+	/**
+	 * The main method.
+	 * 
+	 * @param args the arguments
+	 * @throws FileNotFoundException the file not found exception
+	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		PrintWriter out = new PrintWriter("src/dk/dtu/ai/blueducks/merge/PlanMergeOptions.java");
 		final int AGENTS_COUNT = 10;
@@ -85,7 +140,7 @@ public class PlanMergeOptionsGenerator {
 
 		// Print data loading
 		for (int agents = 1; agents <= AGENTS_COUNT; agents++)
-			out.println(PlanMergeOptionsGenerator.formatArray(agents-1,
+			out.println(PlanMergeOptionsGenerator.formatArray(agents - 1,
 					new PlanMergeOptionsGenerator().generateAll(agents)));
 
 		// Print file footer
