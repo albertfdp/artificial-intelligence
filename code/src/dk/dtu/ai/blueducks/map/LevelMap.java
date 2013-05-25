@@ -57,6 +57,8 @@ public class LevelMap {
 	/** The betweenness centrality score for each free cell */
 	private Map<Cell, Double> betweennesScore;
 
+	private boolean isDijkstraDistance;
+
 	private Map<Cell, Map<Cell, Number>> distances;
 
 	private Set<Cell> lockedCells;
@@ -302,27 +304,47 @@ public class LevelMap {
 	public void unlockCell(Cell cell) {
 		this.lockedCells.remove(cell);
 	}
+	
+
+	public boolean isDijkstraDistance() {
+		return isDijkstraDistance;
+	}
+	
+	public List<Cell> getAllGoals() {
+		List<Cell> goalList = new ArrayList<Cell>();
+		for (Entry<Character, List<Cell>> e : goals.entrySet()) {
+			for (Cell goal : e.getValue()) {
+				goalList.add(goal);
+			}
+		}
+		return goalList;
+	}
 
 	/**
 	 * Execute a pre-analysis of the map.
 	 */
 	public void executeMapPreAnalysis() {
 
-		MapAnalyzer.getInstance();
+		MapAnalyzer mapAnalyzer = MapAnalyzer.getInstance();
+		
 		// calculate distances
-		if (MapAnalyzer.graph.getVertexCount() < MAX_NUMBER_VERTEX) {			
+		if (mapAnalyzer.graph.getVertexCount() < MAX_NUMBER_VERTEX) {			
 			logger.info("Using betweennes centrality and dijkstra distances for improving performance ... ");
 			// Analyze map
-			this.betweennesScore = MapAnalyzer.getInstance().getNormalizedBetweenessCentrality();
+			this.betweennesScore = mapAnalyzer.getNormalizedBetweenessCentrality();
+			this.isDijkstraDistance = true;
 			for (Cell cell : this.getCells()) {
-				distances.put(cell, MapAnalyzer.getInstance().getDistances(cell));
+				distances.put(cell, mapAnalyzer.getDistances(cell));
 			}
 		} else {
 			logger.info("Using manhattan distances for improving computing time ... ");
-			this.betweennesScore = MapAnalyzer.getInstance().getDefaultBetweennessCentrality();
+			this.betweennesScore = mapAnalyzer.getDefaultBetweennessCentrality();
 			for (Cell cell : this.getCells()) {
-				distances.put(cell, MapAnalyzer.getInstance().getManhattanDistances(cell));
+				distances.put(cell, mapAnalyzer.getManhattanDistances(cell));
 			}
 		}
+		
+		mapAnalyzer.getNeighbourGoals(getAllGoals());
+		
 	}
 }
