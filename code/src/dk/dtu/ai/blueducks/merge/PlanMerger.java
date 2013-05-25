@@ -1,10 +1,11 @@
 package dk.dtu.ai.blueducks.merge;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,25 +30,35 @@ public class PlanMerger {
 	private static int getNextOptionIndex(int currentOptionsPos, List<Conflict> conflictingAgents) {
 		if (currentOptionsPos >= mergeOptions.length)
 			return NO_MORE_OPTIONS;
-	
+
 		boolean[] activeAgents;
 		boolean conflict = true;
-		
+
 		// we consider the next position to start the testing
 		currentOptionsPos++;
-		
+
 		// we don't consider possibilities which we already know would be conflicting
 		while (conflict == true) {
 			conflict = false;
 			activeAgents = mergeOptions[currentOptionsPos];
-			for(Conflict c: conflictingAgents)
-				if(activeAgents[c.agent1]==true && activeAgents[c.agent2]==true) {
+			for (Conflict c : conflictingAgents)
+				if (activeAgents[c.agent1] == true && activeAgents[c.agent2] == true) {
 					currentOptionsPos++;
 					conflict = true;
 					break;
 				}
 		}
 		return currentOptionsPos;
+	}
+	
+	
+
+	private static Set<Action> getApplicableActions(Action[] agentsActions, MultiAgentState state) {
+		Set<Action> applicable = new HashSet<>();
+		for (Action a : agentsActions)
+			if (a.isApplicable(state))
+				applicable.add(a);
+		return applicable;
 	}
 
 	/**
@@ -94,7 +105,7 @@ public class PlanMerger {
 		boolean[] activeAgents;
 		int currentOptionsIndex = 0;
 
-		//TODO: Move the conflicts checking at the beginning
+		// TODO: Move the conflicts checking at the beginning
 		while (currentOptionsIndex != NO_MORE_OPTIONS) {
 			activeAgents = mergeOptions[currentOptionsIndex];
 
@@ -113,7 +124,8 @@ public class PlanMerger {
 				if (activeAgents[i] == true) {
 					Action agentIAction = agentsActions[i];
 					// checking if action can be performed on the state
-					if (agentIAction.isApplicable(duplicatedState) && agentIAction.isApplicable(current.getState())) {
+					if (agentIAction.isApplicable(duplicatedState)
+							&& agentIAction.isApplicable(current.getState())) {
 						// if yes -> execute it
 						agentIAction.execute(duplicatedState);
 					} else {
