@@ -76,6 +76,7 @@ public class PlanMerger {
 		boolean[] activeAgents;
 		int currentOptionsIndex = 0;
 
+		//TODO: Move the conflicts checking at the beginning
 		while (currentOptionsIndex != NO_MORE_OPTIONS) {
 			activeAgents = mergeOptions[currentOptionsIndex];
 
@@ -94,7 +95,7 @@ public class PlanMerger {
 				if (activeAgents[i] == true) {
 					Action agentIAction = agentsActions[i];
 					// checking if action can be performed on the state
-					if (agentIAction.isApplicable(duplicatedState)) {
+					if (agentIAction.isApplicable(duplicatedState) && agentIAction.isApplicable(current.getState())) {
 						// if yes -> execute it
 						agentIAction.execute(duplicatedState);
 					} else {

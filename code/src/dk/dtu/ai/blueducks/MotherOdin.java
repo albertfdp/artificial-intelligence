@@ -57,6 +57,8 @@ public class MotherOdin {
 
 	private List<LinkedList<Action>> mergedPlans;
 
+	private boolean needMerging;
+
 	/**
 	 * Gets the single instance of MotherOdin.
 	 * 
@@ -132,7 +134,10 @@ public class MotherOdin {
 			for (int agent = 0; agent < agents.size(); agent++)
 				if (mergedPlans.get(agent).peek() != null)
 				{
-					actions.add(mergedPlans.get(agent).remove());
+					Action nextAction=mergedPlans.get(agent).remove();
+					actions.add(nextAction);
+					if(nextAction==unmergedPlans.get(agent).peek())
+						unmergedPlans.get(agent).remove(0);
 				}
 				else
 					actions.add(new NoOpAction());
@@ -168,6 +173,8 @@ public class MotherOdin {
 	}
 
 	private void mergePlans() {
+		if(!needMerging)
+			return;
 		log.info("Starting plan merging...");
 		// Prepare actions
 		Action[][] actions = new Action[agents.size()][];
@@ -182,6 +189,7 @@ public class MotherOdin {
 		// Start the merging
 		PlanMerger.mergePlans(actions, agentsCurrentActionsIndex, new PlanMergeNode(
 				startState, null, null), 0);
+		needMerging=false;
 	}
 
 	public void setMergedPlan(List<LinkedList<Action>> mergedPlan) {
@@ -223,6 +231,7 @@ public class MotherOdin {
 	 */
 	public synchronized void appendPlan(Agent agent, List<Action> plan) {
 		unmergedPlans.get(agent.getId()).addAll(plan);
+		needMerging = true;
 	}
 
 	/**
