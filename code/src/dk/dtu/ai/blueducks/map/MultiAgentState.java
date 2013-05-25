@@ -18,9 +18,19 @@ public class MultiAgentState {
 	
 	/** The boxes. */
 	private Map<Cell, Box> boxes;
-	
+
 	/** The agents. */
 	private Map<Cell, Agent> agents;
+
+	
+	public Map<Cell, Box> getBoxes() {
+		return boxes;
+	}
+
+
+	public Map<Cell, Agent> getAgents() {
+		return agents;
+	}
 	
 	public MultiAgentState(Map<Cell, Agent> agents, Map<Cell, Box> boxes) {
 		this.agents = agents;
@@ -43,6 +53,17 @@ public class MultiAgentState {
 			}
 		}
 		return null;
+	}
+	
+	
+	public void changeBoxPosition(Cell destCell, Cell boxCell,Box box) {
+		boxes.put(destCell, box);
+		boxes.remove(boxCell);
+	}
+
+	public void changeAgentPosition(Cell destCell, Cell agentCell, Agent agent) {
+		agents.put(destCell, agent);
+		agents.remove(agentCell);
 	}
 	
 	/**

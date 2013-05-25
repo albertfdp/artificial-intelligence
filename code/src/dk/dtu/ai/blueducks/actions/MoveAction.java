@@ -11,6 +11,7 @@ package dk.dtu.ai.blueducks.actions;
 import java.util.Map;
 
 import dk.dtu.ai.blueducks.Agent;
+import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;
@@ -134,8 +135,11 @@ public class MoveAction extends Action {
 
 	@Override
 	public void execute(MultiAgentState state) {
-		// TODO Auto-generated method stub
-		
+		Cell agentCell = state.getCellForAgent(agent);
+		Cell destCell = agentCell.getNeighbour(agentDirection);
+		 
+		state.changeAgentPosition(destCell, agentCell, agent);
+
 	}
 
 }
