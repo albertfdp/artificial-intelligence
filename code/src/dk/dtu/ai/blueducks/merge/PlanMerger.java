@@ -2,10 +2,9 @@ package dk.dtu.ai.blueducks.merge;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +26,8 @@ public class PlanMerger {
 		log.config("Loaded options for " + AGENTS_COUNT + " agents.");
 	}
 
-	private static int getNextOptionIndex(int currentOptionsPos, List<Conflict> conflictingAgents) {
+	private static int getNextOptionIndex(int currentOptionsPos, List<Conflict> conflictingAgents,
+			boolean[] applicableActions) {
 		if (currentOptionsPos >= mergeOptions.length)
 			return NO_MORE_OPTIONS;
 
@@ -41,23 +41,36 @@ public class PlanMerger {
 		while (conflict == true) {
 			conflict = false;
 			activeAgents = mergeOptions[currentOptionsPos];
+			// Check if the actions are applicable
+			for (int agent = 0; agent < AGENTS_COUNT; agent++)
+				if (activeAgents[agent] && !applicableActions[agent]) {
+					currentOptionsPos++;
+					conflict = true;
+					log.info("Option not valid due to lack of applicability: "
+							+ Arrays.toString(activeAgents));
+					break;
+				}
+
+			if (conflict)
+				break;
+
+			// Check if the conflicts are respected
 			for (Conflict c : conflictingAgents)
 				if (activeAgents[c.agent1] == true && activeAgents[c.agent2] == true) {
 					currentOptionsPos++;
 					conflict = true;
+					log.info("Option not valid due to conflict: " + Arrays.toString(activeAgents));
 					break;
 				}
 		}
 		return currentOptionsPos;
 	}
-	
-	
 
-	private static Set<Action> getApplicableActions(Action[] agentsActions, MultiAgentState state) {
-		Set<Action> applicable = new HashSet<>();
-		for (Action a : agentsActions)
-			if (a.isApplicable(state))
-				applicable.add(a);
+	private static boolean[] getApplicableActions(Action[] agentsActions, MultiAgentState state) {
+		boolean[] applicable = new boolean[AGENTS_COUNT];
+		for (short agent = 0; agent < AGENTS_COUNT; agent++)
+			if (agentsActions[agent].isApplicable(state))
+				applicable[agent] = true;
 		return applicable;
 	}
 
@@ -103,7 +116,12 @@ public class PlanMerger {
 
 		// we try to get all option of generated activeAgents
 		boolean[] activeAgents;
-		int currentOptionsIndex = 0;
+		int currentOptionsIndex = -1;
+
+		//check applicable actions
+		boolean[] applicableActions = getApplicableActions(agentsActions, current.getState());
+
+		currentOptionsIndex = getNextOptionIndex(-1, Collections.<Conflict> emptyList(), applicableActions);
 
 		// TODO: Move the conflicts checking at the beginning
 		while (currentOptionsIndex != NO_MORE_OPTIONS) {
@@ -124,8 +142,7 @@ public class PlanMerger {
 				if (activeAgents[i] == true) {
 					Action agentIAction = agentsActions[i];
 					// checking if action can be performed on the state
-					if (agentIAction.isApplicable(duplicatedState)
-							&& agentIAction.isApplicable(current.getState())) {
+					if (agentIAction.isApplicable(duplicatedState)) {
 						// if yes -> execute it
 						agentIAction.execute(duplicatedState);
 					} else {
@@ -170,7 +187,8 @@ public class PlanMerger {
 				return mergePlans(actions, nextAgentCurrentActionIndex, next, step + 1);
 			} else {
 				// get the next option
-				currentOptionsIndex = getNextOptionIndex(currentOptionsIndex, conflictingAgents);
+				currentOptionsIndex = getNextOptionIndex(currentOptionsIndex, conflictingAgents,
+						applicableActions);
 			}
 		}
 		log.info("Plan merge not possible.");
