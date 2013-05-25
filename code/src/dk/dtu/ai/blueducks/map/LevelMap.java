@@ -10,6 +10,7 @@ package dk.dtu.ai.blueducks.map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class LevelMap {
 	private Set<Cell> lockedCells;
 
 	private List<Cell> verifiedCells;
-	
+
 	private final static int MAX_NUMBER_VERTEX = 60 * 60;
 
 	/**
@@ -74,6 +75,8 @@ public class LevelMap {
 		goals = new HashMap<Character, List<Cell>>();
 		verifiedCells = new ArrayList<Cell>();
 		agents = new ArrayList<Agent>(10);
+		for (int i = 0; i < 10; i++)
+			agents.add(null);
 		distances = new HashMap<Cell, Map<Cell, Number>>();
 		lockedCells = new HashSet<Cell>();
 	}
@@ -303,6 +306,15 @@ public class LevelMap {
 		this.lockedCells.remove(cell);
 	}
 
+	public void finishLoading() {
+
+		Iterator<Agent> agentsIterator = agents.iterator();
+		while (agentsIterator.hasNext())
+			if (agentsIterator.next() == null)
+				agentsIterator.remove();
+		logger.config("Cleaned agents: " + agents);
+	}
+
 	/**
 	 * Execute a pre-analysis of the map.
 	 */
@@ -310,7 +322,7 @@ public class LevelMap {
 
 		MapAnalyzer.getInstance();
 		// calculate distances
-		if (MapAnalyzer.graph.getVertexCount() < MAX_NUMBER_VERTEX) {			
+		if (MapAnalyzer.graph.getVertexCount() < MAX_NUMBER_VERTEX) {
 			logger.info("Using betweennes centrality and dijkstra distances for improving performance ... ");
 			// Analyze map
 			this.betweennesScore = MapAnalyzer.getInstance().getNormalizedBetweenessCentrality();

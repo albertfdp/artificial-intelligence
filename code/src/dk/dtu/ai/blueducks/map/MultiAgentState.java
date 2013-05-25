@@ -7,6 +7,7 @@
  */
 package dk.dtu.ai.blueducks.map;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -33,8 +34,8 @@ public class MultiAgentState {
 	}
 	
 	public MultiAgentState(Map<Cell, Agent> agents, Map<Cell, Box> boxes) {
-		this.agents = agents;
-		this.boxes = boxes;
+		this.agents = new HashMap<Cell, Agent>(agents);
+		this.boxes = new HashMap<Cell, Box>(boxes);
 	}
 	
 	public Cell getCellForBox(Box box) {

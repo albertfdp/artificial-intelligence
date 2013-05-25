@@ -96,6 +96,7 @@ public class MapLoader {
 			x++;
 		}
 		scan.close();
+		map.finishLoading();
 		
 //		//TODO: change the logging
 //		for (Entry<Cell, Agent> e : map.getAgents().entrySet()) {

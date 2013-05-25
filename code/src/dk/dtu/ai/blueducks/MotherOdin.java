@@ -23,6 +23,9 @@ import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
+import dk.dtu.ai.blueducks.map.MultiAgentState;
+import dk.dtu.ai.blueducks.merge.PlanMergeNode;
+import dk.dtu.ai.blueducks.merge.PlanMerger;
 import dk.dtu.ai.blueducks.planner.GoalPlanner.GoalCost;
 
 /**
@@ -145,7 +148,7 @@ public class MotherOdin {
 			// Notify the agents that something has changed
 			if (!jointActionSuccessful) {
 				log.info("Triggering agent replanning!");
-				//TODO: Optimize this... 
+				// TODO: Optimize this...
 				generateTopLevelGoals();
 				assignAgentsGoals();
 				for (int a = 0; a < agents.size(); a++)
@@ -157,7 +160,17 @@ public class MotherOdin {
 	}
 
 	private void mergePlans() {
-		// TODO Auto-generated method stub
+		log.info("Starting plan merging...");
+		// Prepare actions
+		Action[][] actions = new Action[agents.size()][];
+		int index = 0;
+		for (List<Action> agentPlan : plans)
+			actions[index++] = (Action[]) agentPlan.toArray(new Action[agentPlan.size()]);
+		// Prepare multiagent state
+		MultiAgentState startState = new MultiAgentState(LevelMap.getInstance().getAgents(), LevelMap
+				.getInstance().getCurrentState().getBoxes());
+		// Start the merging
+		PlanMerger.mergePlans(actions, new PlanMergeNode(startState, null, null), 0);
 	}
 
 	/**
@@ -245,7 +258,7 @@ public class MotherOdin {
 		for (Entry<Agent, Goal> e : agentsGoals.entrySet()) {
 			// If the goals for any of the agent has been changed, request a new plan from him.
 			if (!e.getValue().equals(e.getKey().getCurrentGoal())) {
-				log.info("Assigned new goal to "+e.getKey());
+				log.info("Assigned new goal to " + e.getKey());
 				e.getKey().requestPlan();
 			}
 		}
