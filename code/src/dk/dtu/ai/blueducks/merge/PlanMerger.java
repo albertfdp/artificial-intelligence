@@ -42,6 +42,8 @@ public class PlanMerger {
 
 		// we don't consider possibilities which we already know would be conflicting
 		while (conflict == true) {
+			if (currentOptionsPos >= mergeOptions.length)
+				return NO_MORE_OPTIONS;
 			conflict = false;
 			activeAgents = mergeOptions[currentOptionsPos];
 			// Check if the actions are applicable
@@ -55,7 +57,7 @@ public class PlanMerger {
 				}
 
 			if (conflict)
-				break;
+				continue;
 
 			// Check if the conflicts are respected
 			for (Conflict c : conflictingAgents)
@@ -123,7 +125,6 @@ public class PlanMerger {
 
 		// check applicable actions
 		boolean[] applicableActions = getApplicableActions(agentsActions, current.getState());
-
 		currentOptionsIndex = getNextOptionIndex(-1, Collections.<Conflict> emptySet(), applicableActions);
 
 		while (currentOptionsIndex != NO_MORE_OPTIONS) {
@@ -186,12 +187,13 @@ public class PlanMerger {
 				log.info("Moving to next step with agent action indexes: "
 						+ Arrays.toString(nextAgentCurrentActionIndex));
 				PlanMergeNode next = new PlanMergeNode(duplicatedState, currentSelectedActions, current);
-				return mergePlans(actions, nextAgentCurrentActionIndex, next, step + 1);
-			} else {
-				// get the next option
-				currentOptionsIndex = getNextOptionIndex(currentOptionsIndex, conflictingAgents,
-						applicableActions);
-			}
+				boolean success = mergePlans(actions, nextAgentCurrentActionIndex, next, step + 1);
+				if (success)
+					return true;
+			} 
+			// get the next option
+			currentOptionsIndex = getNextOptionIndex(currentOptionsIndex, conflictingAgents,
+					applicableActions);
 		}
 		log.info("Plan merge not possible.");
 		return false;
