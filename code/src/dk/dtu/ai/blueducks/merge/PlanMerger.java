@@ -30,7 +30,7 @@ public class PlanMerger {
 	}
 
 	private static int getNextOptionIndex(int currentOptionsPos, Set<Conflict> conflictingAgents,
-			boolean[] applicableActions) {
+			boolean[] applicableActions, Action[] agentsActions) {
 		if (currentOptionsPos >= mergeOptions.length)
 			return NO_MORE_OPTIONS;
 
@@ -48,11 +48,13 @@ public class PlanMerger {
 			activeAgents = mergeOptions[currentOptionsPos];
 			// Check if the actions are applicable
 			for (int agent = 0; agent < AGENTS_COUNT; agent++)
-				if (activeAgents[agent] && !applicableActions[agent]) {
+				if (activeAgents[agent]
+						&& (!applicableActions[agent] || agentsActions[agent] instanceof NoOpAction)) {
 					currentOptionsPos++;
 					conflict = true;
-					log.info("Option not valid due to lack of applicability: "
-							+ Arrays.toString(activeAgents));
+					if (log.isLoggable(Level.FINER))
+						log.finer("Option not valid due to lack of applicability: "
+								+ Arrays.toString(activeAgents));
 					break;
 				}
 
@@ -125,7 +127,8 @@ public class PlanMerger {
 
 		// check applicable actions
 		boolean[] applicableActions = getApplicableActions(agentsActions, current.getState());
-		currentOptionsIndex = getNextOptionIndex(-1, Collections.<Conflict> emptySet(), applicableActions);
+		currentOptionsIndex = getNextOptionIndex(-1, Collections.<Conflict> emptySet(), applicableActions,
+				agentsActions);
 
 		while (currentOptionsIndex != NO_MORE_OPTIONS) {
 			activeAgents = mergeOptions[currentOptionsIndex];
@@ -190,10 +193,10 @@ public class PlanMerger {
 				boolean success = mergePlans(actions, nextAgentCurrentActionIndex, next, step + 1);
 				if (success)
 					return true;
-			} 
+			}
 			// get the next option
 			currentOptionsIndex = getNextOptionIndex(currentOptionsIndex, conflictingAgents,
-					applicableActions);
+					applicableActions, agentsActions);
 		}
 		log.info("Plan merge not possible.");
 		return false;
