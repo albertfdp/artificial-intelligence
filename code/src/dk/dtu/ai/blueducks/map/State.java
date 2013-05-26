@@ -171,7 +171,7 @@ public class State extends AStarNode {
 				actions.add(new MoveAction(agentCell.getDirection(cell), agent));
 			} else {
 				// TODO: Optimize to only use boxes.get(cell) once to not compute hash twice
-				if (boxes.containsKey(cell) && boxes.get(cell).getColor() == agent.getColor()) {
+				if (boxes.containsKey(cell) && boxes.get(cell).getColor().equals(agent.getColor())) {
 
 					for (Cell neighbour : cell.getCellNeighbours()) {
 						if (isFree(neighbour) != CellVisibility.NOT_FREE) {

@@ -1,27 +1,35 @@
 package dk.dtu.ai.blueducks.merge;
 
+import java.util.Arrays;
+
+import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.map.MultiAgentState;
 
 public class PlanMergeNode {
 	private MultiAgentState state;
-	private boolean[] activeAgents;
+	private Action[] prevActions;
 	private PlanMergeNode prev;
 
-	public PlanMergeNode(MultiAgentState state, boolean[] activeAgents, PlanMergeNode prev) {
+	public PlanMergeNode(MultiAgentState state, Action[] prevActions, PlanMergeNode prev) {
 		this.state = state;
 		this.prev = prev;
-		this.activeAgents = activeAgents;
+		this.prevActions=prevActions;
 	}
 
 	public MultiAgentState getState() {
 		return state;
 	}
-	
-	public boolean[] getActiveAgents() {
-		return activeAgents;
+
+	public Action[] getPrevActions() {
+		return prevActions;
 	}
-	
+
 	public PlanMergeNode getPrevNode() {
 		return prev;
+	}
+
+	@Override
+	public String toString() {
+		return "PlanMergeNode [prevActions=" + Arrays.toString(prevActions) + "]";
 	}
 }
