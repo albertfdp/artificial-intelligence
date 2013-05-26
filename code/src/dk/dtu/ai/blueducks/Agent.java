@@ -13,8 +13,6 @@ import java.util.PriorityQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.print.attribute.standard.Finishings;
-
 import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.actions.NoOpAction;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
@@ -27,8 +25,8 @@ import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
 import dk.dtu.ai.blueducks.planner.AStarSearch;
 import dk.dtu.ai.blueducks.planner.GoalPlanner;
-import dk.dtu.ai.blueducks.planner.GoalSplitter;
 import dk.dtu.ai.blueducks.planner.GoalPlanner.GoalCost;
+import dk.dtu.ai.blueducks.planner.GoalSplitter;
 
 /**
  * The Class Agent.
@@ -154,7 +152,7 @@ public class Agent {
 		}
 
 		// Replan
-		State agentState = new State(LevelMap.getInstance().getCellForAgent(this), null, null, this, LevelMap.getInstance().getCurrentState().getBoxes());
+		State agentState = new State(LevelMap.getInstance().getCellForAgent(this), null, null, this, LevelMap.getInstance().getCurrentState().getOccupiedCells(), LevelMap.getInstance().getCurrentState().getCellsForBoxes());
 		
 		Goal subgoal = subgoals.get(currentSubgoalIndex++);
 		if (log.isLoggable(Level.FINER))

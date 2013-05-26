@@ -10,7 +10,6 @@ package dk.dtu.ai.blueducks;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.map.Cell;
-import dk.dtu.ai.blueducks.map.State;
 
 public class Box {
 

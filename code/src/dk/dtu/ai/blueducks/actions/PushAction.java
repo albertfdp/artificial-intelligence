@@ -85,9 +85,8 @@ public class PushAction extends Action {
 		agents.put(boxCell, agent);
 		agents.remove(agentCell);
 
-		Map<Cell, Box> boxes = LevelMap.getInstance().getCurrentState().getBoxes();
-		boxes.put(destCell, box);
-		boxes.remove(boxCell);
+		LevelMap.getInstance().getCurrentState().movedAgent(agentCell, boxCell);
+		LevelMap.getInstance().getCurrentState().movedBox(box, boxCell, destCell);
 		LevelMap.getInstance().markAsNotWall(destCell);
 	}
 
@@ -97,10 +96,10 @@ public class PushAction extends Action {
 		Cell destCell = boxCell.getNeighbour(boxDirection);
 		Cell agentCell = state.getAgentCell();
 
-		State nextState = new State(boxCell, this, state, agent, state.getBoxes());
+		State nextState = new State(boxCell, this, state, agent, state.getOccupiedCells(), state.getCellsForBoxes());
 
 		nextState.movedBox(box, boxCell, destCell);
-		nextState.movedAgentFrom(agentCell);
+		nextState.movedAgent(agentCell, boxCell);
 
 		return nextState;
 	}

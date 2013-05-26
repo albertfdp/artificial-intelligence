@@ -117,11 +117,9 @@ public class PullAction extends Action {
 		Map<Cell, Agent> agents = LevelMap.getInstance().getAgents();
 		agents.put(destCell, agent);
 		agents.remove(agentCell);
-		
-		Map<Cell, Box> boxes = LevelMap.getInstance().getCurrentState().getBoxes();
-		boxes.put(agentCell, box);
-		boxes.remove(boxCell);
-
+		LevelMap.getInstance().getCurrentState().movedAgent(agentCell, destCell);
+		LevelMap.getInstance().getCurrentState().movedBox(box, boxCell, agentCell);
+		LevelMap.getInstance().markAsNotWall(destCell);
 	}
 
 	@Override
@@ -129,9 +127,9 @@ public class PullAction extends Action {
 		Cell agentCell = state.getAgentCell();
 		Cell agentDestCell = agentCell.getNeighbour(agentDirection);
 		
-		State nextState = new State(agentDestCell, this, state, agent, state.getBoxes());
+		State nextState = new State(agentDestCell, this, state, agent, state.getOccupiedCells(), state.getCellsForBoxes());
 		nextState.movedBox(box, agentCell.getNeighbour(boxDirection), agentCell);
-		nextState.movedAgentFrom(agentCell);
+		nextState.movedAgent(agentCell, agentDestCell);
 		return nextState;
 	}
 

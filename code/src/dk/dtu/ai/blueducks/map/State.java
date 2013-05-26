@@ -8,6 +8,7 @@
 package dk.dtu.ai.blueducks.map;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +30,8 @@ public class State extends AStarNode {
 		FREE, NOT_FREE, POSSIBLY_FREE
 	};
 
-	/** The boxes. */
-	private Map<Cell, Box> boxes;
+	BitSet occupiedCells;
+	List<Cell> cellsForBoxes;
 
 	/** The agent cell. */
 	Cell agentCell;
@@ -60,31 +61,54 @@ public class State extends AStarNode {
 	 * @param agent the agent
 	 * @param map the map
 	 */
-	public State(Cell agentCell, Action previousAction, State previousState, Agent agent, Map<Cell, Box> map){
-	//	if(map != null )
-	//		this.boxes = new HashMap<Cell, Box>(map);
-	//	else
-		this.boxes = new HashMap<Cell, Box>();
-		if(map!= null)
-			this.boxes.putAll(map);
+	public State(Cell agentCell, Action previousAction, State previousState, Agent agent, BitSet previousStateOccupiedCells, List<Cell> previousStateCellForBoxes){
 		this.agentCell = agentCell;
 		this.previousAction = previousAction;
 		this.previousState = previousState;
 		this.agent = agent;
-		if(previousState == null) {
+		occupiedCells = new BitSet();
+		if(previousStateOccupiedCells != null)
+			occupiedCells = (BitSet) previousStateOccupiedCells.clone();
+		else
+			occupiedCells = new BitSet();
+		if(previousStateCellForBoxes != null)
+			cellsForBoxes = new ArrayList<Cell>(previousStateCellForBoxes);
+		else
+			cellsForBoxes = new ArrayList<Cell>();
+		
+		if(previousState != null) {
+			this.computedHashCode = previousState.hashCode();
+		} else {
 			computeHashCode();
 		}
-		else { 
-			this.computedHashCode = previousState.hashCode();
-		}
+		
+		
+		
+	}
+
+	public List<Cell> getCellsForBoxes() {
+		return cellsForBoxes;
+	}
+
+	public BitSet getOccupiedCells() {
+		return occupiedCells;
 	}
 
 	public void computeHashCode(){
 		this.computedHashCode = 0;
 		log.info("Compute HASH code");
-		for(Entry<Cell, Box> entry : this.boxes.entrySet()) {
-			this.computedHashCode = this.computedHashCode + entry.getValue().powerHashValue * entry.getKey().uniqueId;
+		List<Box> boxList = LevelMap.getInstance().getBoxesList();
+		
+		for(int index = 0; index < cellsForBoxes.size(); index++) {
+			log.info("NUM OF BOX" + index);
+			log.info("CELLS FOR BOXES " + cellsForBoxes);
+			Cell cell = cellsForBoxes.get(index);
+			Box box = boxList.get(index);
+			log.info("BOX "+ box);
+			log.info("CELL" + cell);
+			this.computedHashCode = this.computedHashCode + box.powerHashValue * cell.uniqueId;
 		}
+		
 		if(agent != null)
 			this.computedHashCode = this.computedHashCode + agent.powerHashValue * agentCell.uniqueId;
 		
@@ -116,11 +140,20 @@ public class State extends AStarNode {
 	/**
 	 * Sets the boxes.
 	 * 
-	 * @param boxes the boxes
+	 * @param boxes the boxes 
 	 */
-	public void setBoxes(Map<Cell, Box> boxes) {
-		this.boxes = boxes;
-		log.info("SET BOXES");
+	public void setInitalBoxesInLevelMap(Map<Cell, Box> boxes) {
+		occupiedCells = new BitSet(Cell.noOfCells);
+		cellsForBoxes = new ArrayList<Cell>();
+		log.info("CELL FOR BOXES SIZE: " + boxes.size());
+		for(int i = 0; i < boxes.size(); i++)
+			cellsForBoxes.add(null);
+		for(Entry<Cell,Box> entry: boxes.entrySet()){
+			log.info("ADDED BOX "+ entry.getValue().uniqueId + " VALUE " + entry.getValue());
+			occupiedCells.set(entry.getKey().uniqueId, true);
+			cellsForBoxes.set(entry.getValue().uniqueId, entry.getKey());
+		}
+		
 		computeHashCode();
 	}
 
@@ -129,9 +162,9 @@ public class State extends AStarNode {
 	 * 
 	 * @return the boxes
 	 */
-	public Map<Cell, Box> getBoxes() {
-		return boxes;
-	}
+//	public Map<Cell, Box> getBoxes() {
+//		return boxes;
+//	}
 
 //	/**
 //	 * Adds the box.
@@ -146,17 +179,18 @@ public class State extends AStarNode {
 
 	
 	public void movedBox(Box box, Cell orig, Cell dest) {
-		//log.info("BOX1 " + box + "ORIG " + orig + "DEST " + dest);
 		this.computedHashCode = this.computedHashCode  - box.powerHashValue * orig.uniqueId;
 		this.computedHashCode = this.computedHashCode  + box.powerHashValue * dest.uniqueId;
-		this.boxes.put(dest, box);
-		this.boxes.remove(orig);
-		//log.info("MOVED BOX " + this.computedHashCode);
+		this.occupiedCells.set(orig.uniqueId, false);
+		this.occupiedCells.set(dest.uniqueId, true);
+		this.cellsForBoxes.set(box.uniqueId, dest);
 	}
 	
-	public void movedAgentFrom(Cell orig) {
-		this.computedHashCode = this.computedHashCode - agent.powerHashValue * orig.uniqueId;
-		this.computedHashCode = this.computedHashCode  + agent.powerHashValue * agentCell.uniqueId;
+	public void movedAgent(Cell orig, Cell dest) {
+		if(agent != null) {
+			this.computedHashCode = this.computedHashCode - agent.powerHashValue * orig.uniqueId;
+			this.computedHashCode = this.computedHashCode  + agent.powerHashValue * dest.uniqueId;
+		}
 	}
 	/**
 	 * @returns the cell of the agent associated with the state
@@ -172,7 +206,7 @@ public class State extends AStarNode {
 	 * @return the celll visibility
 	 */
 	public CellVisibility isFree(Cell cell) {
-		if (cell == null || boxes.containsKey(cell) || cell == agentCell)
+		if (cell == null || occupiedCells.get(cell.uniqueId) || cell == agentCell)
 			return CellVisibility.NOT_FREE;
 		// TODO: where will we use the fact that the cell might/ might not be free
 		if (LevelMap.getInstance().isVerified(cell))
@@ -187,12 +221,8 @@ public class State extends AStarNode {
 	 * @return the cell for box
 	 */
 	public Cell getCellForBox(Box box) {
-		for (Entry<Cell, Box> e : boxes.entrySet()) {
-			if (e.getValue() == box) {
-				return e.getKey();
-			}
-		}
-		return null;
+		return cellsForBoxes.get(box.uniqueId);
+
 	}
 
 	/**
@@ -204,25 +234,27 @@ public class State extends AStarNode {
 		List<Action> actions = new ArrayList<Action>();
 		List<Cell> neighbourCells = agentCell.getCellNeighbours();
 
-		// log.info("AGENT CELL "+ agentCell);
 		for (Cell cell : neighbourCells) {
+			if(cell == null)
+				continue;
 			if (isFree(cell) != CellVisibility.NOT_FREE) {
-				// log.info("ACTION "+ agentCell.getDirection(cell));
 				actions.add(new MoveAction(agentCell.getDirection(cell), agent));
 			} else {
-				// TODO: Optimize to only use boxes.get(cell) once to not compute hash twice
-				if (boxes.containsKey(cell) && boxes.get(cell).getColor() == agent.getColor()) {
+				int boxId = cellsForBoxes.indexOf(cell);
+				List<Box> boxList = LevelMap.getInstance().getBoxesList();
+
+				if(occupiedCells.get(cell.uniqueId) && boxList.get(boxId).getColor() == agent.getColor()) {
 
 					for (Cell neighbour : cell.getCellNeighbours()) {
 						if (isFree(neighbour) != CellVisibility.NOT_FREE) {
 							actions.add(new PushAction(agentCell.getDirection(cell), cell
-									.getDirection(neighbour), agent, boxes.get(cell)));
+									.getDirection(neighbour), agent, boxList.get(boxId)));
 						}
 					}
 					for (Cell myNeighbour : neighbourCells) {
 						if (isFree(myNeighbour) != CellVisibility.NOT_FREE) {
 							actions.add(new PullAction(agentCell.getDirection(myNeighbour), agentCell
-									.getDirection(cell), agent, boxes.get(cell)));
+									.getDirection(cell), agent, boxList.get(boxId)));
 						}
 					}
 				}
@@ -239,14 +271,36 @@ public class State extends AStarNode {
 
 	@Override
 	public String toString() {
-		return "State [agent=" + agent + ", boxes=" + boxes + ", agentCell=" + agentCell
+		return "State [agent=" + agent + ", boxesCell=" + cellsForBoxes + ", agentCell=" + agentCell
 				+ ", previousAction=" + previousAction + "]";
 	}
 
+	public List<Box> getBoxesInGoalCells() {
+		List<Box> boxList = LevelMap.getInstance().getBoxesList();
+		for (Box box : boxList) {
+			if (LevelMap.getInstance().getGoals().get(box.getId()).contains(cellsForBoxes.get(box.uniqueId))) {
+				boxesInGoalCell.add(box);
+			}
+		}
+		return boxesInGoalCell;
+	}
+
+//	@Override
+//	public int hashCode() {
+//
+//		return computedHashCode;
+//	}
+	
 	@Override
 	public int hashCode() {
-
-		return computedHashCode;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((agent == null) ? 0 : agent.hashCode());
+		result = prime * result + ((agentCell == null) ? 0 : agentCell.hashCode());
+		result = prime * result + ((boxesInGoalCell == null) ? 0 : boxesInGoalCell.hashCode());
+		result = prime * result + ((cellsForBoxes == null) ? 0 : cellsForBoxes.hashCode());
+		result = prime * result + ((occupiedCells == null) ? 0 : occupiedCells.hashCode());
+		return result;
 	}
 
 	@Override
@@ -258,45 +312,38 @@ public class State extends AStarNode {
 		if (getClass() != obj.getClass())
 			return false;
 		State other = (State) obj;
+		if (agent == null) {
+			if (other.agent != null)
+				return false;
+		} else if (!agent.equals(other.agent))
+			return false;
 		if (agentCell == null) {
 			if (other.agentCell != null)
 				return false;
 		} else if (!agentCell.equals(other.agentCell))
 			return false;
-		if (boxes == null) {
-			if (other.boxes != null)
+		if (boxesInGoalCell == null) {
+			if (other.boxesInGoalCell != null)
 				return false;
-		} else {
-			for (Entry<Cell, Box> entry : boxes.entrySet()) {
-				if (!entry.getValue().equals(other.getBoxes().get(entry.getKey())))
+		} else if (!boxesInGoalCell.equals(other.boxesInGoalCell))
+			return false;
+		if (cellsForBoxes == null) {
+			if (other.cellsForBoxes != null)
+				return false;
+		} else 
+			for(int index = 0; index < cellsForBoxes.size(); index++){
+				if(cellsForBoxes.get(index) != other.cellsForBoxes.get(index))
 					return false;
 			}
-			// if(boxes.hashCode() != other.boxes.hashCode()){
-			// return false;
-			// }
-		}
-		return true;
-	}
-
-	// /**
-	// * Duplicate - shallow copy of the object
-	// *
-	// * @return a copy of the state
-	// */
-	// public State duplicate() {
-	// State st = new State(agentCell, previousAction, previousState, agent);
-	// st.boxes = new HashMap<Cell, Box>(this.boxes);
-	// return st;
-	// }
-
-	public List<Box> getBoxesInGoalCells() {
-		for (Entry<Cell, Box> ent : boxes.entrySet()) {
-			Box box = ent.getValue();
-			if (LevelMap.getInstance().getGoals().get(box.getId()).contains(ent.getKey())) {
-				boxesInGoalCell.add(ent.getValue());
+		if (occupiedCells == null) {
+			if (other.occupiedCells != null)
+				return false;
+		} else 
+			for(int index = 0; index < occupiedCells.size(); index++){
+				if(occupiedCells.get(index) != other.occupiedCells.get(index))
+					return false;
 			}
-		}
-		return boxesInGoalCell;
+		return true;
 	}
 
 }

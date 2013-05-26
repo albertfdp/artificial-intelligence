@@ -51,7 +51,7 @@ public class LevelMap {
 	/** The current state. */
 	private State currentState;
 
-	/** The boxes list. */
+	/** The boxes list put in he order of the uniqueID. */
 	private List<Box> boxesList;
 
 	/** The betweenness centrality score for each free cell */
@@ -87,7 +87,7 @@ public class LevelMap {
 	public static LevelMap getInstance() {
 		if (LevelMap.map == null) {
 			LevelMap.map = new LevelMap();
-			map.currentState = new State(null, null, null, null, null);
+			map.currentState = new State(null, null, null, null, null, null);
 		}
 		return LevelMap.map;
 	}
@@ -179,16 +179,20 @@ public class LevelMap {
 	 * @param box the box
 	 */
 	public void attachBoxes(Map<Cell, Box> boxes) {
-
+		this.boxesList = new ArrayList<Box>(boxes.size());
+		logger.info("BOX SIZE: " + boxes.size());
+		for(int i = 0; i < boxes.size(); i++)
+			this.boxesList.add(null);
 		
 		for(Entry<Cell, Box> entry : boxes.entrySet()) {
-			this.boxesList.add(entry.getValue());
+			logger.info("LOOP BOX ATTACH");
+			this.boxesList.set(entry.getValue().uniqueId, entry.getValue());
 			entry.getValue().computePowerHashValue();
 		}
 		for(Agent agent : agents) {
 			agent.computePowerHashValue();
 		}
-		this.currentState.setBoxes(boxes);
+		this.currentState.setInitalBoxesInLevelMap(boxes);
 	}
 
 	public List<Cell> getCells() {

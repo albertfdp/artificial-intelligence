@@ -62,7 +62,7 @@ public class MoveAction extends Action {
 		agents.put(destCell, agent);
 		agents.remove(agentCell);
 		LevelMap.getInstance().markAsNotWall(destCell);
-			
+		LevelMap.getInstance().getCurrentState().movedAgent(agentCell, destCell);
 	}
 
 	/** 
@@ -74,8 +74,8 @@ public class MoveAction extends Action {
 	@Override
 	public State getNextState(State state) {
 		Cell nextCell = state.getAgentCell().getNeighbour(agentDirection);
-		State nextState = new State(nextCell, this, state, agent, state.getBoxes());
-		nextState.movedAgentFrom(state.getAgentCell());
+		State nextState = new State(nextCell, this, state, agent, state.getOccupiedCells(), state.getCellsForBoxes());
+		nextState.movedAgent(state.getAgentCell(), nextCell);
 		return nextState;	
 	}
 
