@@ -185,14 +185,10 @@ public class MotherOdin {
 		int index = 0;
 		for (List<Action> agentPlan : unmergedPlans)
 			actions[index++] = (Action[]) agentPlan.toArray(new Action[agentPlan.size()]);
-		// Prepare multiagent state
-		MultiAgentState startState = new MultiAgentState(LevelMap.getInstance().getAgents(), LevelMap
-				.getInstance().getCurrentState().getBoxes());
-		// Prepare start indexes
-		short[] agentsCurrentActionsIndex = new short[agents.size()];
+
 		// Start the merging
-		PlanMerger.mergePlans(actions, agentsCurrentActionsIndex, new PlanMergeNode(
-				startState, null, null), 0);
+		PlanMerger merger=new PlanMerger(agents.size(), actions);
+		merger.run();
 		needMerging=false;
 	}
 
