@@ -2,6 +2,7 @@ package dk.dtu.ai.blueducks.merge;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -50,11 +51,11 @@ public class PlanAnalyzer {
 	}
 
 	public static class CommonResources {
-		public Set<Short> agents;
+		public LinkedHashSet<Short> agents;
 		public PlanAffectedResources resources;
 
 		public CommonResources(short a, PlanAffectedResources res) {
-			this.agents = new HashSet<Short>();
+			this.agents = new LinkedHashSet<Short>();
 			this.agents.add(a);
 
 			this.resources = res;

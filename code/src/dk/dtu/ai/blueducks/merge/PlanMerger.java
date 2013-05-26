@@ -88,8 +88,8 @@ public class PlanMerger {
 						&& (!applicableActions[agent] || agentsActions[agent] instanceof NoOpAction)) {
 					currentOptionsPos++;
 					conflict = true;
-					if (log.isLoggable(Level.FINER))
-						log.finer("Option not valid due to lack of applicability: "
+					if (log.isLoggable(Level.FINEST))
+						log.finest("Option not valid due to lack of applicability: "
 								+ Arrays.toString(activeAgents));
 					break;
 				}
@@ -102,7 +102,8 @@ public class PlanMerger {
 				if (activeAgents[c.agent1] == true && activeAgents[c.agent2] == true) {
 					currentOptionsPos++;
 					conflict = true;
-					log.info("Option not valid due to conflict: " + Arrays.toString(activeAgents));
+					if(log.isLoggable(Level.FINEST))
+						log.finest("Option not valid due to conflict: " + Arrays.toString(activeAgents));
 					break;
 				}
 		}

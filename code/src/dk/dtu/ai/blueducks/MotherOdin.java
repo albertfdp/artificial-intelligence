@@ -101,8 +101,13 @@ public class MotherOdin {
 					continue;
 				// Create goals for each of the boxes that could fulfill this goal
 				for (Box b : boxes)
-					if (b.getId() == goalCells.getKey())
-						topLevelGoals.add(new DeliverBoxGoal(b, goalCell));
+					if (b.getId() == goalCells.getKey()) {
+						//If the goal was already assigned to somebody else, ignore it.
+						DeliverBoxGoal newGoal = new DeliverBoxGoal(b, goalCell);
+						if (!agentsGoals.values().contains(newGoal))
+							topLevelGoals.add(new DeliverBoxGoal(b, goalCell));
+					}
+
 			}
 		}
 
@@ -189,20 +194,38 @@ public class MotherOdin {
 			log.finest("Possible conflicts: " + possibleConflicts);
 
 		log.info("Starting plan merging...");
-		// Prepare actions
-		Action[][] actions = new Action[agents.size()][];
-		int index = 0;
-		for (List<Action> agentPlan : unmergedPlans)
-			actions[index++] = (Action[]) agentPlan.toArray(new Action[agentPlan.size()]);
+		// Start the merging of the plans for agents who use common resources
+		for (CommonResources c : possibleConflicts) {
+			// If it's only one agent, there is no need for merging
+			if (c.agents.size() == 1) {
+				short agent = c.agents.iterator().next();
+				log.fine("Not need for merging for agent " + agent);
+				mergedPlans.set(agent, unmergedPlans.get(agent));
+			} else {
+				if (log.isLoggable(Level.FINE))
+					log.fine("Merging plans for agents: " + c.agents);
+				// Prepare actions
+				Action[][] actions = new Action[c.agents.size()][];
+				int index = 0;
+				for (short agent : c.agents) {
+					List<Action> agentPlan = unmergedPlans.get(agent);
+					actions[index++] = agentPlan.toArray(new Action[agentPlan.size()]);
+				}
 
-		// Start the merging
-		PlanMerger merger = new PlanMerger(agents.size(), actions);
-		List<LinkedList<Action>> mergedPlans = merger.run();
-		if (mergedPlans != null) {
-			this.setMergedPlan(mergedPlans);
-		} else {
-			log.info("Could not find way to merge plans...");
+				// Do the merging
+				PlanMerger merger = new PlanMerger(c.agents.size(), actions);
+				List<LinkedList<Action>> mergePlansResult = merger.run();
+				if (mergePlansResult != null) {
+					index = 0;
+					for (short agent : c.agents)
+						this.mergedPlans.set(agent, mergePlansResult.get(index++));
+				} else {
+					// TODO: Do something to solve this situation
+					log.info("Could not find way to merge plans...");
+				}
+			}
 		}
+		log.info("Merged plan: " + mergedPlans);
 		needMerging = false;
 	}
 
