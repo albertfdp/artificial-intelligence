@@ -7,15 +7,15 @@
  */
 package dk.dtu.ai.blueducks.heuristics;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.Agent;
+import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.map.Cell;
-import dk.dtu.ai.blueducks.map.CellEdge;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.MapAnalyzer;
 
@@ -30,38 +30,6 @@ public class GoalPlannerHeuristic {
 	public static float getHeuristicValue(Agent agent, Goal goal) {
 		return chooseNotBlockingGoal(agent, goal);
 		//return chooseClosestGoal(agent, goal);
-//		DeliverBoxGoal dbg =(DeliverBoxGoal) goal;
-//		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
-//		Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(dbg.getWhat());
-//		Cell goalCell = dbg.getTo();
-//		
-//		// We init distance with a number large enough to avoid chosing unachievable cells
-//		float distance = 100000;
-//		
-//		// If the box exists, the distance would be Manhattan/Dijkstra (depends on the size the map)
-//		if (boxCell != null) { 
-//			distance = LevelMap.getInstance().getDistance(agentCell, boxCell);
-//			distance += LevelMap.getInstance().getDistance(boxCell, goalCell);
-//		}
-//		
-//		// Avoid selecting locked cells, if possible
-//		if (LevelMap.getInstance().getLockedCells().contains(boxCell)) {
-//			distance += distance * 10;
-//		}
-//		/*
-//		List<Cell> goalNeighbours = goalCell.getCellNeighbours();
-//		for (Cell neighbour : goalNeighbours) {
-//			Map<Cell, Double> nbc = LevelMap.getInstance().getBetweenessCentrality();
-//				
-//			if (neighbour != null && (MapAnalyzer.getInstance().getDegreeCentrality().get(goalCell) == 2)
-//					&& LevelMap.getInstance().isGoal(neighbour) && (nbc.get(neighbour) <= nbc.get(goalCell))) {
-//				distance += (100 * nbc.get(goalCell));
-//			}
-//		}*/
-//		
-//		// TODO: Add more stuff
-//		logger.info(agent.toString() + " cost of " + goal.toString() + " => " + distance);
-//		return distance;
 	}
 	
 	private static float chooseClosestGoal(Agent agent, Goal goal) {
@@ -93,14 +61,18 @@ public class GoalPlannerHeuristic {
 		
 		float h = 0;
 		
-		float a0 = 1;
-		float a1 = 1;
-		float a2 = 1;
-		float a3 = 100;
-		float a4 = 1;
-		float a5 = 0;
+		float a0 = 1; // distance agent box goal
+		float a1 = 1; // betweenness box
+		float a2 = 0.01f; // distance other boxes
+		float a3 = 200; // betweenness goal cell
+		float a4 = 0; // locking goal
+		float a5 = 0; // undoing a goal
 		
 		DeliverBoxGoal deliverBoxGoal = (DeliverBoxGoal) goal;
+		
+		if (deliverBoxGoal.getWhat().getId() == 'A') {
+			a0 = 1;
+		}
 		
 		// cell where the agent is located now
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
@@ -114,15 +86,32 @@ public class GoalPlannerHeuristic {
 		float distanceAgentBox = LevelMap.getInstance().getDistance(agentCell, boxCell);
 		float distanceBoxGoal = LevelMap.getInstance().getDistance(boxCell, goalCell);
 		
-		float betweennessBox = LevelMap.getInstance().getBetweenessCentrality().get(boxCell).floatValue();
-		float betweennessGoal = LevelMap.getInstance().getBetweenessCentrality().get(goalCell).floatValue();
+		Map<Cell, Double> nbc = LevelMap.getInstance().getBetweenessCentrality();
+		
+		float betweennessBox = nbc.get(boxCell).floatValue();
+		float betweennessGoal = nbc.get(goalCell).floatValue();
+		
 		
 		// check if resolving this goal, locks other goals
-		float lockingGoal = 0;
-		for (Cell neighbour : goalCell.getCellNeighbours()) {
-			Map<Cell, Double> nbc = LevelMap.getInstance().getBetweenessCentrality();
-			if (neighbour != null && (LevelMap.getInstance().isGoal(neighbour)) && (nbc.get(neighbour) <= nbc.get(goalCell))) {
-				lockingGoal = nbc.get(goalCell).floatValue();
+		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getInstance().getNeighbourGoals(LevelMap.getInstance().getAllGoals());
+		for (Set<Cell> groupOfGoals : groupsOfGoals) {
+			if (groupOfGoals.contains(goalCell)) {
+				boolean hasLargestBetweenness = true;
+				for (Cell cellGroup : groupOfGoals) {
+					if (nbc.get(cellGroup) > betweennessGoal)
+						hasLargestBetweenness = false;
+				}
+				if (hasLargestBetweenness)
+					a4 = 1;
+			}
+		}
+		
+		float distanceOtherBoxes = 0;
+		for (Box box : LevelMap.getInstance().getBoxesList()) {
+			if (box != deliverBoxGoal.getWhat()) {
+				Cell otherBoxCell = LevelMap.getInstance().getCurrentState().getCellForBox(box);
+				if (!LevelMap.getInstance().getLockedCells().contains(otherBoxCell))
+					distanceOtherBoxes += LevelMap.getInstance().getDistance(otherBoxCell, goalCell);
 			}
 		}
 		
@@ -131,12 +120,11 @@ public class GoalPlannerHeuristic {
 			a5 = 1;
 		}
 		
-		h = a0 * distanceAgentBox + a1 * betweennessBox + a2 * distanceBoxGoal + a3 * betweennessGoal + a4 * lockingGoal
+		h = a0 * (distanceAgentBox + distanceBoxGoal) + a1 * betweennessBox + a2 * distanceOtherBoxes 
+				+ a3 * betweennessGoal + a4 * Heuristic.PENALTY_LOCK_GOAL
 				+ a5 * Heuristic.PENALTY_UNDO_GOAL;
+		
 		logger.info(deliverBoxGoal.toString() + " => " + h);
-//		logger.info("h = " + " + " + a0 * distanceAgentBox + " + " 
-//				+ a1 * betweennessBox + " + " + a2 * distanceBoxGoal + " + " 
-//				+ a3 * betweennessGoal + " + " + a4 * lockingGoal * distanceBoxGoal + " = " + h);
 		
 		return h;
 	}
