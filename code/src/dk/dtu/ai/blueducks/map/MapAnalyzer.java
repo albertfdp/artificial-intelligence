@@ -97,6 +97,7 @@ public class MapAnalyzer {
 				log.info("SCORE: " + entry.getKey().toString() + " " + entry.getValue() / highest);
 				normalizedScores.put(entry.getKey(), entry.getValue() / highest);
 			}
+			nbc = normalizedScores;
 			return normalizedScores;
 		}
 		return nbc;
@@ -125,6 +126,59 @@ public class MapAnalyzer {
 	
 	public Number getManhattanDistance(Cell cellA, Cell cellB) {
 		return (Number) (Math.abs(cellA.x - cellB.x) + Math.abs(cellA.y - cellB.y));
+	}
+	
+	
+	private boolean isEndOfDeadEnd(List<Cell> cells) {
+		for (Cell cell : cells) {			
+			if (cell != null && graph.degree(cell) > 2)
+				return true;
+		}
+		return false;
+	}
+	
+	public Set<List<Cell>> getDeadEnds() {
+		Map<Cell, Double> nbc = getNormalizedBetweenessCentrality();
+		Set<Cell> endOfDeadEndCells = new HashSet<Cell>();
+		for (Cell cell : graph.getVertices()) {
+			if (nbc.get(cell) == 0) {
+				endOfDeadEndCells.add(cell);
+			}
+		}
+		
+		Set<List<Cell>> deadEndsCells = new HashSet<List<Cell>>();
+		for (final Cell endOfDeadEndCell : endOfDeadEndCells) {
+			List<Cell> deadEndCells = new ArrayList<Cell>();
+			List<Cell> neighbours = endOfDeadEndCell.getCellNeighbours();
+			Cell currentCell = endOfDeadEndCell;
+			while (!isEndOfDeadEnd(neighbours)) {
+				for (Cell neighbour : neighbours) {
+					if (neighbour != null) {
+						double dCurrent = dd.getDistance(endOfDeadEndCell, currentCell).doubleValue();
+						double dNext = dd.getDistance(endOfDeadEndCell, neighbour).doubleValue();
+						if (!deadEndCells.contains(neighbour))
+							deadEndCells.add(neighbour);
+						if (dCurrent < dNext) {
+							currentCell = neighbour;
+						}
+					}
+				}
+				neighbours = currentCell.getCellNeighbours();
+			}
+			Collections.sort(deadEndCells, new Comparator<Cell>() {
+
+				@Override
+				public int compare(Cell o1, Cell o2) {
+					double d1 = dd.getDistance(endOfDeadEndCell, o1).doubleValue();
+					double d2 = dd.getDistance(endOfDeadEndCell, o2).doubleValue();
+					
+					return d1 < d2 ? -1 : d1 > d2 ? 1 : 0;
+				}
+				
+			});
+			deadEndsCells.add(deadEndCells);
+		}		
+		return deadEndsCells;
 	}
 		
 	public Set<Set<Cell>> getNeighbourGoals(List<Cell> goals) {

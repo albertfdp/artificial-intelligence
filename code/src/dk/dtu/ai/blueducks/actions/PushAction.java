@@ -84,6 +84,10 @@ public class PushAction extends Action {
 		Map<Cell, Agent> agents = LevelMap.getInstance().getAgents();
 		agents.put(boxCell, agent);
 		agents.remove(agentCell);
+		
+		Cell previousBoxCell = LevelMap.getInstance().getCurrentState().getCellForBox(box);
+		if (LevelMap.getInstance().getLockedCells().contains(previousBoxCell))
+			LevelMap.getInstance().unlockCell(previousBoxCell);
 
 		LevelMap.getInstance().getCurrentState().movedAgent(agentCell, boxCell);
 		LevelMap.getInstance().getCurrentState().movedBox(box, boxCell, destCell);
