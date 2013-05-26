@@ -100,12 +100,8 @@ public class State extends AStarNode {
 		List<Box> boxList = LevelMap.getInstance().getBoxesList();
 		
 		for(int index = 0; index < cellsForBoxes.size(); index++) {
-			log.info("NUM OF BOX" + index);
-			log.info("CELLS FOR BOXES " + cellsForBoxes);
 			Cell cell = cellsForBoxes.get(index);
 			Box box = boxList.get(index);
-			log.info("BOX "+ box);
-			log.info("CELL" + cell);
 			this.computedHashCode = this.computedHashCode + box.powerHashValue * cell.uniqueId;
 		}
 		
