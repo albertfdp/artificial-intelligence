@@ -24,6 +24,7 @@ import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristic;
 import dk.dtu.ai.blueducks.heuristics.MoveBoxHeuristic;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
+import dk.dtu.ai.blueducks.merge.PlanAffectedResources;
 import dk.dtu.ai.blueducks.planner.AStarSearch;
 import dk.dtu.ai.blueducks.planner.GoalPlanner;
 import dk.dtu.ai.blueducks.planner.GoalSplitter;
@@ -151,22 +152,30 @@ public class Agent {
 		if (log.isLoggable(Level.FINER))
 			log.finer("\tCurrent subgoal: " + subgoal);
 		List<State> plan = computePlanStates(subgoal, agentState);
-		//TODO: Needs checking...
-		if(plan==null){
+		// TODO: Needs checking...
+		if (plan == null) {
 			log.finest("No plan found for goal.");
-			List<Action> emptyPlan=new LinkedList<Action>();
+			List<Action> emptyPlan = new LinkedList<Action>();
 			emptyPlan.add(new NoOpAction());
-			MotherOdin.getInstance().appendPlan(this, emptyPlan);
+			MotherOdin.getInstance().appendPlan(this, emptyPlan, new PlanAffectedResources());
 			return;
 		}
+
+		// Prepare the affected resources
+		PlanAffectedResources affectedResources = new PlanAffectedResources(plan);
+		// Prepare the actions, ignoring the first state in the plan (the current state)
 		plan.remove(0);
 		List<Action> actions = new LinkedList<Action>();
 		for (State s : plan)
 			actions.add((Action) s.getEdgeFromPrevNode());
+		
+		// Logging
 		if (log.isLoggable(Level.FINEST))
 			log.finest("Generated plan actions: " + actions);
+		if (log.isLoggable(Level.FINEST))
+			log.finest("Affected resources: " + affectedResources);
 
-		MotherOdin.getInstance().appendPlan(this, actions);
+		MotherOdin.getInstance().appendPlan(this, actions, affectedResources);
 	}
 
 	/**

@@ -32,6 +32,8 @@ public class PlanMerger {
 	private final boolean[][] mergeOptions;
 	private final int agentsCount;
 	private final Action[][] actions;
+	
+	private List<LinkedList<Action>> mergedPlan;
 
 	public PlanMerger(int agentsCount, Action[][] actionsToMerge) {
 		this.mergeOptions = PlanMergeOptions.OPTIONS[agentsCount - 1];
@@ -42,13 +44,25 @@ public class PlanMerger {
 	/**
 	 * Runs the merger.
 	 */
-	public void run() {
+	public List<LinkedList<Action>> run() {
 		// Prepare multiagent state
 		MultiAgentState startState = new MultiAgentState(LevelMap.getInstance().getAgents(), LevelMap
 				.getInstance().getCurrentState().getBoxes());
 		// Prepare start indexes
 		short[] agentsCurrentActionsIndex = new short[agentsCount];
-		this.mergePlans(agentsCurrentActionsIndex, new PlanMergeNode(startState, null, null), 0);
+		boolean result=this.mergePlans(agentsCurrentActionsIndex, new PlanMergeNode(startState, null, null), 0);
+		if(result)
+		{
+			log.info("Plan merging successful.");
+			if (log.isLoggable(Level.FINER))
+				log.finer("Merged plan: " + mergedPlan);
+			return this.mergedPlan;
+		}
+		else {
+			log.info("Plan merging failed.");
+			return null;
+		}
+			
 	}
 
 	private int getNextOptionIndex(int currentOptionsPos, Set<Conflict> conflictingAgents,
@@ -130,11 +144,8 @@ public class PlanMerger {
 		}
 
 		if (agentsDone == this.agentsCount) {
-			log.info("Plan merging complete.");
 			List<LinkedList<Action>> mergedPlan = prepareResponse(current);
-			if (log.isLoggable(Level.FINER))
-				log.finer("Merged plan: " + mergedPlan);
-			MotherOdin.getInstance().setMergedPlan(mergedPlan);
+			this.mergedPlan=mergedPlan;
 			return true;
 		}
 
@@ -222,7 +233,7 @@ public class PlanMerger {
 			currentOptionsIndex = getNextOptionIndex(currentOptionsIndex, conflictingAgents,
 					applicableActions, agentsActions);
 		}
-		log.info("Plan merge not possible.");
+		log.finest("Plan merging path failed. Going back...");
 		return false;
 	}
 

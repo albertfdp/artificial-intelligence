@@ -23,8 +23,7 @@ import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
-import dk.dtu.ai.blueducks.map.MultiAgentState;
-import dk.dtu.ai.blueducks.merge.PlanMergeNode;
+import dk.dtu.ai.blueducks.merge.PlanAffectedResources;
 import dk.dtu.ai.blueducks.merge.PlanMerger;
 import dk.dtu.ai.blueducks.planner.GoalPlanner.GoalCost;
 
@@ -53,6 +52,8 @@ public class MotherOdin {
 	/** The agents' goals. */
 	private HashMap<Agent, Goal> agentsGoals = new HashMap<>();
 
+	private List<PlanAffectedResources> affectedResources;
+	
 	private List<LinkedList<Action>> unmergedPlans;
 
 	private List<LinkedList<Action>> mergedPlans;
@@ -72,13 +73,15 @@ public class MotherOdin {
 		super();
 		agents = LevelMap.getInstance().getAgentsList();
 		// Init the plans list
-		unmergedPlans = new ArrayList<LinkedList<Action>>();
+		unmergedPlans = new ArrayList<LinkedList<Action>>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
 			unmergedPlans.add(new LinkedList<Action>());
-		mergedPlans = new ArrayList<LinkedList<Action>>();
+		mergedPlans = new ArrayList<LinkedList<Action>>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
 			mergedPlans.add(new LinkedList<Action>());
-
+		affectedResources=new ArrayList<PlanAffectedResources>(agents.size());
+		for (int i = 0; i < agents.size(); i++)
+			affectedResources.add(null);
 	}
 
 	/**
@@ -188,7 +191,13 @@ public class MotherOdin {
 
 		// Start the merging
 		PlanMerger merger=new PlanMerger(agents.size(), actions);
-		merger.run();
+		List<LinkedList<Action>> mergedPlans=merger.run();
+		if(mergedPlans!=null){
+			this.setMergedPlan(mergedPlans);
+		}
+		else{
+			log.info("Could not find way to merge plans...");
+		}
 		needMerging=false;
 	}
 
@@ -225,13 +234,15 @@ public class MotherOdin {
 
 	/**
 	 * Appends the plan of a given agent.
-	 * 
+	 *
 	 * @param agent the agent
 	 * @param plan the plan
+	 * @param affectedResources the resources affected by the plan
 	 */
-	public synchronized void appendPlan(Agent agent, List<Action> plan) {
-		unmergedPlans.get(agent.getId()).addAll(plan);
-		needMerging = true;
+	public synchronized void appendPlan(Agent agent, List<Action> plan, PlanAffectedResources affectedResources) {
+		this.unmergedPlans.get(agent.getId()).addAll(plan);
+		this.affectedResources.set(agent.getId(),affectedResources);
+		this.needMerging = true;
 	}
 
 	/**

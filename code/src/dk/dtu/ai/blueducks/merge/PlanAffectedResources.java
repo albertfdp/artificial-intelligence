@@ -17,25 +17,28 @@ public class PlanAffectedResources {
 	public Set<Box> affectedBoxes;
 
 	public PlanAffectedResources(List<State> states) {
-		affectedBoxes=new LinkedHashSet<Box>();
-		affectedCells=new LinkedHashSet<Cell>();
-		
+		affectedBoxes = new LinkedHashSet<Box>();
+		affectedCells = new LinkedHashSet<Cell>();
 		Action prevAction;
-		for (State state: states){
+		for (State state : states) {
 			affectedCells.add(state.getAgentCell());
-			prevAction = (Action)state.getEdgeFromPrevNode(); 
-			
-			if (prevAction!=null){
-				if (prevAction instanceof PullAction){
-					affectedCells.add(state.getCellForBox(((PullAction)prevAction).getBox()));		
-					affectedBoxes.add(((PullAction)prevAction).getBox());
-				}
-				else if (prevAction instanceof PushAction){
-					affectedCells.add(state.getCellForBox(((PushAction)prevAction).getBox()));		
-					affectedBoxes.add(((PushAction)prevAction).getBox());
+			prevAction = (Action) state.getEdgeFromPrevNode();
+
+			if (prevAction != null) {
+				if (prevAction instanceof PullAction) {
+					affectedCells.add(state.getCellForBox(((PullAction) prevAction).getBox()));
+					affectedBoxes.add(((PullAction) prevAction).getBox());
+				} else if (prevAction instanceof PushAction) {
+					affectedCells.add(state.getCellForBox(((PushAction) prevAction).getBox()));
+					affectedBoxes.add(((PushAction) prevAction).getBox());
 				}
 			}
 		}
+	}
+
+	public PlanAffectedResources() {
+		affectedBoxes = new LinkedHashSet<Box>();
+		affectedCells = new LinkedHashSet<Cell>();
 	}
 
 	/**
@@ -51,6 +54,11 @@ public class PlanAffectedResources {
 	public Set<Box> getAffectedBoxes() {
 		return affectedBoxes;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "PlanAffectedResources [affectedCells=" + affectedCells + ", affectedBoxes=" + affectedBoxes
+				+ "]";
+	}
+
 }
