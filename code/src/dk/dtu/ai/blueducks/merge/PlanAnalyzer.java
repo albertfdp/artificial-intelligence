@@ -15,15 +15,15 @@ public class PlanAnalyzer {
 		return cloneSet.size();
 	}
 
-	public List<CommonResources> findPossibleConflictingAgents(PlanAffectedResources[] affectedResources) {
+	public static List<CommonResources> findPossibleConflictingAgents(List<PlanAffectedResources> affectedResources) {
 		List<CommonResources> commonResources = new LinkedList<CommonResources>();
 
 		// for each agent we test to see if he has something in common with other CommonResources
 		// from other agents
-		for (short agent = 0; agent < affectedResources.length; agent++) {
+		for (short agent = 0; agent < affectedResources.size(); agent++) {
 
 			// making a CommonResouces object for each agent at the beginning
-			CommonResources agentCommonResources = new CommonResources(agent, affectedResources[agent]);
+			CommonResources agentCommonResources = new CommonResources(agent, affectedResources.get(agent));
 
 			Iterator<CommonResources> it = commonResources.iterator();
 
@@ -49,7 +49,7 @@ public class PlanAnalyzer {
 		return commonResources;
 	}
 
-	public class CommonResources {
+	public static class CommonResources {
 		public Set<Short> agents;
 		public PlanAffectedResources resources;
 
@@ -81,6 +81,11 @@ public class PlanAnalyzer {
 
 			// there are no common resources so it returns false
 			return false;
+		}
+
+		@Override
+		public String toString() {
+			return "CommonResources [agents=" + agents + ", resources=" + resources + "]";
 		}
 	}
 }

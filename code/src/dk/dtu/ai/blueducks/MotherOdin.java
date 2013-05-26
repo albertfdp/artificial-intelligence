@@ -24,7 +24,9 @@ import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.merge.PlanAffectedResources;
+import dk.dtu.ai.blueducks.merge.PlanAnalyzer;
 import dk.dtu.ai.blueducks.merge.PlanMerger;
+import dk.dtu.ai.blueducks.merge.PlanAnalyzer.CommonResources;
 import dk.dtu.ai.blueducks.planner.GoalPlanner.GoalCost;
 
 /**
@@ -53,7 +55,7 @@ public class MotherOdin {
 	private HashMap<Agent, Goal> agentsGoals = new HashMap<>();
 
 	private List<PlanAffectedResources> affectedResources;
-	
+
 	private List<LinkedList<Action>> unmergedPlans;
 
 	private List<LinkedList<Action>> mergedPlans;
@@ -79,7 +81,7 @@ public class MotherOdin {
 		mergedPlans = new ArrayList<LinkedList<Action>>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
 			mergedPlans.add(new LinkedList<Action>());
-		affectedResources=new ArrayList<PlanAffectedResources>(agents.size());
+		affectedResources = new ArrayList<PlanAffectedResources>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
 			affectedResources.add(null);
 	}
@@ -135,14 +137,12 @@ public class MotherOdin {
 			// Build the joint action
 			List<Action> actions = new LinkedList<>();
 			for (int agent = 0; agent < agents.size(); agent++)
-				if (mergedPlans.get(agent).peek() != null)
-				{
-					Action nextAction=mergedPlans.get(agent).remove();
+				if (mergedPlans.get(agent).peek() != null) {
+					Action nextAction = mergedPlans.get(agent).remove();
 					actions.add(nextAction);
-					if(nextAction==unmergedPlans.get(agent).peek())
+					if (nextAction == unmergedPlans.get(agent).peek())
 						unmergedPlans.get(agent).remove(0);
-				}
-				else
+				} else
 					actions.add(new NoOpAction());
 
 			// Send the joint actions to the server
@@ -176,12 +176,18 @@ public class MotherOdin {
 	}
 
 	private void mergePlans() {
-		if(!needMerging)
+		if (!needMerging)
 			return;
-		if(agents.size()==1){
-			mergedPlans=unmergedPlans;
+		if (agents.size() == 1) {
+			mergedPlans = unmergedPlans;
 		}
-		
+
+		// Check if plan merging is needed
+		List<CommonResources> possibleConflicts = PlanAnalyzer
+				.findPossibleConflictingAgents(affectedResources);
+		if (log.isLoggable(Level.FINEST))
+			log.finest("Possible conflicts: " + possibleConflicts);
+
 		log.info("Starting plan merging...");
 		// Prepare actions
 		Action[][] actions = new Action[agents.size()][];
@@ -190,15 +196,14 @@ public class MotherOdin {
 			actions[index++] = (Action[]) agentPlan.toArray(new Action[agentPlan.size()]);
 
 		// Start the merging
-		PlanMerger merger=new PlanMerger(agents.size(), actions);
-		List<LinkedList<Action>> mergedPlans=merger.run();
-		if(mergedPlans!=null){
+		PlanMerger merger = new PlanMerger(agents.size(), actions);
+		List<LinkedList<Action>> mergedPlans = merger.run();
+		if (mergedPlans != null) {
 			this.setMergedPlan(mergedPlans);
-		}
-		else{
+		} else {
 			log.info("Could not find way to merge plans...");
 		}
-		needMerging=false;
+		needMerging = false;
 	}
 
 	public void setMergedPlan(List<LinkedList<Action>> mergedPlan) {
@@ -234,14 +239,15 @@ public class MotherOdin {
 
 	/**
 	 * Appends the plan of a given agent.
-	 *
+	 * 
 	 * @param agent the agent
 	 * @param plan the plan
 	 * @param affectedResources the resources affected by the plan
 	 */
-	public synchronized void appendPlan(Agent agent, List<Action> plan, PlanAffectedResources affectedResources) {
+	public synchronized void appendPlan(Agent agent, List<Action> plan,
+			PlanAffectedResources affectedResources) {
 		this.unmergedPlans.get(agent.getId()).addAll(plan);
-		this.affectedResources.set(agent.getId(),affectedResources);
+		this.affectedResources.set(agent.getId(), affectedResources);
 		this.needMerging = true;
 	}
 
