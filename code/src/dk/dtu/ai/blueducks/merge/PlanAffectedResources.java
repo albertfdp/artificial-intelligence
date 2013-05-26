@@ -37,4 +37,20 @@ public class PlanAffectedResources {
 			}
 		}
 	}
+
+	/**
+	 * @return the affectedCells
+	 */
+	public Set<Cell> getAffectedCells() {
+		return affectedCells;
+	}
+
+	/**
+	 * @return the affectedBoxes
+	 */
+	public Set<Box> getAffectedBoxes() {
+		return affectedBoxes;
+	}
+	
+	
 }
