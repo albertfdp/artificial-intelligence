@@ -16,7 +16,7 @@ public class PlanAffectedResources {
 	public Set<Cell> affectedCells;
 	public Set<Box> affectedBoxes;
 
-	public PlanAffectedResources(List<State> states, List<Action> actions) {
+	public PlanAffectedResources(List<State> states) {
 		affectedBoxes=new LinkedHashSet<Box>();
 		affectedCells=new LinkedHashSet<Cell>();
 		
@@ -24,13 +24,16 @@ public class PlanAffectedResources {
 		for (State state: states){
 			affectedCells.add(state.getAgentCell());
 			prevAction = (Action)state.getEdgeFromPrevNode(); 
-			if ((prevAction!=null) && (prevAction instanceof PullAction)){
-				affectedCells.add(state.getCellForBox(((PullAction)prevAction).getBox()));		
-				affectedBoxes.add(((PullAction)prevAction).getBox());
-			}
-			else if ((prevAction!=null) && (prevAction instanceof PushAction)){
-				affectedCells.add(state.getCellForBox(((PushAction)prevAction).getBox()));		
-				affectedBoxes.add(((PushAction)prevAction).getBox());
+			
+			if (prevAction!=null){
+				if (prevAction instanceof PullAction){
+					affectedCells.add(state.getCellForBox(((PullAction)prevAction).getBox()));		
+					affectedBoxes.add(((PullAction)prevAction).getBox());
+				}
+				else if (prevAction instanceof PushAction){
+					affectedCells.add(state.getCellForBox(((PushAction)prevAction).getBox()));		
+					affectedBoxes.add(((PushAction)prevAction).getBox());
+				}
 			}
 		}
 	}
