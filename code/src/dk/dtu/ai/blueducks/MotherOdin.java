@@ -23,6 +23,9 @@ import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
+import dk.dtu.ai.blueducks.map.MultiAgentState;
+import dk.dtu.ai.blueducks.merge.PlanMergeNode;
+import dk.dtu.ai.blueducks.merge.PlanMerger;
 import dk.dtu.ai.blueducks.planner.GoalPlanner.GoalCost;
 
 /**
@@ -50,7 +53,11 @@ public class MotherOdin {
 	/** The agents' goals. */
 	private HashMap<Agent, Goal> agentsGoals = new HashMap<>();
 
-	private List<LinkedList<Action>> plans;
+	private List<LinkedList<Action>> unmergedPlans;
+
+	private List<LinkedList<Action>> mergedPlans;
+
+	private boolean needMerging;
 
 	/**
 	 * Gets the single instance of MotherOdin.
@@ -65,9 +72,12 @@ public class MotherOdin {
 		super();
 		agents = LevelMap.getInstance().getAgentsList();
 		// Init the plans list
-		plans = new ArrayList<LinkedList<Action>>();
+		unmergedPlans = new ArrayList<LinkedList<Action>>();
 		for (int i = 0; i < agents.size(); i++)
-			plans.add(new LinkedList<Action>());
+			unmergedPlans.add(new LinkedList<Action>());
+		mergedPlans = new ArrayList<LinkedList<Action>>();
+		for (int i = 0; i < agents.size(); i++)
+			mergedPlans.add(new LinkedList<Action>());
 
 	}
 
@@ -110,13 +120,14 @@ public class MotherOdin {
 		// TODO: Wait for synchronization when using multi-threading
 		assignAgentsGoals();
 		// TODO: Wait for synchronization when using multi-threading
+		mergePlans();
 
 		while (true) {
 			log.info("Starting loop " + (++currentLoop) + "...");
 
 			// Check if any agent is out of actions
-			for (int agent = 0; agent < plans.size(); agent++)
-				if (plans.get(agent).isEmpty()) {
+			for (int agent = 0; agent < mergedPlans.size(); agent++)
+				if (mergedPlans.get(agent).isEmpty()) {
 					agents.get(agent).requestPlan();
 				}
 			// TODO: Wait for synchronization when using multi-threading
@@ -125,8 +136,13 @@ public class MotherOdin {
 			// Build the joint action
 			List<Action> actions = new LinkedList<>();
 			for (int agent = 0; agent < agents.size(); agent++)
-				if (plans.get(agent).peek() != null)
-					actions.add(plans.get(agent).remove());
+				if (mergedPlans.get(agent).peek() != null)
+				{
+					Action nextAction=mergedPlans.get(agent).remove();
+					actions.add(nextAction);
+					if(nextAction==unmergedPlans.get(agent).peek())
+						unmergedPlans.get(agent).remove(0);
+				}
 				else
 					actions.add(new NoOpAction());
 
@@ -149,19 +165,39 @@ public class MotherOdin {
 			// Notify the agents that something has changed
 			if (!jointActionSuccessful) {
 				log.info("Triggering agent replanning!");
-				//TODO: Optimize this... 
+				// TODO: Optimize this...
 				generateTopLevelGoals();
 				assignAgentsGoals();
 				for (int a = 0; a < agents.size(); a++)
 					// By clearing the plan, a new plan will be requested at the beginning of the
 					// next loop
-					plans.get(a).clear();
+					mergedPlans.get(a).clear();
 			}
 		}
 	}
 
 	private void mergePlans() {
-		// TODO Auto-generated method stub
+		if(!needMerging)
+			return;
+		if(agents.size()==1){
+			mergedPlans=unmergedPlans;
+		}
+		
+		log.info("Starting plan merging...");
+		// Prepare actions
+		Action[][] actions = new Action[agents.size()][];
+		int index = 0;
+		for (List<Action> agentPlan : unmergedPlans)
+			actions[index++] = (Action[]) agentPlan.toArray(new Action[agentPlan.size()]);
+
+		// Start the merging
+		PlanMerger merger=new PlanMerger(agents.size(), actions);
+		merger.run();
+		needMerging=false;
+	}
+
+	public void setMergedPlan(List<LinkedList<Action>> mergedPlan) {
+		this.mergedPlans = mergedPlan;
 	}
 
 	/**
@@ -198,7 +234,8 @@ public class MotherOdin {
 	 * @param plan the plan
 	 */
 	public synchronized void appendPlan(Agent agent, List<Action> plan) {
-		plans.get(agent.getId()).addAll(plan);
+		unmergedPlans.get(agent.getId()).addAll(plan);
+		needMerging = true;
 	}
 
 	/**
@@ -232,7 +269,7 @@ public class MotherOdin {
 				for (Agent other : LevelMap.getInstance().getAgentsList())
 					if (other != agent) {
 						GoalCost gc = goalCosts.get(other).peek();
-						if (bestGoal.goal == gc.goal && gc.cost < bestGoal.cost) {
+						if (bestGoal.goal == gc.goal && gc.cost <= bestGoal.cost) {
 							goalCosts.get(agent).remove();
 							done = false;
 							break;
@@ -249,7 +286,7 @@ public class MotherOdin {
 		for (Entry<Agent, Goal> e : agentsGoals.entrySet()) {
 			// If the goals for any of the agent has been changed, request a new plan from him.
 			if (!e.getValue().equals(e.getKey().getCurrentGoal())) {
-				log.info("Assigned new goal to "+e.getKey());
+				log.info("Assigned new goal to " + e.getKey());
 				e.getKey().requestPlan();
 			}
 		}

@@ -243,7 +243,8 @@ public class State extends AStarNode {
 				int boxId = cellsForBoxes.indexOf(cell);
 				List<Box> boxList = LevelMap.getInstance().getBoxesList();
 
-				if(occupiedCells.get(cell.uniqueId) && boxList.get(boxId).getColor() == agent.getColor()) {
+				if(occupiedCells.get(cell.uniqueId) && boxList.get(boxId).getColor().equals(agent.getColor())) {
+				// TODO: Optimize to only use boxes.get(cell) once to not compute hash twice
 
 					for (Cell neighbour : cell.getCellNeighbours()) {
 						if (isFree(neighbour) != CellVisibility.NOT_FREE) {

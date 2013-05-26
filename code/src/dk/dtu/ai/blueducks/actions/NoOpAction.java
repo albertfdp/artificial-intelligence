@@ -45,7 +45,11 @@ public class NoOpAction extends Action {
 
 	@Override
 	public void execute(MultiAgentState state) {
-		// TODO Auto-generated method stub
-		
+		return;
+	}
+
+	@Override
+	public String toString() {
+		return "NoOpAction";
 	}
 }

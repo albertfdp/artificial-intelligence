@@ -10,6 +10,7 @@ package dk.dtu.ai.blueducks.map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -57,12 +58,14 @@ public class LevelMap {
 	/** The betweenness centrality score for each free cell */
 	private Map<Cell, Double> betweennesScore;
 
+	private boolean isDijkstraDistance;
+
 	private Map<Cell, Map<Cell, Number>> distances;
 
 	private Set<Cell> lockedCells;
 
 	private List<Cell> verifiedCells;
-	
+
 	private final static int MAX_NUMBER_VERTEX = 60 * 60;
 
 	/**
@@ -74,6 +77,8 @@ public class LevelMap {
 		goals = new HashMap<Character, List<Cell>>();
 		verifiedCells = new ArrayList<Cell>();
 		agents = new ArrayList<Agent>(10);
+		for (int i = 0; i < 10; i++)
+			agents.add(null);
 		distances = new HashMap<Cell, Map<Cell, Number>>();
 		lockedCells = new HashSet<Cell>();
 	}
@@ -313,27 +318,56 @@ public class LevelMap {
 	public void unlockCell(Cell cell) {
 		this.lockedCells.remove(cell);
 	}
+	
+
+	public boolean isDijkstraDistance() {
+		return isDijkstraDistance;
+	}
+	
+	public List<Cell> getAllGoals() {
+		List<Cell> goalList = new ArrayList<Cell>();
+		for (Entry<Character, List<Cell>> e : goals.entrySet()) {
+			for (Cell goal : e.getValue()) {
+				goalList.add(goal);
+			}
+		}
+		return goalList;
+	}
+
+	public void finishLoading() {
+
+		Iterator<Agent> agentsIterator = agents.iterator();
+		while (agentsIterator.hasNext())
+			if (agentsIterator.next() == null)
+				agentsIterator.remove();
+		logger.config("Cleaned agents: " + agents);
+	}
 
 	/**
 	 * Execute a pre-analysis of the map.
 	 */
 	public void executeMapPreAnalysis() {
 
-		MapAnalyzer.getInstance();
+		MapAnalyzer mapAnalyzer = MapAnalyzer.getInstance();
+		
 		// calculate distances
-		if (MapAnalyzer.graph.getVertexCount() < MAX_NUMBER_VERTEX) {			
+		if (MapAnalyzer.graph.getVertexCount() < MAX_NUMBER_VERTEX) {
 			logger.info("Using betweennes centrality and dijkstra distances for improving performance ... ");
 			// Analyze map
-			this.betweennesScore = MapAnalyzer.getInstance().getNormalizedBetweenessCentrality();
+			this.betweennesScore = mapAnalyzer.getNormalizedBetweenessCentrality();
+			this.isDijkstraDistance = true;
 			for (Cell cell : this.getCells()) {
-				distances.put(cell, MapAnalyzer.getInstance().getDistances(cell));
+				distances.put(cell, mapAnalyzer.getDistances(cell));
 			}
 		} else {
 			logger.info("Using manhattan distances for improving computing time ... ");
-			this.betweennesScore = MapAnalyzer.getInstance().getDefaultBetweennessCentrality();
+			this.betweennesScore = mapAnalyzer.getDefaultBetweennessCentrality();
 			for (Cell cell : this.getCells()) {
-				distances.put(cell, MapAnalyzer.getInstance().getManhattanDistances(cell));
+				distances.put(cell, mapAnalyzer.getManhattanDistances(cell));
 			}
 		}
+		
+		mapAnalyzer.getNeighbourGoals(getAllGoals());
+		
 	}
 }

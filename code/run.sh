@@ -1,4 +1,5 @@
 #!/bin/bash
+
 LEVEL="levels/FOSABlueDucks.lvl"
 if [ $# == '1' ]
 then

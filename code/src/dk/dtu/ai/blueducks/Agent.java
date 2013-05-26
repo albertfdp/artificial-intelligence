@@ -158,6 +158,14 @@ public class Agent {
 		if (log.isLoggable(Level.FINER))
 			log.finer("\tCurrent subgoal: " + subgoal);
 		List<State> plan = computePlanStates(subgoal, agentState);
+		//TODO: Needs checking...
+		if(plan==null){
+			log.finest("No plan found for goal.");
+			List<Action> emptyPlan=new LinkedList<Action>();
+			emptyPlan.add(new NoOpAction());
+			MotherOdin.getInstance().appendPlan(this, emptyPlan);
+			return;
+		}
 		plan.remove(0);
 		List<Action> actions = new LinkedList<Action>();
 		for (State s : plan)

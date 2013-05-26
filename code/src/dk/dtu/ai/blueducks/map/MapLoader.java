@@ -102,7 +102,10 @@ public class MapLoader {
 			x++;
 		}
 		scan.close();
+		map.finishLoading();
 		map.attachBoxes(boxes);
+		
+		
 //		//TODO: change the logging
 //		for (Entry<Cell, Agent> e : map.getAgents().entrySet()) {
 //			Agent a = e.getValue();

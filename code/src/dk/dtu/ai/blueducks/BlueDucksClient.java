@@ -41,7 +41,7 @@ public class BlueDucksClient {
 
 		// Read empty new line
 		in.readLine();
-		
+
 		LevelMap.getInstance().executeMapPreAnalysis();
 	}
 
@@ -67,10 +67,12 @@ public class BlueDucksClient {
 		}
 
 		// Parse the percepts;
+		percepts = percepts.replaceAll(" ", "");
+		percepts = percepts.substring(1);
 		String[] splitPercepts = percepts.split("[,\\]\\[]");
-		boolean[] resp = new boolean[splitPercepts.length - 1];
-		for (int i = 1; i < splitPercepts.length; i++)
-			resp[i - 1] = Boolean.valueOf(splitPercepts[i]);
+		boolean[] resp = new boolean[splitPercepts.length];
+		for (int i = 0; i < splitPercepts.length; i++)
+			resp[i] = Boolean.valueOf(splitPercepts[i]);
 		if (log.isLoggable(Level.FINER))
 			log.finer("Environment action success response: " + Arrays.toString(resp));
 
