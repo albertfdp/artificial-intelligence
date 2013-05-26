@@ -6,6 +6,8 @@ import java.util.Set;
 
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.actions.PullAction;
+import dk.dtu.ai.blueducks.actions.PushAction;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.State;
 
@@ -17,5 +19,19 @@ public class PlanAffectedResources {
 	public PlanAffectedResources(List<State> states, List<Action> actions) {
 		affectedBoxes=new LinkedHashSet<Box>();
 		affectedCells=new LinkedHashSet<Cell>();
+		
+		Action prevAction;
+		for (State state: states){
+			affectedCells.add(state.getAgentCell());
+			prevAction = (Action)state.getEdgeFromPrevNode(); 
+			if ((prevAction!=null) && (prevAction instanceof PullAction)){
+				affectedCells.add(state.getCellForBox(((PullAction)prevAction).getBox()));		
+				affectedBoxes.add(((PullAction)prevAction).getBox());
+			}
+			else if ((prevAction!=null) && (prevAction instanceof PushAction)){
+				affectedCells.add(state.getCellForBox(((PushAction)prevAction).getBox()));		
+				affectedBoxes.add(((PushAction)prevAction).getBox());
+			}
+		}
 	}
 }
