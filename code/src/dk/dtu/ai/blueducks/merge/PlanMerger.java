@@ -1,3 +1,10 @@
+/*
+ * Artificial Intelligence and Multi-Agent Systems
+ * Denmarks Tehnical University
+ * 
+ * Blue Ducks
+ * Spring 2013
+ */
 package dk.dtu.ai.blueducks.merge;
 
 import java.util.ArrayList;
@@ -20,16 +27,31 @@ import dk.dtu.ai.blueducks.map.MultiAgentState;
 public class PlanMerger {
 
 	private static final Logger log = Logger.getLogger(PlanMerger.class.getSimpleName());
-	private static final boolean[][] mergeOptions;
-	private static final int AGENTS_COUNT;
 	private static final int NO_MORE_OPTIONS = -2;
-	static {
-		AGENTS_COUNT = LevelMap.getInstance().getAgentsList().size();
-		mergeOptions = PlanMergeOptions.OPTIONS[AGENTS_COUNT - 1];
-		log.config("Loaded options for " + AGENTS_COUNT + " agents.");
+
+	private final boolean[][] mergeOptions;
+	private final int agentsCount;
+	private final Action[][] actions;
+
+	public PlanMerger(int agentsCount, Action[][] actionsToMerge) {
+		this.mergeOptions = PlanMergeOptions.OPTIONS[agentsCount - 1];
+		this.agentsCount = agentsCount;
+		this.actions = actionsToMerge;
 	}
 
-	private static int getNextOptionIndex(int currentOptionsPos, Set<Conflict> conflictingAgents,
+	/**
+	 * Runs the merger.
+	 */
+	public void run() {
+		// Prepare multiagent state
+		MultiAgentState startState = new MultiAgentState(LevelMap.getInstance().getAgents(), LevelMap
+				.getInstance().getCurrentState().getBoxes());
+		// Prepare start indexes
+		short[] agentsCurrentActionsIndex = new short[agentsCount];
+		this.mergePlans(agentsCurrentActionsIndex, new PlanMergeNode(startState, null, null), 0);
+	}
+
+	private int getNextOptionIndex(int currentOptionsPos, Set<Conflict> conflictingAgents,
 			boolean[] applicableActions, Action[] agentsActions) {
 		if (currentOptionsPos >= mergeOptions.length)
 			return NO_MORE_OPTIONS;
@@ -47,7 +69,7 @@ public class PlanMerger {
 			conflict = false;
 			activeAgents = mergeOptions[currentOptionsPos];
 			// Check if the actions are applicable
-			for (int agent = 0; agent < AGENTS_COUNT; agent++)
+			for (int agent = 0; agent < this.agentsCount; agent++)
 				if (activeAgents[agent]
 						&& (!applicableActions[agent] || agentsActions[agent] instanceof NoOpAction)) {
 					currentOptionsPos++;
@@ -73,29 +95,30 @@ public class PlanMerger {
 		return currentOptionsPos;
 	}
 
-	private static boolean[] getApplicableActions(Action[] agentsActions, MultiAgentState state) {
-		boolean[] applicable = new boolean[AGENTS_COUNT];
-		for (short agent = 0; agent < AGENTS_COUNT; agent++)
+	private boolean[] getApplicableActions(Action[] agentsActions, MultiAgentState state) {
+		boolean[] applicable = new boolean[this.agentsCount];
+		for (short agent = 0; agent < this.agentsCount; agent++)
 			if (agentsActions[agent].isApplicable(state))
 				applicable[agent] = true;
 		return applicable;
 	}
 
 	/**
-	 * @param actions - line i contains the actions from the agent i's plan
+	 * Merge plans recursively.
+	 *
+	 * @param agentCurrentActionIndex the agent current action index
 	 * @param current - the node we are trying to expand
 	 * @param step - the current depth of the plan (e.g. step 3 - we're trying to see what actions
-	 *            from step 3 can be done)
+	 * from step 3 can be done)
 	 * @return true if is successful in merging the plans or false otherwise
 	 */
 	// TODO - limit the go back
 	// TODO - keep track of the most advanced point where it failed
-	public static boolean mergePlans(Action[][] actions, short[] agentCurrentActionIndex,
-			PlanMergeNode current, int step) {
+	private boolean mergePlans(short[] agentCurrentActionIndex, PlanMergeNode current, int step) {
 		// getting current action for each agent
-		Action[] agentsActions = new Action[AGENTS_COUNT];
+		Action[] agentsActions = new Action[this.agentsCount];
 		short agentsDone = 0;
-		for (int agent = 0; agent < AGENTS_COUNT; agent++)
+		for (int agent = 0; agent < this.agentsCount; agent++)
 			if (agentCurrentActionIndex[agent] >= actions[agent].length) {
 				agentsActions[agent] = new NoOpAction();
 				agentsDone++;
@@ -106,7 +129,7 @@ public class PlanMerger {
 					+ Arrays.toString(agentsActions));
 		}
 
-		if (agentsDone == AGENTS_COUNT) {
+		if (agentsDone == this.agentsCount) {
 			log.info("Plan merging complete.");
 			List<LinkedList<Action>> mergedPlan = prepareResponse(current);
 			if (log.isLoggable(Level.FINER))
@@ -176,8 +199,8 @@ public class PlanMerger {
 			// if we can move on to next step (no conflict was found at this one)
 			if (conflictFound == false) {
 				short[] nextAgentCurrentActionIndex = new short[agentCurrentActionIndex.length];
-				Action[] currentSelectedActions = new Action[AGENTS_COUNT];
-				for (int i = 0; i < AGENTS_COUNT; i++)
+				Action[] currentSelectedActions = new Action[this.agentsCount];
+				for (int i = 0; i < this.agentsCount; i++)
 					if (activeAgents[i]) {
 						nextAgentCurrentActionIndex[i] = (short) (agentCurrentActionIndex[i] + 1);
 						currentSelectedActions[i] = agentsActions[i];
@@ -186,11 +209,12 @@ public class PlanMerger {
 						currentSelectedActions[i] = new NoOpAction();
 					}
 
-				log.info("Moving to next step after selecting: " + Arrays.toString(currentSelectedActions));
-				log.info("Moving to next step with agent action indexes: "
-						+ Arrays.toString(nextAgentCurrentActionIndex));
+				// log.info("Moving to next step after selecting: " +
+				// Arrays.toString(currentSelectedActions));
+				// log.info("Moving to next step with agent action indexes: "
+				// + Arrays.toString(nextAgentCurrentActionIndex));
 				PlanMergeNode next = new PlanMergeNode(duplicatedState, currentSelectedActions, current);
-				boolean success = mergePlans(actions, nextAgentCurrentActionIndex, next, step + 1);
+				boolean success = mergePlans(nextAgentCurrentActionIndex, next, step + 1);
 				if (success)
 					return true;
 			}
@@ -202,17 +226,17 @@ public class PlanMerger {
 		return false;
 	}
 
-	private static List<LinkedList<Action>> prepareResponse(PlanMergeNode finalNode) {
+	private List<LinkedList<Action>> prepareResponse(PlanMergeNode finalNode) {
 		// return the plan...
 		PlanMergeNode crt = finalNode;
 		List<LinkedList<Action>> mergedPlan = new ArrayList<LinkedList<Action>>();
-		for (int i = 0; i < AGENTS_COUNT; i++)
+		for (int i = 0; i < this.agentsCount; i++)
 			mergedPlan.add(new LinkedList<Action>());
 
 		// while there are nodes to go back to (and not the first node, because it doesn't have
 		// stored actions which led to it)
 		while (crt.getPrevNode() != null) {
-			for (int i = 0; i < AGENTS_COUNT; i++)
+			for (int i = 0; i < this.agentsCount; i++)
 				// in the plan of i we put the action of i that brought us to this state
 				mergedPlan.get(i).push(crt.getPrevActions()[i]);
 
