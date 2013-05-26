@@ -96,7 +96,11 @@ public class MotherOdin {
 			for (Cell goalCell : goalCells.getValue()) {
 				// If there's a box on the goal and it has the same color, do not add this goal
 				// anymore
-				Box boxOnGoal = map.getCurrentState().getBoxes().get(goalCell);
+				int boxIndex = map.getCurrentState().getCellsForBoxes().indexOf(goalCell);
+				Box boxOnGoal = null;
+				if(boxIndex != -1){
+					boxOnGoal = boxes.get(boxIndex);
+				}
 				if (boxOnGoal != null && boxOnGoal.getId() == goalCells.getKey())
 					continue;
 				// Create goals for each of the boxes that could fulfill this goal

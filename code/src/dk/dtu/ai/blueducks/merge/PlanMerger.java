@@ -47,7 +47,8 @@ public class PlanMerger {
 	public List<LinkedList<Action>> run() {
 		// Prepare multiagent state
 		MultiAgentState startState = new MultiAgentState(LevelMap.getInstance().getAgents(), LevelMap
-				.getInstance().getCurrentState().getBoxes());
+				.getInstance().getCurrentState().getOccupiedCells(),LevelMap
+				.getInstance().getCurrentState().getCellsForBoxes());
 		// Prepare start indexes
 		short[] agentsCurrentActionsIndex = new short[agentsCount];
 		boolean result=this.mergePlans(agentsCurrentActionsIndex, new PlanMergeNode(startState, null, null), 0);
@@ -176,7 +177,7 @@ public class PlanMerger {
 
 			// we duplicate state
 			MultiAgentState duplicatedState = new MultiAgentState(current.getState().getAgents(), current
-					.getState().getBoxes());
+					.getState().getOccupiedCells(), current.getState().getCellForBoxes());
 
 			// we try to add actions of the active agents and see if we have conflicts
 			for (short i = 0; i < agentsActions.length; i++) {

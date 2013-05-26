@@ -18,6 +18,9 @@ import dk.dtu.ai.blueducks.planner.AStarNode;
  */
 public class Cell extends AStarNode{
 
+	public static int noOfCells = 0;
+	public int uniqueId;
+
 	/** The Constant map. */
 	protected static LevelMap map;
 
@@ -34,6 +37,8 @@ public class Cell extends AStarNode{
 		this.previousCell = null;
 		// not set yet (or maybe non-existent)
 		this.dirFromPrev = null;
+		this.uniqueId = Cell.noOfCells;
+		Cell.noOfCells ++;
 	}
 
 	/**

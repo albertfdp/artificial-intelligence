@@ -8,7 +8,6 @@
 package dk.dtu.ai.blueducks.actions;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
@@ -118,30 +117,19 @@ public class PullAction extends Action {
 		Map<Cell, Agent> agents = LevelMap.getInstance().getAgents();
 		agents.put(destCell, agent);
 		agents.remove(agentCell);
-		
-		Map<Cell, Box> boxes = LevelMap.getInstance().getCurrentState().getBoxes();
-		boxes.put(agentCell, box);
-		boxes.remove(boxCell);
-
+		LevelMap.getInstance().getCurrentState().movedAgent(agentCell, destCell);
+		LevelMap.getInstance().getCurrentState().movedBox(box, boxCell, agentCell);
+		LevelMap.getInstance().markAsNotWall(destCell);
 	}
 
 	@Override
 	public State getNextState(State state) {
 		Cell agentCell = state.getAgentCell();
-		Cell destCell = agentCell.getNeighbour(agentDirection);
+		Cell agentDestCell = agentCell.getNeighbour(agentDirection);
 		
-		State nextState = new State(destCell, this, state, agent);
-		Map<Cell, Box> boxes = state.getBoxes();
-		
-		// TODO: improve 	
-		for (Entry<Cell, Box> e : boxes.entrySet()) {
-			if (e.getValue() != box) {
-				nextState.addBox(e.getKey(), e.getValue());
-			} else {
-				nextState.addBox(agentCell, box);
-			}
-		}
-		
+		State nextState = new State(agentDestCell, this, state, agent, state.getOccupiedCells(), state.getCellsForBoxes());
+		nextState.movedBox(box, agentCell.getNeighbour(boxDirection), agentCell);
+		nextState.movedAgent(agentCell, agentDestCell);
 		return nextState;
 	}
 
