@@ -336,4 +336,14 @@ public class MotherOdin {
 		return agentsGoals.get(agent);
 	}
 
+	/**
+	 * Append conflict plan.
+	 *
+	 * @param agent the agent
+	 * @param plan the plan
+	 */
+	public synchronized void appendConflictPlan(Agent agent, List<Action> plan){
+		
+	}
+	
 }

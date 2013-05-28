@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.actions.NoOpAction;
+import dk.dtu.ai.blueducks.goals.ClearPathGoal;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
@@ -65,12 +66,12 @@ public class Agent {
 	/** The Constant logger. */
 	private final Logger log;
 
-	
 	public static int noOfAgents = 0;
-	
+
 	public int uniqueId;
-	
+
 	public int powerHashValue;
+
 	/**
 	 * Instantiates a new agent.
 	 * 
@@ -84,7 +85,7 @@ public class Agent {
 		this.goalSplitter = new GoalSplitter();
 		this.log = Logger.getLogger("Agent " + id);
 		this.uniqueId = Agent.noOfAgents;
-		Agent.noOfAgents ++;
+		Agent.noOfAgents++;
 	}
 
 	/**
@@ -153,8 +154,10 @@ public class Agent {
 		}
 
 		// Replan
-		State agentState = new State(LevelMap.getInstance().getCellForAgent(this), null, null, this, LevelMap.getInstance().getCurrentState().getOccupiedCells(), LevelMap.getInstance().getCurrentState().getCellsForBoxes());
-		
+		State agentState = new State(LevelMap.getInstance().getCellForAgent(this), null, null, this, LevelMap
+				.getInstance().getCurrentState().getOccupiedCells(), LevelMap.getInstance().getCurrentState()
+				.getCellsForBoxes());
+
 		Goal subgoal = subgoals.get(currentSubgoalIndex++);
 		if (log.isLoggable(Level.FINER))
 			log.finer("\tCurrent subgoal: " + subgoal);
@@ -175,7 +178,7 @@ public class Agent {
 		List<Action> actions = new LinkedList<Action>();
 		for (State s : plan)
 			actions.add((Action) s.getEdgeFromPrevNode());
-		
+
 		// Logging
 		if (log.isLoggable(Level.FINEST))
 			log.finest("Generated plan actions: " + actions);
@@ -208,4 +211,15 @@ public class Agent {
 		powerHashValue = (int) Math.pow(Cell.noOfCells, (this.uniqueId + Box.noOfBoxes));
 		log.info("Power hash value: " + this.powerHashValue);
 	}
+
+	/**
+	 * Request the plan of the agent to solve a conflict. As a response to this method, the agent
+	 * should respond with a proposal using {@link MotherOdin#appendConflictPlan(Agent, List)}.<br/>
+	 * <br/>
+	 * If the agent has no plan, he must call the callback method with a null as a plan.
+	 */
+	public void requestPlanForConflictSolving(ClearPathGoal goal) {
+
+	}
+
 }

@@ -41,6 +41,17 @@ public class ClearPathGoal extends Goal {
 		this.box = box;
 	}
 
+	/**
+	 * Instantiates a new clear path goal.
+	 *
+	 * @param plan the plan
+	 * @param startIndexOfConflictingArea the start index of conflicting state
+	 * @param endIndexOfConflictingArea the end index of conflicting state
+	 */
+	public ClearPathGoal(List<State> plan, int startIndexOfConflictingArea, int endIndexOfConflictingArea){
+		//TODO: Ruxy
+	}
+	
 	public ClearPathGoal(Box box, List<Cell> cells) {
 		this.box = box;
 		this.cells = new HashSet<Cell>(cells);
