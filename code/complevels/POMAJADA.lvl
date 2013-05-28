@@ -1,0 +1,22 @@
+red: 0,1,2,9,A,B,C,D,E,F,G,H,Z
+blue: 3,4,8,I,K,M
+green: 5,6,7,J,L,N
+*******************************
+*                             *
+* *+*+*+*+*+*+*+*+*+*+*   IIII*
+* +az  12             A 3 JJJJ*
+* *+*+*+* *+*+*+*     B       *
+* +ZZZZZZZ*  0  *     C       *
+* *ZZZZZZZ*A* +a+     D 4 KKKK*
+* +ZZZZZZZ*B* +b+     E   LLLL*
+* *ZZZZZZZ* * +c+     F       *
+* +ZZZZZZZ*C* +d+     G 5     *
+* *ZZZZZZZ*D* +e+     H   MMMM*
+* +ZZZZZZZ* * + ++    + 6 NNNN*
+*n+ZZZZZZZ*E* + f+    *       *
+*m+ZZZZZZZ*F* +g++    + 7 *****
+*l+ZZZZZZZ*G* + +     *   *9  *
+*k+AZZZZZZ*H* +h+     + 8 *   *
+*j++++++*+*+*+++++*+*+*   *   *
+*ijklmn                   *   *
+*******************************

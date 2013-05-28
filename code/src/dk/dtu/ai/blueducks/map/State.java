@@ -282,23 +282,23 @@ public class State extends AStarNode {
 		return boxesInGoalCell;
 	}
 
-//	@Override
-//	public int hashCode() {
-//
-//		return computedHashCode;
-//	}
-	
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((agent == null) ? 0 : agent.hashCode());
-		result = prime * result + ((agentCell == null) ? 0 : agentCell.hashCode());
-		result = prime * result + ((boxesInGoalCell == null) ? 0 : boxesInGoalCell.hashCode());
-		result = prime * result + ((cellsForBoxes == null) ? 0 : cellsForBoxes.hashCode());
-		result = prime * result + ((occupiedCells == null) ? 0 : occupiedCells.hashCode());
-		return result;
+
+		return computedHashCode;
 	}
+	
+//	@Override
+//	public int hashCode() {
+//		final int prime = 5003;
+//		int result = 1;
+//		result = prime * result + ((agent == null) ? 0 : agent.hashCode());
+//		result = prime * result + ((agentCell == null) ? 0 : agentCell.hashCode());
+//		result = prime * result + ((boxesInGoalCell == null) ? 0 : boxesInGoalCell.hashCode());
+//		result = prime * result + ((cellsForBoxes == null) ? 0 : cellsForBoxes.hashCode());
+//		result = prime * result + ((occupiedCells == null) ? 0 : occupiedCells.hashCode());
+//		return result;
+//	}
 
 	@Override
 	public boolean equals(Object obj) {
