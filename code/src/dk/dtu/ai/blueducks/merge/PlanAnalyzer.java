@@ -1,3 +1,10 @@
+/*
+ * Artificial Intelligence and Multi-Agent Systems
+ * Denmarks Tehnical University
+ * 
+ * Blue Ducks
+ * Spring 2013
+ */
 package dk.dtu.ai.blueducks.merge;
 
 import java.util.HashSet;
@@ -7,7 +14,49 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import dk.dtu.ai.blueducks.map.State;
+
 public class PlanAnalyzer {
+
+	/**
+	 * Detect unmergeable plans.
+	 *
+	 * @param plan1 the plan1
+	 * @param plan2 the plan2
+	 * @param affResources1 the aff resources1
+	 * @param affResources2 the aff resources2
+	 * @return true, if the plans are unmeargeable
+	 */
+	public boolean detectUnmergeablePlans(List<State> plan1, List<State> plan2,
+			List<PlanAffectedResources> affResources1, List<PlanAffectedResources> affResources2) {
+		return false;
+	}
+	
+	/**
+	 * Identify the conflict area in the plans of 2 agents.
+	 *
+	 * @param plan1 the plan1
+	 * @param plan2 the plan2
+	 * @param affResources1 the aff resources1
+	 * @param affResources2 the aff resources2
+	 * @return the conflict area
+	 */
+	public ConflictArea identifyConflictArea(List<State> plan1, List<State> plan2,
+			List<PlanAffectedResources> affResources1, List<PlanAffectedResources> affResources2) {
+				return null;
+	}
+	
+	public static class ConflictArea{
+		/** The agent1 conflict start index. */
+		int agent1ConflictStart;
+		/** The agent2 conflict start index. */
+		int agent2ConflictStart;
+		/** The agent1 conflict end index. */
+		int agent1ConflictEnd;
+		/** The agent2 conflict end index. */
+		int agent2ConflictEnd;
+	}
+	
 
 	public static <T> int getIntersection(Set<T> set1, Set<T> set2) {
 		boolean set1IsLarger = set1.size() > set2.size();
@@ -16,7 +65,8 @@ public class PlanAnalyzer {
 		return cloneSet.size();
 	}
 
-	public static List<CommonResources> findPossibleConflictingAgents(List<PlanAffectedResources> affectedResources) {
+	public static List<CommonResources> findPossibleConflictingAgents(
+			List<PlanAffectedResources> affectedResources) {
 		List<CommonResources> commonResources = new LinkedList<CommonResources>();
 
 		// for each agent we test to see if he has something in common with other CommonResources
