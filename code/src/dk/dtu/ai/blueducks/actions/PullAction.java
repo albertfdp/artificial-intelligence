@@ -106,7 +106,8 @@ public class PullAction extends Action {
 	public String toCommandString() {
 		return "Pull("+ agentDirection + "," + boxDirection + ")";
 	}
-
+	
+	
 	@Override
 	public void updateBeliefs() {
 		
@@ -117,6 +118,11 @@ public class PullAction extends Action {
 		Map<Cell, Agent> agents = LevelMap.getInstance().getAgents();
 		agents.put(destCell, agent);
 		agents.remove(agentCell);
+		
+		Cell previousBoxCell = LevelMap.getInstance().getCurrentState().getCellForBox(box);
+		if (LevelMap.getInstance().getLockedCells().contains(previousBoxCell))
+			LevelMap.getInstance().unlockCell(previousBoxCell);
+		
 		LevelMap.getInstance().getCurrentState().movedAgent(agentCell, destCell);
 		LevelMap.getInstance().getCurrentState().movedBox(box, boxCell, agentCell);
 		LevelMap.getInstance().markAsNotWall(destCell);

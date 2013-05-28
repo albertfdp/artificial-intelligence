@@ -97,11 +97,14 @@ public class GoalPlannerHeuristic {
 		for (Set<Cell> groupOfGoals : groupsOfGoals) {
 			if (groupOfGoals.contains(goalCell)) {
 				boolean hasLargestBetweenness = true;
+				int numCells = groupOfGoals.size();
 				for (Cell cellGroup : groupOfGoals) {
+					if (LevelMap.getInstance().getLockedCells().contains(cellGroup))
+						numCells--;
 					if (nbc.get(cellGroup) > betweennessGoal)
 						hasLargestBetweenness = false;
 				}
-				if (hasLargestBetweenness)
+				if (hasLargestBetweenness && numCells > 1)
 					a4 = 1;
 			}
 		}
