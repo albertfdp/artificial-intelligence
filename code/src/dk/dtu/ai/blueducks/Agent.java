@@ -165,27 +165,24 @@ public class Agent {
 		// TODO: Needs checking...
 		if (plan == null) {
 			log.finest("No plan found for goal.");
-			List<Action> emptyPlan = new LinkedList<Action>();
-			emptyPlan.add(new NoOpAction());
+			List<State> emptyPlan = new LinkedList<State>();
+			emptyPlan.add(agentState);
 			MotherOdin.getInstance().appendPlan(this, emptyPlan, new PlanAffectedResources());
 			return;
 		}
 
 		// Prepare the affected resources
 		PlanAffectedResources affectedResources = new PlanAffectedResources(plan);
-		// Prepare the actions, ignoring the first state in the plan (the current state)
-		plan.remove(0);
-		List<Action> actions = new LinkedList<Action>();
-		for (State s : plan)
-			actions.add((Action) s.getEdgeFromPrevNode());
 
 		// Logging
-		if (log.isLoggable(Level.FINEST))
+		if (log.isLoggable(Level.FINEST)) {
+			List<Action> actions = MotherOdin.getActionsFromPlan(plan);
 			log.finest("Generated plan actions: " + actions);
+		}
 		if (log.isLoggable(Level.FINEST))
 			log.finest("Affected resources: " + affectedResources);
 
-		MotherOdin.getInstance().appendPlan(this, actions, affectedResources);
+		MotherOdin.getInstance().appendPlan(this, plan, affectedResources);
 	}
 
 	/**
