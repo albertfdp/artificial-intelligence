@@ -26,13 +26,16 @@ import dk.dtu.ai.blueducks.map.MultiAgentState;
 
 public class PlanMerger {
 
+	// Already explored states
+	private Set<PlanMergeNode> exploredStates = new HashSet<PlanMergeNode>();
+
 	private static final Logger log = Logger.getLogger(PlanMerger.class.getSimpleName());
 	private static final int NO_MORE_OPTIONS = -2;
 
 	private final boolean[][] mergeOptions;
 	private final int agentsCount;
 	private final Action[][] actions;
-	
+
 	private List<LinkedList<Action>> mergedPlan;
 
 	public PlanMerger(int agentsCount, Action[][] actionsToMerge) {
@@ -47,23 +50,22 @@ public class PlanMerger {
 	public List<LinkedList<Action>> run() {
 		// Prepare multiagent state
 		MultiAgentState startState = new MultiAgentState(LevelMap.getInstance().getAgents(), LevelMap
-				.getInstance().getCurrentState().getOccupiedCells(),LevelMap
-				.getInstance().getCurrentState().getCellsForBoxes());
+				.getInstance().getCurrentState().getOccupiedCells(), LevelMap.getInstance().getCurrentState()
+				.getCellsForBoxes());
 		// Prepare start indexes
 		short[] agentsCurrentActionsIndex = new short[agentsCount];
-		boolean result=this.mergePlans(agentsCurrentActionsIndex, new PlanMergeNode(startState, null, null), 0);
-		if(result)
-		{
+		boolean result = this.mergePlans(
+				new PlanMergeNode(startState, null, null, agentsCurrentActionsIndex), 0);
+		if (result) {
 			log.info("Plan merging successful.");
 			if (log.isLoggable(Level.FINER))
 				log.finer("Merged plan: " + mergedPlan);
 			return this.mergedPlan;
-		}
-		else {
+		} else {
 			log.info("Plan merging failed.");
 			return null;
 		}
-			
+
 	}
 
 	private int getNextOptionIndex(int currentOptionsPos, Set<Conflict> conflictingAgents,
@@ -103,7 +105,7 @@ public class PlanMerger {
 				if (activeAgents[c.agent1] == true && activeAgents[c.agent2] == true) {
 					currentOptionsPos++;
 					conflict = true;
-					if(log.isLoggable(Level.FINEST))
+					if (log.isLoggable(Level.FINEST))
 						log.finest("Option not valid due to conflict: " + Arrays.toString(activeAgents));
 					break;
 				}
@@ -121,16 +123,22 @@ public class PlanMerger {
 
 	/**
 	 * Merge plans recursively.
-	 *
+	 * 
 	 * @param agentCurrentActionIndex the agent current action index
 	 * @param current - the node we are trying to expand
 	 * @param step - the current depth of the plan (e.g. step 3 - we're trying to see what actions
-	 * from step 3 can be done)
+	 *            from step 3 can be done)
 	 * @return true if is successful in merging the plans or false otherwise
 	 */
 	// TODO - limit the go back
 	// TODO - keep track of the most advanced point where it failed
-	private boolean mergePlans(short[] agentCurrentActionIndex, PlanMergeNode current, int step) {
+	private boolean mergePlans(PlanMergeNode current, int step) {
+		if (exploredStates.contains(current))
+			return false;
+		exploredStates.add(current);
+
+		short[] agentCurrentActionIndex = current.getAgentCurrentActionIndex();
+
 		// getting current action for each agent
 		Action[] agentsActions = new Action[this.agentsCount];
 		short agentsDone = 0;
@@ -147,7 +155,7 @@ public class PlanMerger {
 
 		if (agentsDone == this.agentsCount) {
 			List<LinkedList<Action>> mergedPlan = prepareResponse(current);
-			this.mergedPlan=mergedPlan;
+			this.mergedPlan = mergedPlan;
 			return true;
 		}
 
@@ -211,6 +219,7 @@ public class PlanMerger {
 
 			// if we can move on to next step (no conflict was found at this one)
 			if (conflictFound == false) {
+
 				short[] nextAgentCurrentActionIndex = new short[agentCurrentActionIndex.length];
 				Action[] currentSelectedActions = new Action[this.agentsCount];
 				for (int i = 0; i < this.agentsCount; i++)
@@ -226,8 +235,8 @@ public class PlanMerger {
 				// Arrays.toString(currentSelectedActions));
 				// log.info("Moving to next step with agent action indexes: "
 				// + Arrays.toString(nextAgentCurrentActionIndex));
-				PlanMergeNode next = new PlanMergeNode(duplicatedState, currentSelectedActions, current);
-				boolean success = mergePlans(nextAgentCurrentActionIndex, next, step + 1);
+				PlanMergeNode next = new PlanMergeNode(duplicatedState, currentSelectedActions, current, nextAgentCurrentActionIndex);
+				boolean success = mergePlans(next, step + 1);
 				if (success)
 					return true;
 			}
