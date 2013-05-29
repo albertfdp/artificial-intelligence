@@ -272,6 +272,7 @@ public class MotherOdin {
 
 		// Now we have the conflict solving plans
 		short fixingAgent, waitingAgent;
+		//TODO: Handle situation where plans where not found
 		if (conflictSolvingPlans.get(agent1).size() <= conflictSolvingPlans.get(agent2).size()) {
 			fixingAgent = agent1;
 			waitingAgent = agent2;
@@ -408,7 +409,7 @@ public class MotherOdin {
 	 * Append conflict plan.
 	 * 
 	 * @param agent the agent
-	 * @param plan the plan
+	 * @param plan the plan, if one has been found, or null if no plan was identified
 	 */
 	public synchronized void appendConflictPlan(Agent agent, List<State> plan) {
 		conflictSolvingPlans.set(agent.getId(), plan);
