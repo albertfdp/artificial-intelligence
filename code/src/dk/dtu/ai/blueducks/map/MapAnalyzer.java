@@ -46,6 +46,10 @@ public class MapAnalyzer {
 	
 	private static Map<Cell, Map<Cell, Number>> distances;
 	
+	public MapAnalyzer() {
+		distances = new HashMap<Cell, Map<Cell, Number>>();
+	}
+	
 	public void doAnalysis() {
 		MapAnalyzer.graph = this.computeGraph(LevelMap.getInstance().getCells());
 		if (MapAnalyzer.graph.getVertexCount() < MAX_NUMBER_VERTEX) {
