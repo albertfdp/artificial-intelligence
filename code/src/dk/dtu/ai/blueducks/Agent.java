@@ -72,7 +72,7 @@ public class Agent {
 	public int uniqueId;
 
 	public int powerHashValue;
-	
+
 	public Cell forbidenCell;
 
 	/**
@@ -100,6 +100,10 @@ public class Agent {
 	 */
 	public String getColor() {
 		return color;
+	}
+
+	public void resetCurrentSubgoal() {
+		this.currentSubgoalIndex = 0;
 	}
 
 	/**
@@ -223,21 +227,34 @@ public class Agent {
 		this.forbidenCell = otheAgentState.getAgentCell();
 		List<Goal> clearPathSubgoals = goalSplitter.getSubgoal(goal, this);
 		List<State> completePlan = new ArrayList<State>();
-		
-		for(int i = 0; i < clearPathSubgoals.size(); i++) {
+
+		for (int i = 0; i < clearPathSubgoals.size(); i++) {
 			List<State> plan = computePlanStates(clearPathSubgoals.get(i), agentState);
-			if(plan != null)
+			if (plan != null)
 				completePlan.addAll(plan);
 		}
-		List<Action> actions = new LinkedList<Action>();
-		if(completePlan.size() == 0) {
-			log.finest("No plan found for clearing the path.");
-			actions.add(new NoOpAction());
-		} else {
-			for (State s : completePlan)
-				actions.add((Action) s.getEdgeFromPrevNode());
+
+		// If a plan was not found
+		if (completePlan.size() == 0) {
+			log.finest("No plan found for goal.");
+			List<State> emptyPlan = new LinkedList<State>();
+			emptyPlan.add(agentState);
+			MotherOdin.getInstance().appendConflictPlan(this, emptyPlan);
+			return;
 		}
-		MotherOdin.getInstance().appendConflictPlan(this, actions);
+
+		// // Prepare the affected resources
+		// PlanAffectedResources affectedResources = new PlanAffectedResources(completePlan);
+
+		// Logging
+		if (log.isLoggable(Level.FINEST)) {
+			List<Action> actions = MotherOdin.getActionsFromPlan(completePlan);
+			log.finest("Generated plan actions: " + actions);
+		}
+		// if (log.isLoggable(Level.FINEST))
+		// log.finest("Affected resources: " + affectedResources);
+
+		MotherOdin.getInstance().appendConflictPlan(this, completePlan);
 		this.forbidenCell = null;
 	}
 }

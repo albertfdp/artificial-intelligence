@@ -63,6 +63,8 @@ public class MotherOdin {
 
 	private List<LinkedList<Action>> mergedPlans;
 
+	private List<List<State>> conflictSolvingPlans;
+
 	private boolean needMerging;
 
 	/**
@@ -79,6 +81,11 @@ public class MotherOdin {
 		agents = LevelMap.getInstance().getAgentsList();
 		// Init the plans list
 		unmergedPlans = new ArrayList<List<State>>(agents.size());
+		for (int i = 0; i < agents.size(); i++)
+			unmergedPlans.add(null);
+		conflictSolvingPlans = new ArrayList<List<State>>(agents.size());
+		for (int i = 0; i < agents.size(); i++)
+			conflictSolvingPlans.add(null);
 		mergedPlans = new ArrayList<LinkedList<Action>>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
 			mergedPlans.add(new LinkedList<Action>());
@@ -249,18 +256,50 @@ public class MotherOdin {
 	}
 
 	private void solveConflict(CommonResources c) {
-		Iterator<Short> it=c.agents.iterator();
-		short agent1=it.next();
-		short agent2=it.next();
-		List<State> plan1=unmergedPlans.get(agent1);
-		List<State> plan2=unmergedPlans.get(agent2);
-				
+		Iterator<Short> it = c.agents.iterator();
+		short agent1 = it.next();
+		short agent2 = it.next();
+		List<State> plan1 = unmergedPlans.get(agent1);
+		List<State> plan2 = unmergedPlans.get(agent2);
+
 		// Request conflict solving solution to first agent
-		ClearPathGoal cpg1=new ClearPathGoal(plan1, 0, plan1.size()-1);
-		
-		
-		
-		ClearPathGoal cpg2=new ClearPathGoal(plan2, 0, plan2.size()-1);
+		ClearPathGoal cpg1 = new ClearPathGoal(plan1, 0, plan1.size() - 1);
+		agents.get(agent1).requestPlanForConflictSolving(cpg1, plan1.get(0), plan2.get(0));
+
+		ClearPathGoal cpg2 = new ClearPathGoal(plan2, 0, plan2.size() - 1);
+		agents.get(agent2).requestPlanForConflictSolving(cpg2, plan1.get(0), plan2.get(0));
+		// TODO: Wait for synchronization when using multi-threading
+
+		// Now we have the conflict solving plans
+		short fixingAgent, waitingAgent;
+		if (conflictSolvingPlans.get(agent1).size() <= conflictSolvingPlans.get(agent2).size()) {
+			fixingAgent = agent1;
+			waitingAgent = agent2;
+		} else {
+			fixingAgent = agent2;
+			waitingAgent = agent1;
+		}
+
+		// Add stuff to merged plans
+		mergedPlans.get(agent1).clear();
+		mergedPlans.get(agent2).clear();
+		// Add the fixing plan
+		mergedPlans.get(fixingAgent).addAll(getActionsFromPlan(conflictSolvingPlans.get(fixingAgent)));
+		mergedPlans.get(waitingAgent).addAll(
+				getActionsForEmptyPlan(conflictSolvingPlans.get(fixingAgent).size()));
+		// Add the other plan
+		mergedPlans.get(waitingAgent).addAll(getActionsFromPlan(unmergedPlans.get(waitingAgent)));
+		mergedPlans.get(fixingAgent).addAll(getActionsForEmptyPlan(unmergedPlans.get(waitingAgent).size()));
+
+		// Make the fixing agent replan when needed
+		agents.get(fixingAgent).resetCurrentSubgoal();
+
+		if (log.isLoggable(Level.FINE)) {
+			log.fine("Merged conflicted plans for fixing agent " + fixingAgent + ": "
+					+ mergedPlans.get(fixingAgent));
+			log.fine("Merged conflicted plans for waiting agent " + waitingAgent + ": "
+					+ mergedPlans.get(waitingAgent));
+		}
 	}
 
 	public void setMergedPlan(List<LinkedList<Action>> mergedPlan) {
@@ -371,8 +410,8 @@ public class MotherOdin {
 	 * @param agent the agent
 	 * @param plan the plan
 	 */
-	public synchronized void appendConflictPlan(Agent agent, List<Action> plan) {
-
+	public synchronized void appendConflictPlan(Agent agent, List<State> plan) {
+		conflictSolvingPlans.set(agent.getId(), plan);
 	}
 
 	public static LinkedList<Action> getActionsFromPlan(List<State> plan) {
@@ -381,6 +420,13 @@ public class MotherOdin {
 		LinkedList<Action> actions = new LinkedList<Action>();
 		for (State s : plan)
 			actions.add((Action) s.getEdgeFromPrevNode());
+		return actions;
+	}
+
+	public static LinkedList<Action> getActionsForEmptyPlan(int planSize) {
+		LinkedList<Action> actions = new LinkedList<>();
+		for (int i = 0; i < planSize; i++)
+			actions.add(new NoOpAction());
 		return actions;
 	}
 
