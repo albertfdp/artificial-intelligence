@@ -73,6 +73,13 @@ public class ClearPathGoal extends Goal {
 			return false;
 		
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "ClearPathGoal [cells=" + cells + ", box=" + box + "]";
 	}	
 
+	
+	
 }

@@ -24,4 +24,9 @@ public class ClearAgentGoal extends Goal {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "ClearAgentGoal [cells=" + cells + "]";
+	}
+
 }

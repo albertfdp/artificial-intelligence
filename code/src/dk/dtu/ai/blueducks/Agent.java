@@ -225,21 +225,36 @@ public class Agent {
 	 */
 	public void requestPlanForConflictSolving(ClearPathGoal goal, State agentState, State otheAgentState) {
 		this.forbidenCell = otheAgentState.getAgentCell();
+		
+		
+		log.finest("Looking for a plan for the clearPathGoal " + goal);
+
+		if(goal.isSatisfied(agentState)){
+			log.finest("Plan found. No action taken");
+			List<State> emptyPlan = new LinkedList<State>();
+			emptyPlan.add(agentState);
+			MotherOdin.getInstance().appendConflictPlan(this, emptyPlan);
+			return;
+		}
+		
 		List<Goal> clearPathSubgoals = goalSplitter.getSubgoal(goal, this);
+		
+		if(log.isLoggable(Level.FINEST)){
+			log.finest("CLEAR PATH SUBGOAL: " + clearPathSubgoals.get(0));
+		}
 		List<State> completePlan = new ArrayList<State>();
 
 		for (int i = 0; i < clearPathSubgoals.size(); i++) {
 			List<State> plan = computePlanStates(clearPathSubgoals.get(i), agentState);
 			if (plan != null)
 				completePlan.addAll(plan);
+			log.finest("THE PLAN " + plan);
 		}
 
 		// If a plan was not found
 		if (completePlan.size() == 0) {
 			log.finest("No plan found for goal.");
-			List<State> emptyPlan = new LinkedList<State>();
-			emptyPlan.add(agentState);
-			MotherOdin.getInstance().appendConflictPlan(this, emptyPlan);
+			MotherOdin.getInstance().appendConflictPlan(this, null);
 			return;
 		}
 
