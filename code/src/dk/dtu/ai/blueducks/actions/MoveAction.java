@@ -11,7 +11,6 @@ package dk.dtu.ai.blueducks.actions;
 import java.util.Map;
 
 import dk.dtu.ai.blueducks.Agent;
-import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.Direction;
 import dk.dtu.ai.blueducks.map.LevelMap;

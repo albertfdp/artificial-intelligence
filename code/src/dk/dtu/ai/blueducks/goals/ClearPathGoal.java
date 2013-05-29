@@ -14,13 +14,10 @@ import java.util.Set;
 
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
-import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class ClearPathGoal extends Goal {
-	
-	private State startingState;
 	
 	/** The cells that need to be cleared. */
 	private Set<Cell> cells; 
@@ -39,13 +36,9 @@ public class ClearPathGoal extends Goal {
 	public Box getBox() {
 		return box;
 	}
-
-	public State getStartingState() {
-		return startingState;
-	}
-	/*public void setBox(Box box) {
+	public void setBox(Box box) {
 		this.box = box;
-	}*/
+	}
 
 	/**
 	 * Instantiates a new clear path goal.
@@ -61,10 +54,6 @@ public class ClearPathGoal extends Goal {
 			toBeClearedCells.add(plan.get(i).getAgentCell());
 		}
 		this.cells = new HashSet<Cell>(toBeClearedCells);
-		if(startIndexOfConflictingArea == 0)
-			startingState = plan.get(startIndexOfConflictingArea);
-		else
-			startingState = plan.get(startIndexOfConflictingArea - 1);
 
 	}
 	
