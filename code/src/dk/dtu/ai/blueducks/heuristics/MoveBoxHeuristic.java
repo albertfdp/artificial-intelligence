@@ -7,6 +7,7 @@ import dk.dtu.ai.blueducks.actions.PushAction;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
+import dk.dtu.ai.blueducks.map.MapAnalyzer;
 import dk.dtu.ai.blueducks.map.State;
 
 public class MoveBoxHeuristic implements Heuristic<State, MoveBoxGoal> {
@@ -89,7 +90,7 @@ public class MoveBoxHeuristic implements Heuristic<State, MoveBoxGoal> {
 				}
 				
 				// don't put the box in a high betweenness cell
-				float betweennessCellBox = LevelMap.getInstance().getBetweenessCentrality().get(boxCell).floatValue();
+				float betweennessCellBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(boxCell).floatValue();
 				h += 1000 * betweennessCellBox;
 				
 			}
@@ -102,7 +103,7 @@ public class MoveBoxHeuristic implements Heuristic<State, MoveBoxGoal> {
 					h += Heuristic.PENALTY_UNDO_GOAL;
 				}
 				// don't put the box in a high betweenness cell
-				float betweennessCellBox = LevelMap.getInstance().getBetweenessCentrality().get(boxCell).floatValue();
+				float betweennessCellBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(boxCell).floatValue();
 				h += 1000 * betweennessCellBox;
 			}
 		}
@@ -127,9 +128,9 @@ public class MoveBoxHeuristic implements Heuristic<State, MoveBoxGoal> {
 		// cell of the goal
 		Cell cellGoal = goal.getTo();
 		
-		float betweennessAgent = LevelMap.getInstance().getBetweenessCentrality().get(cellAgent).floatValue();
-		float betweennessBox = LevelMap.getInstance().getBetweenessCentrality().get(cellBox).floatValue();
-		float betweennessGoal = LevelMap.getInstance().getBetweenessCentrality().get(cellGoal).floatValue();
+		float betweennessAgent = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellAgent).floatValue();
+		float betweennessBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue();
+		float betweennessGoal = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellGoal).floatValue();
 		
 		float distance = LevelMap.getInstance().getDistance(cellAgent, cellGoal);
 		
@@ -147,7 +148,7 @@ public class MoveBoxHeuristic implements Heuristic<State, MoveBoxGoal> {
 				}
 				
 				// don't put the box in a high betweenness cell
-				float betweennessCellBox = LevelMap.getInstance().getBetweenessCentrality().get(boxCell).floatValue();
+				float betweennessCellBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(boxCell).floatValue();
 				h += 1000 * betweennessCellBox;
 				
 			}
@@ -160,7 +161,7 @@ public class MoveBoxHeuristic implements Heuristic<State, MoveBoxGoal> {
 					h += Heuristic.PENALTY_UNDO_GOAL;
 				}
 				// don't put the box in a high betweenness cell
-				float betweennessCellBox = LevelMap.getInstance().getBetweenessCentrality().get(boxCell).floatValue();
+				float betweennessCellBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(boxCell).floatValue();
 				h += 1000 * betweennessCellBox;
 			}
 		}

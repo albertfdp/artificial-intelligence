@@ -69,11 +69,7 @@ public class GoalPlannerHeuristic {
 		float a5 = 0; // undoing a goal
 		
 		DeliverBoxGoal deliverBoxGoal = (DeliverBoxGoal) goal;
-		
-		if (deliverBoxGoal.getWhat().getId() == 'A') {
-			a0 = 1;
-		}
-		
+				
 		// cell where the agent is located now
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
 		
@@ -86,14 +82,14 @@ public class GoalPlannerHeuristic {
 		float distanceAgentBox = LevelMap.getInstance().getDistance(agentCell, boxCell);
 		float distanceBoxGoal = LevelMap.getInstance().getDistance(boxCell, goalCell);
 		
-		Map<Cell, Double> nbc = LevelMap.getInstance().getBetweenessCentrality();
+		Map<Cell, Double> nbc = MapAnalyzer.getNormalizedBetweennessCentrality();
 		
 		float betweennessBox = nbc.get(boxCell).floatValue();
 		float betweennessGoal = nbc.get(goalCell).floatValue();
 		
 		
 		// check if resolving this goal, locks other goals
-		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getInstance().getNeighbourGoals(LevelMap.getInstance().getAllGoals());
+		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
 		for (Set<Cell> groupOfGoals : groupsOfGoals) {
 			if (groupOfGoals.contains(goalCell)) {
 				boolean hasLargestBetweenness = true;
