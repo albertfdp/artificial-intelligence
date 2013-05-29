@@ -7,6 +7,7 @@
  */
 package dk.dtu.ai.blueducks;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -71,6 +72,8 @@ public class Agent {
 	public int uniqueId;
 
 	public int powerHashValue;
+	
+	public Cell forbidenCell;
 
 	/**
 	 * Instantiates a new agent.
@@ -86,6 +89,7 @@ public class Agent {
 		this.log = Logger.getLogger("Agent " + id);
 		this.uniqueId = Agent.noOfAgents;
 		Agent.noOfAgents++;
+		this.forbidenCell = null;
 	}
 
 	/**
@@ -218,8 +222,25 @@ public class Agent {
 	 * <br/>
 	 * If the agent has no plan, he must call the callback method with a null as a plan.
 	 */
-	public void requestPlanForConflictSolving(ClearPathGoal goal) {
-
+	public void requestPlanForConflictSolving(ClearPathGoal goal, State agentState, State otheAgentState) {
+		this.forbidenCell = otheAgentState.getAgentCell();
+		List<Goal> clearPathSubgoals = goalSplitter.getSubgoal(goal, this);
+		List<State> completePlan = new ArrayList<State>();
+		
+		for(int i = 0; i < clearPathSubgoals.size(); i++) {
+			List<State> plan = computePlanStates(clearPathSubgoals.get(i), agentState);
+			if(plan != null)
+				completePlan.addAll(plan);
+		}
+		List<Action> actions = new LinkedList<Action>();
+		if(completePlan.size() == 0) {
+			log.finest("No plan found for clearing the path.");
+			actions.add(new NoOpAction());
+		} else {
+			for (State s : completePlan)
+				actions.add((Action) s.getEdgeFromPrevNode());
+		}
+		MotherOdin.getInstance().appendConflictPlan(this, actions);
+		this.forbidenCell = null;
 	}
-
 }
