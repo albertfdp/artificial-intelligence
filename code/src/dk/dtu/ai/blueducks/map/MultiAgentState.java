@@ -103,4 +103,41 @@ public class MultiAgentState {
 		return cellsForBoxes;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((agents == null) ? 0 : agents.hashCode());
+		result = prime * result + ((cellsForBoxes == null) ? 0 : cellsForBoxes.hashCode());
+		result = prime * result + ((occupiedCells == null) ? 0 : occupiedCells.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MultiAgentState other = (MultiAgentState) obj;
+		if (agents == null) {
+			if (other.agents != null)
+				return false;
+		} else if (!agents.equals(other.agents))
+			return false;
+		if (cellsForBoxes == null) {
+			if (other.cellsForBoxes != null)
+				return false;
+		} else if (!cellsForBoxes.equals(other.cellsForBoxes))
+			return false;
+		if (occupiedCells == null) {
+			if (other.occupiedCells != null)
+				return false;
+		} else if (!occupiedCells.equals(other.occupiedCells))
+			return false;
+		return true;
+	}
+
 }

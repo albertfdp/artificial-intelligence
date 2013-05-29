@@ -42,6 +42,9 @@ public class LevelMap {
 
 	/** The goals. */
 	private Map<Character, List<Cell>> goals;
+	
+	/** All the goals. */
+	private List<Cell> allGoals;
 
 	/** The width. */
 	private int width;
@@ -55,18 +58,9 @@ public class LevelMap {
 	/** The boxes list put in he order of the uniqueID. */
 	private List<Box> boxesList;
 
-	/** The betweenness centrality score for each free cell */
-	private Map<Cell, Double> betweennesScore;
-
-	private boolean isDijkstraDistance;
-
-	private Map<Cell, Map<Cell, Number>> distances;
-
 	private Set<Cell> lockedCells;
 
 	private List<Cell> verifiedCells;
-
-	private final static int MAX_NUMBER_VERTEX = 60 * 60;
 
 	/**
 	 * Instantiates a new level map.
@@ -75,11 +69,11 @@ public class LevelMap {
 		agentCells = new HashMap<Cell, Agent>(10);
 		boxesList = new LinkedList<>();
 		goals = new HashMap<Character, List<Cell>>();
+		allGoals = new ArrayList<Cell>();
 		verifiedCells = new ArrayList<Cell>();
 		agents = new ArrayList<Agent>(10);
 		for (int i = 0; i < 10; i++)
 			agents.add(null);
-		distances = new HashMap<Cell, Map<Cell, Number>>();
 		lockedCells = new HashSet<Cell>();
 	}
 
@@ -111,10 +105,6 @@ public class LevelMap {
 			this.matrix[i] = new Cell[width];
 		}
 		Cell.map = this;
-	}
-
-	public Map<Cell, Double> getBetweenessCentrality() {
-		return this.betweennesScore;
 	}
 
 	/**
@@ -153,6 +143,7 @@ public class LevelMap {
 	 */
 	public void addGoalCell(Cell cell, int x, int y, char id) {
 		this.addCell(cell, x, y);
+		allGoals.add(cell);
 		logger.info("Added Cell FOR GOAL: " + x + " " + y + " GOAL " + id);
 		List<Cell> list;
 		if (!goals.containsKey(id)) {
@@ -241,11 +232,7 @@ public class LevelMap {
 	}
 
 	public boolean isGoal(Cell cell) {
-		for (Entry<Character, List<Cell>> goal : goals.entrySet()) {
-			if (goal.getValue().contains(cell))
-				return true;
-		}
-		return false;
+		return allGoals.contains(cell);
 	}
 
 	/**
@@ -304,7 +291,7 @@ public class LevelMap {
 	}
 
 	public int getDistance(Cell cellA, Cell cellB) {
-		return this.distances.get(cellA).get(cellB).intValue();
+		return MapAnalyzer.getDistances().get(cellA).get(cellB).intValue();
 	}
 
 	public Set<Cell> getLockedCells() {
@@ -319,19 +306,8 @@ public class LevelMap {
 		this.lockedCells.remove(cell);
 	}
 	
-
-	public boolean isDijkstraDistance() {
-		return isDijkstraDistance;
-	}
-	
 	public List<Cell> getAllGoals() {
-		List<Cell> goalList = new ArrayList<Cell>();
-		for (Entry<Character, List<Cell>> e : goals.entrySet()) {
-			for (Cell goal : e.getValue()) {
-				goalList.add(goal);
-			}
-		}
-		return goalList;
+		return allGoals;
 	}
 
 	public void finishLoading() {
@@ -348,26 +324,7 @@ public class LevelMap {
 	 */
 	public void executeMapPreAnalysis() {
 
-		MapAnalyzer mapAnalyzer = MapAnalyzer.getInstance();
-		
-		// calculate distances
-		if (MapAnalyzer.graph.getVertexCount() < MAX_NUMBER_VERTEX) {
-			logger.info("Using betweennes centrality and dijkstra distances for improving performance ... ");
-			// Analyze map
-			this.betweennesScore = mapAnalyzer.getNormalizedBetweenessCentrality();
-			this.isDijkstraDistance = true;
-			for (Cell cell : this.getCells()) {
-				distances.put(cell, mapAnalyzer.getDistances(cell));
-			}
-		} else {
-			logger.info("Using manhattan distances for improving computing time ... ");
-			this.betweennesScore = mapAnalyzer.getDefaultBetweennessCentrality();
-			for (Cell cell : this.getCells()) {
-				distances.put(cell, mapAnalyzer.getManhattanDistances(cell));
-			}
-		}
-		
-		mapAnalyzer.getNeighbourGoals(getAllGoals());
+		MapAnalyzer.getInstance().doAnalysis();
 		
 	}
 }

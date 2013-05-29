@@ -42,8 +42,8 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 		float betweennessCellBox = 0;
 		
 		List<Cell> allGoals = LevelMap.getInstance().getAllGoals();
-		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getInstance().getNeighbourGoals(allGoals);
-		Map<Cell, Double> nbc = LevelMap.getInstance().getBetweenessCentrality();
+		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
+		Map<Cell, Double> nbc = MapAnalyzer.getNormalizedBetweennessCentrality();
 		
 		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
 			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
@@ -144,7 +144,7 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 			Cell cellBoxPrevious = prevState.getCellForBox(pullAction.getBox());
 			
 			// don't put the box in a high betweenness cell
-			float betweennessCellBox = LevelMap.getInstance().getBetweenessCentrality().get(cellBox).floatValue();
+			float betweennessCellBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue();
 			h += 1000 * betweennessCellBox;
 			
 			// don't unlock goals
@@ -159,7 +159,7 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 			Cell cellBoxPrevious = prevState.getCellForBox(pushAction.getBox());
 			
 			// don't put the box in a high betweenness cell
-			float betweennessCellBox = LevelMap.getInstance().getBetweenessCentrality().get(cellBox).floatValue();
+			float betweennessCellBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue();
 			h += 1000 * betweennessCellBox;
 			
 			// don't unlock goals

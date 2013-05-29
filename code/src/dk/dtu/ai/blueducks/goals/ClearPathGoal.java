@@ -7,6 +7,7 @@
  */
 package dk.dtu.ai.blueducks.goals;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,7 +18,6 @@ import dk.dtu.ai.blueducks.map.State;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class ClearPathGoal extends Goal {
-	
 	
 	/** The cells that need to be cleared. */
 	private Set<Cell> cells; 
@@ -36,7 +36,6 @@ public class ClearPathGoal extends Goal {
 	public Box getBox() {
 		return box;
 	}
-
 	public void setBox(Box box) {
 		this.box = box;
 	}
@@ -49,7 +48,13 @@ public class ClearPathGoal extends Goal {
 	 * @param endIndexOfConflictingArea the end index of conflicting state
 	 */
 	public ClearPathGoal(List<State> plan, int startIndexOfConflictingArea, int endIndexOfConflictingArea){
-		//TODO: Ruxy
+		int i;
+		List<Cell> toBeClearedCells = new ArrayList<Cell>();
+		for(i = startIndexOfConflictingArea; i <= endIndexOfConflictingArea ;i++) {
+			toBeClearedCells.add(plan.get(i).getAgentCell());
+		}
+		this.cells = new HashSet<Cell>(toBeClearedCells);
+
 	}
 	
 	public ClearPathGoal(Box box, List<Cell> cells) {
