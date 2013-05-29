@@ -148,6 +148,7 @@ public class MotherOdin {
 				if (mergedPlans.get(agent).isEmpty()) {
 					agents.get(agent).requestPlan();
 				}
+			log.info(unmergedPlans+"");
 			// TODO: Wait for synchronization when using multi-threading
 			mergePlans();
 
@@ -417,10 +418,11 @@ public class MotherOdin {
 
 	public static LinkedList<Action> getActionsFromPlan(List<State> plan) {
 		// Prepare the actions, ignoring the first state in the plan (the current state)
-		plan.remove(0);
 		LinkedList<Action> actions = new LinkedList<Action>();
-		for (State s : plan)
-			actions.add((Action) s.getEdgeFromPrevNode());
+		Iterator<State> it=plan.iterator();
+		it.next();
+		while(it.hasNext())
+			actions.add((Action) it.next().getEdgeFromPrevNode());
 		return actions;
 	}
 
