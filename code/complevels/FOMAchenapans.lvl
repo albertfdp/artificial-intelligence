@@ -1,5 +1,5 @@
 magenta: 2,B,D
-red: 0,C 
+red: 0,C
 green: 4,1,F,E,G
 yellow: 3,H
 +++++++++++++
@@ -7,7 +7,7 @@ yellow: 3,H
 +  F++++C   +
 +          0+
 +  B++++2  G+
-+c  +H +bD E+ 
++c  +H +bD E+
 ++++++ ++++++
 +e E      h3+
 +e+ +E   4  +
