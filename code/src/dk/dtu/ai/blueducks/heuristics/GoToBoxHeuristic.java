@@ -27,7 +27,7 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 		float h = 1;
 		
 		float a0 = 100; // distance
-		float a1 = 1000; // penalize actions other than move
+		float a1 = 0; // penalize actions other than move
 		float a2 = 1000; // penalize leaving boxes in cells with high betweenness
 		float a3 = 0; // penalize leaving boxes in goal cells
 		float a4 = 0; // penalize blocking goals

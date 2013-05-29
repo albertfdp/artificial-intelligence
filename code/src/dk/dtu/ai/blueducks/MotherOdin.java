@@ -263,11 +263,11 @@ public class MotherOdin {
 		List<State> plan2 = unmergedPlans.get(agent2);
 
 		// Request conflict solving solution to first agent
-		ClearPathGoal cpg1 = new ClearPathGoal(plan1, 0, plan1.size() - 1);
+		ClearPathGoal cpg1 = new ClearPathGoal(plan2, 0, plan2.size() - 1);
 		agents.get(agent1).requestPlanForConflictSolving(cpg1, plan1.get(0), plan2.get(0));
 
-		ClearPathGoal cpg2 = new ClearPathGoal(plan2, 0, plan2.size() - 1);
-		agents.get(agent2).requestPlanForConflictSolving(cpg2, plan1.get(0), plan2.get(0));
+		ClearPathGoal cpg2 = new ClearPathGoal(plan1, 0, plan1.size() - 1);
+		agents.get(agent2).requestPlanForConflictSolving(cpg2, plan2.get(0), plan1.get(0));
 		// TODO: Wait for synchronization when using multi-threading
 
 		// Now we have the conflict solving plans
