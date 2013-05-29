@@ -202,7 +202,7 @@ public class State extends AStarNode {
 	 * @return the celll visibility
 	 */
 	public CellVisibility isFree(Cell cell) {
-		if (cell == null || occupiedCells.get(cell.uniqueId) || cell == agentCell)
+		if (cell == null || occupiedCells.get(cell.uniqueId) || cell == agentCell || LevelMap.getInstance().getCellAt(cell.x, cell.y) == null)
 			return CellVisibility.NOT_FREE;
 		// TODO: where will we use the fact that the cell might/ might not be free
 		if (LevelMap.getInstance().isVerified(cell))

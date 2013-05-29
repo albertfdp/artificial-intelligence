@@ -7,6 +7,7 @@
  */
 package dk.dtu.ai.blueducks;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -219,7 +220,21 @@ public class Agent {
 	 * If the agent has no plan, he must call the callback method with a null as a plan.
 	 */
 	public void requestPlanForConflictSolving(ClearPathGoal goal) {
-
+		List<Goal> clearPathSubgoals = goalSplitter.getSubgoal(goal, this);
+		List<State> completePlan = new ArrayList<State>();
+		for(int i = 0; i < clearPathSubgoals.size(); i++) {
+			List<State> plan = computePlanStates(clearPathSubgoals.get(i), goal.getStartingState());
+			if(plan != null)
+				completePlan.addAll(plan);
+		}
+		List<Action> actions = new LinkedList<Action>();
+		if(completePlan.size() == 0) {
+			log.finest("No plan found for clearing the path.");
+			actions.add(new NoOpAction());
+		} else {
+			for (State s : completePlan)
+				actions.add((Action) s.getEdgeFromPrevNode());
+		}
+		MotherOdin.getInstance().appendConflictPlan(this, actions);
 	}
-
 }
