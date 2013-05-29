@@ -36,8 +36,19 @@ public class PlanAnalyzer {
 	public boolean detectUnmergeablePlans(List<State> plan1, List<State> plan2,
 			PlanAffectedResources affResources1, PlanAffectedResources affResources2) {
 		
-		//si no se puede hacer ninguna accion
-		//blub la bla ble bli
+		Cell firstStateCell1 = plan1.get(0).getAgentCell();
+		Cell firstStateCell2 = plan2.get(0).getAgentCell();
+		Cell lastStateCell1 = plan1.get(plan1.size()-1).getAgentCell();
+		Cell lastStateCell2 = plan2.get(plan2.size()-1).getAgentCell();
+		
+		if((affResources1.getAffectedCells().contains(firstStateCell2)) && 
+				(affResources2.getAffectedCells().contains(firstStateCell1)))
+			return true;
+		
+		if((affResources1.getAffectedCells().contains(lastStateCell2)) && 
+				(affResources2.getAffectedCells().contains(lastStateCell1)))
+			return true;
+		
 		return false;
 	}
 	
