@@ -14,6 +14,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import dk.dtu.ai.blueducks.Box;
+import dk.dtu.ai.blueducks.actions.Action;
+import dk.dtu.ai.blueducks.actions.MoveAction;
+import dk.dtu.ai.blueducks.actions.PullAction;
+import dk.dtu.ai.blueducks.actions.PushAction;
+import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.State;
 
 public class PlanAnalyzer {
@@ -42,8 +48,41 @@ public class PlanAnalyzer {
 	 * @return the conflict area
 	 */
 	public ConflictArea identifyConflictArea(List<State> plan1, List<State> plan2,
-			List<PlanAffectedResources> affResources1, List<PlanAffectedResources> affResources2) {
-				return null;
+			PlanAffectedResources affResources1, PlanAffectedResources affResources2) {
+		int i = 0, j = 0;
+		ConflictArea conflictArea = new ConflictArea();
+		Set<Cell> affectedCells2 = affResources2.getAffectedCells();
+		
+		//find in the two plans the beginning of the common area
+		//while the agent cell of the state in plan 1 is not affected by plan 2 or the cells are different
+		while((i < plan1.size()) && (j < plan2.size()) && 
+				((!affectedCells2.contains(plan1.get(i).getAgentCell())) || 
+						(plan2.get(j).getAgentCell() != plan1.get(i).getAgentCell()))){
+			//next state of plan 1
+			if (!affectedCells2.contains(plan1.get(i).getAgentCell()))
+				i++;
+			//next state of plan 2
+			if (plan2.get(j).getAgentCell() != plan1.get(i).getAgentCell())
+				j++;	
+		}
+
+		//not common path
+		if((i == plan1.size()) || (j == plan2.size()))
+			return null;
+		
+		conflictArea.agent1ConflictStart = i;
+		conflictArea.agent2ConflictStart = j;
+		
+		//find the rest of the path
+		while(plan2.get(j).getAgentCell() == plan1.get(i).getAgentCell()){
+			i++;
+			j++;
+		}
+		 
+		conflictArea.agent1ConflictEnd = i;
+		conflictArea.agent2ConflictEnd = j;
+		
+		return conflictArea;
 	}
 	
 	public static class ConflictArea{
