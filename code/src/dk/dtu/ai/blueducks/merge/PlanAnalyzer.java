@@ -34,7 +34,10 @@ public class PlanAnalyzer {
 	 * @return true, if the plans are unmeargeable
 	 */
 	public boolean detectUnmergeablePlans(List<State> plan1, List<State> plan2,
-			List<PlanAffectedResources> affResources1, List<PlanAffectedResources> affResources2) {
+			PlanAffectedResources affResources1, PlanAffectedResources affResources2) {
+		
+		//si no se puede hacer ninguna accion
+		//blub la bla ble bli
 		return false;
 	}
 	
@@ -58,15 +61,18 @@ public class PlanAnalyzer {
 		while((i < plan1.size()) && (j < plan2.size()) && 
 				((!affectedCells2.contains(plan1.get(i).getAgentCell())) || 
 						(plan2.get(j).getAgentCell() != plan1.get(i).getAgentCell()))){
+			
+			Cell agentCell1 = plan1.get(i).getAgentCell(); 
+			
 			//next state of plan 1
 			if (!affectedCells2.contains(plan1.get(i).getAgentCell()))
 				i++;
 			//next state of plan 2
-			if (plan2.get(j).getAgentCell() != plan1.get(i).getAgentCell())
+			if (plan2.get(j).getAgentCell() != agentCell1)
 				j++;	
 		}
 
-		//not common path
+		//there is no common path
 		if((i == plan1.size()) || (j == plan2.size()))
 			return null;
 		
