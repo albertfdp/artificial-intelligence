@@ -7,6 +7,7 @@
  */
 package dk.dtu.ai.blueducks;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -72,6 +73,8 @@ public class Agent {
 
 	public int powerHashValue;
 
+	public Cell forbidenCell;
+
 	/**
 	 * Instantiates a new agent.
 	 * 
@@ -86,6 +89,7 @@ public class Agent {
 		this.log = Logger.getLogger("Agent " + id);
 		this.uniqueId = Agent.noOfAgents;
 		Agent.noOfAgents++;
+		this.forbidenCell = null;
 	}
 
 	/**
@@ -96,6 +100,10 @@ public class Agent {
 	 */
 	public String getColor() {
 		return color;
+	}
+
+	public void resetCurrentSubgoal() {
+		this.currentSubgoalIndex = 0;
 	}
 
 	/**
@@ -165,27 +173,24 @@ public class Agent {
 		// TODO: Needs checking...
 		if (plan == null) {
 			log.finest("No plan found for goal.");
-			List<Action> emptyPlan = new LinkedList<Action>();
-			emptyPlan.add(new NoOpAction());
+			List<State> emptyPlan = new LinkedList<State>();
+			emptyPlan.add(agentState);
 			MotherOdin.getInstance().appendPlan(this, emptyPlan, new PlanAffectedResources());
 			return;
 		}
 
 		// Prepare the affected resources
 		PlanAffectedResources affectedResources = new PlanAffectedResources(plan);
-		// Prepare the actions, ignoring the first state in the plan (the current state)
-		plan.remove(0);
-		List<Action> actions = new LinkedList<Action>();
-		for (State s : plan)
-			actions.add((Action) s.getEdgeFromPrevNode());
 
 		// Logging
-		if (log.isLoggable(Level.FINEST))
+		if (log.isLoggable(Level.FINEST)) {
+			List<Action> actions = MotherOdin.getActionsFromPlan(plan);
 			log.finest("Generated plan actions: " + actions);
+		}
 		if (log.isLoggable(Level.FINEST))
 			log.finest("Affected resources: " + affectedResources);
 
-		MotherOdin.getInstance().appendPlan(this, actions, affectedResources);
+		MotherOdin.getInstance().appendPlan(this, plan, affectedResources);
 	}
 
 	/**
@@ -218,8 +223,53 @@ public class Agent {
 	 * <br/>
 	 * If the agent has no plan, he must call the callback method with a null as a plan.
 	 */
-	public void requestPlanForConflictSolving(ClearPathGoal goal) {
+	public void requestPlanForConflictSolving(ClearPathGoal goal, State agentState, State otheAgentState) {
+		this.forbidenCell = otheAgentState.getAgentCell();
+		
+		
+		log.finest("Looking for a plan for the clearPathGoal " + goal);
 
+		if(goal.isSatisfied(agentState)){
+			log.finest("Plan found. No action taken");
+			List<State> emptyPlan = new LinkedList<State>();
+			emptyPlan.add(agentState);
+			MotherOdin.getInstance().appendConflictPlan(this, emptyPlan);
+			return;
+		}
+		
+		List<Goal> clearPathSubgoals = goalSplitter.getSubgoal(goal, this);
+		
+		if(log.isLoggable(Level.FINEST)){
+			log.finest("CLEAR PATH SUBGOAL: " + clearPathSubgoals.get(0));
+		}
+		List<State> completePlan = new ArrayList<State>();
+
+		for (int i = 0; i < clearPathSubgoals.size(); i++) {
+			List<State> plan = computePlanStates(clearPathSubgoals.get(i), agentState);
+			if (plan != null)
+				completePlan.addAll(plan);
+			log.finest("THE PLAN " + plan);
+		}
+
+		// If a plan was not found
+		if (completePlan.size() == 0) {
+			log.finest("No plan found for goal.");
+			MotherOdin.getInstance().appendConflictPlan(this, null);
+			return;
+		}
+
+		// // Prepare the affected resources
+		// PlanAffectedResources affectedResources = new PlanAffectedResources(completePlan);
+
+		// Logging
+		if (log.isLoggable(Level.FINEST)) {
+			List<Action> actions = MotherOdin.getActionsFromPlan(completePlan);
+			log.finest("Generated plan actions: " + actions);
+		}
+		// if (log.isLoggable(Level.FINEST))
+		// log.finest("Affected resources: " + affectedResources);
+
+		MotherOdin.getInstance().appendConflictPlan(this, completePlan);
+		this.forbidenCell = null;
 	}
-
 }

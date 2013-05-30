@@ -9,6 +9,7 @@ package dk.dtu.ai.blueducks;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,14 +20,16 @@ import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.actions.NoOpAction;
+import dk.dtu.ai.blueducks.goals.ClearPathGoal;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
+import dk.dtu.ai.blueducks.map.State;
 import dk.dtu.ai.blueducks.merge.PlanAffectedResources;
 import dk.dtu.ai.blueducks.merge.PlanAnalyzer;
-import dk.dtu.ai.blueducks.merge.PlanMerger;
 import dk.dtu.ai.blueducks.merge.PlanAnalyzer.CommonResources;
+import dk.dtu.ai.blueducks.merge.PlanMerger;
 import dk.dtu.ai.blueducks.planner.GoalPlanner.GoalCost;
 
 /**
@@ -56,9 +59,11 @@ public class MotherOdin {
 
 	private List<PlanAffectedResources> affectedResources;
 
-	private List<LinkedList<Action>> unmergedPlans;
+	private List<List<State>> unmergedPlans;
 
 	private List<LinkedList<Action>> mergedPlans;
+
+	private List<List<State>> conflictSolvingPlans;
 
 	private boolean needMerging;
 
@@ -75,9 +80,12 @@ public class MotherOdin {
 		super();
 		agents = LevelMap.getInstance().getAgentsList();
 		// Init the plans list
-		unmergedPlans = new ArrayList<LinkedList<Action>>(agents.size());
+		unmergedPlans = new ArrayList<List<State>>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
-			unmergedPlans.add(new LinkedList<Action>());
+			unmergedPlans.add(null);
+		conflictSolvingPlans = new ArrayList<List<State>>(agents.size());
+		for (int i = 0; i < agents.size(); i++)
+			conflictSolvingPlans.add(null);
 		mergedPlans = new ArrayList<LinkedList<Action>>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
 			mergedPlans.add(new LinkedList<Action>());
@@ -98,7 +106,7 @@ public class MotherOdin {
 				// anymore
 				int boxIndex = map.getCurrentState().getCellsForBoxes().indexOf(goalCell);
 				Box boxOnGoal = null;
-				if(boxIndex != -1){
+				if (boxIndex != -1) {
 					boxOnGoal = boxes.get(boxIndex);
 				}
 				if (boxOnGoal != null && boxOnGoal.getId() == goalCells.getKey())
@@ -106,7 +114,7 @@ public class MotherOdin {
 				// Create goals for each of the boxes that could fulfill this goal
 				for (Box b : boxes)
 					if (b.getId() == goalCells.getKey()) {
-						//If the goal was already assigned to somebody else, ignore it.
+						// If the goal was already assigned to somebody else, ignore it.
 						DeliverBoxGoal newGoal = new DeliverBoxGoal(b, goalCell);
 						if (!agentsGoals.values().contains(newGoal))
 							topLevelGoals.add(new DeliverBoxGoal(b, goalCell));
@@ -140,6 +148,7 @@ public class MotherOdin {
 				if (mergedPlans.get(agent).isEmpty()) {
 					agents.get(agent).requestPlan();
 				}
+			log.info(unmergedPlans+"");
 			// TODO: Wait for synchronization when using multi-threading
 			mergePlans();
 
@@ -149,8 +158,8 @@ public class MotherOdin {
 				if (mergedPlans.get(agent).peek() != null) {
 					Action nextAction = mergedPlans.get(agent).remove();
 					actions.add(nextAction);
-					if (nextAction == unmergedPlans.get(agent).peek())
-						unmergedPlans.get(agent).remove(0);
+					// if (nextAction == unmergedPlans.get(agent).peek())
+					// unmergedPlans.get(agent).remove(0);
 				} else
 					actions.add(new NoOpAction());
 
@@ -185,34 +194,41 @@ public class MotherOdin {
 	}
 
 	private void mergePlans() {
+		// If there's no need for merging the plans, skip merging
 		if (!needMerging)
 			return;
+		// If there is only one agent, skip merging
 		if (agents.size() == 1) {
-			mergedPlans = unmergedPlans;
+			mergedPlans.set(0, getActionsFromPlan(unmergedPlans.get(0)));
 		}
 
-		// Check if plan merging is needed
+		log.info("Starting plan merging...");
+
+		// Check which agents are using same resources and merge only their plans together
 		List<CommonResources> possibleConflicts = PlanAnalyzer
 				.findPossibleConflictingAgents(affectedResources);
 		if (log.isLoggable(Level.FINEST))
 			log.finest("Possible conflicts: " + possibleConflicts);
 
-		log.info("Starting plan merging...");
 		// Start the merging of the plans for agents who use common resources
 		for (CommonResources c : possibleConflicts) {
 			// If it's only one agent, there is no need for merging
 			if (c.agents.size() == 1) {
 				short agent = c.agents.iterator().next();
 				log.fine("Not need for merging for agent " + agent);
-				mergedPlans.set(agent, unmergedPlans.get(agent));
+				mergedPlans.set(agent, getActionsFromPlan(unmergedPlans.get(agent)));
 			} else {
 				if (log.isLoggable(Level.FINE))
 					log.fine("Merging plans for agents: " + c.agents);
+				// Check if plans are mergeable
+				// TODO:
+				boolean mergeSuccessful = true;
+
 				// Prepare actions
 				Action[][] actions = new Action[c.agents.size()][];
 				int index = 0;
 				for (short agent : c.agents) {
-					List<Action> agentPlan = unmergedPlans.get(agent);
+					List<Action> agentPlan = getActionsFromPlan(unmergedPlans.get(agent));
 					actions[index++] = agentPlan.toArray(new Action[agentPlan.size()]);
 				}
 
@@ -224,13 +240,68 @@ public class MotherOdin {
 					for (short agent : c.agents)
 						this.mergedPlans.set(agent, mergePlansResult.get(index++));
 				} else {
-					// TODO: Do something to solve this situation
 					log.info("Could not find way to merge plans...");
+					if (c.agents.size() == 2) {
+						solveConflict(c);
+					} else {
+						log.severe("FAILED merge of multiple agents...");
+						// TODO: Do something or this as well
+					}
+					// Ask agents to come up with a solution
+
 				}
 			}
 		}
 		log.info("Merged plan: " + mergedPlans);
 		needMerging = false;
+	}
+
+	private void solveConflict(CommonResources c) {
+		Iterator<Short> it = c.agents.iterator();
+		short agent1 = it.next();
+		short agent2 = it.next();
+		List<State> plan1 = unmergedPlans.get(agent1);
+		List<State> plan2 = unmergedPlans.get(agent2);
+
+		// Request conflict solving solution to first agent
+		ClearPathGoal cpg1 = new ClearPathGoal(plan2, 0, plan2.size() - 1);
+		agents.get(agent1).requestPlanForConflictSolving(cpg1, plan1.get(0), plan2.get(0));
+
+		ClearPathGoal cpg2 = new ClearPathGoal(plan1, 0, plan1.size() - 1);
+		agents.get(agent2).requestPlanForConflictSolving(cpg2, plan2.get(0), plan1.get(0));
+		// TODO: Wait for synchronization when using multi-threading
+
+		// Now we have the conflict solving plans
+		short fixingAgent, waitingAgent;
+		//TODO: Handle situation where plans where not found
+		if (conflictSolvingPlans.get(agent1).size() <= conflictSolvingPlans.get(agent2).size()) {
+			fixingAgent = agent1;
+			waitingAgent = agent2;
+		} else {
+			fixingAgent = agent2;
+			waitingAgent = agent1;
+		}
+
+		// Add stuff to merged plans
+		mergedPlans.get(agent1).clear();
+		mergedPlans.get(agent2).clear();
+		// Add the fixing plan
+		mergedPlans.get(fixingAgent).addAll(getActionsFromPlan(conflictSolvingPlans.get(fixingAgent)));
+		mergedPlans.get(waitingAgent).addAll(
+				getActionsForEmptyPlan(conflictSolvingPlans.get(fixingAgent).size()));
+		// Add the other plan
+		mergedPlans.get(waitingAgent).addAll(getActionsFromPlan(unmergedPlans.get(waitingAgent)));
+		mergedPlans.get(fixingAgent).addAll(getActionsForEmptyPlan(unmergedPlans.get(waitingAgent).size()));
+
+		// Make the fixing agent replan when needed
+		agents.get(fixingAgent).resetCurrentSubgoal();
+
+		if (log.isLoggable(Level.FINE)) {
+			log.fine("Merged conflicted plans for fixing agent " + fixingAgent + ": "
+					+ mergedPlans.get(fixingAgent));
+			log.fine("Merged conflicted plans for waiting agent " + waitingAgent + ": "
+					+ mergedPlans.get(waitingAgent));
+		}
 	}
 
 	public void setMergedPlan(List<LinkedList<Action>> mergedPlan) {
@@ -271,9 +342,8 @@ public class MotherOdin {
 	 * @param plan the plan
 	 * @param affectedResources the resources affected by the plan
 	 */
-	public synchronized void appendPlan(Agent agent, List<Action> plan,
-			PlanAffectedResources affectedResources) {
-		this.unmergedPlans.get(agent.getId()).addAll(plan);
+	public synchronized void appendPlan(Agent agent, List<State> plan, PlanAffectedResources affectedResources) {
+		this.unmergedPlans.set(agent.getId(), plan);
 		this.affectedResources.set(agent.getId(), affectedResources);
 		this.needMerging = true;
 	}
@@ -338,12 +408,29 @@ public class MotherOdin {
 
 	/**
 	 * Append conflict plan.
-	 *
+	 * 
 	 * @param agent the agent
-	 * @param plan the plan
+	 * @param plan the plan, if one has been found, or null if no plan was identified
 	 */
-	public synchronized void appendConflictPlan(Agent agent, List<Action> plan){
-		
+	public synchronized void appendConflictPlan(Agent agent, List<State> plan) {
+		conflictSolvingPlans.set(agent.getId(), plan);
 	}
-	
+
+	public static LinkedList<Action> getActionsFromPlan(List<State> plan) {
+		// Prepare the actions, ignoring the first state in the plan (the current state)
+		LinkedList<Action> actions = new LinkedList<Action>();
+		Iterator<State> it=plan.iterator();
+		it.next();
+		while(it.hasNext())
+			actions.add((Action) it.next().getEdgeFromPrevNode());
+		return actions;
+	}
+
+	public static LinkedList<Action> getActionsForEmptyPlan(int planSize) {
+		LinkedList<Action> actions = new LinkedList<>();
+		for (int i = 0; i < planSize; i++)
+			actions.add(new NoOpAction());
+		return actions;
+	}
+
 }
