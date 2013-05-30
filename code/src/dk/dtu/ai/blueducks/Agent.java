@@ -24,6 +24,7 @@ import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
 import dk.dtu.ai.blueducks.goals.TopLevelClearAgentGoal;
 import dk.dtu.ai.blueducks.heuristics.ClearAgentHeuristic;
 import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristic;
+import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristicFactory;
 import dk.dtu.ai.blueducks.heuristics.MoveBoxHeuristic;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
@@ -131,7 +132,8 @@ public class Agent {
 		List<State> path = null;
 		if (goal instanceof GoToBoxGoal) {
 			GoToBoxGoal gtbGoal = (GoToBoxGoal) goal;
-			path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState, gtbGoal, new GoToBoxHeuristic());
+			GoToBoxHeuristicFactory ghf = new GoToBoxHeuristicFactory();
+			path = AStarSearch.<State, GoToBoxGoal> getBestPath(agentState, gtbGoal, ghf.getHeuristic());
 		} else if (goal instanceof MoveBoxGoal) {
 			MoveBoxGoal mbGoal = (MoveBoxGoal) goal;
 			path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState, mbGoal, new MoveBoxHeuristic());

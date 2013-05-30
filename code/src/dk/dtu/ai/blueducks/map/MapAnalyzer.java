@@ -46,6 +46,8 @@ public class MapAnalyzer {
 	
 	private static Map<Cell, Map<Cell, Number>> distances;
 	
+	private static int MapHashCode = 0;
+	
 	public MapAnalyzer() {
 		distances = new HashMap<Cell, Map<Cell, Number>>();
 	}
@@ -66,7 +68,7 @@ public class MapAnalyzer {
 		//computeDeadEnds();
 		computeNeighbourGoals();
 	}
-	
+		
 	public static MapAnalyzer getInstance() {
 		if (MapAnalyzer.analyzer == null) {
 			MapAnalyzer.analyzer = new MapAnalyzer();
