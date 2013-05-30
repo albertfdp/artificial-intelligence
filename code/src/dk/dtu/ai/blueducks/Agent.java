@@ -374,9 +374,4 @@ public class Agent {
 			return false;
 		return true;
 	}
-<<<<<<< HEAD
-
-=======
-	
->>>>>>> branch 'master' of https://github.com/ullfoll/artificial-intelligence.git
 }
