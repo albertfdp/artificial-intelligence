@@ -17,14 +17,12 @@ import java.util.logging.Logger;
 import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.actions.NoOpAction;
 import dk.dtu.ai.blueducks.goals.ClearAgentGoal;
-import dk.dtu.ai.blueducks.goals.ClearBoxGoal;
 import dk.dtu.ai.blueducks.goals.ClearPathGoal;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
 import dk.dtu.ai.blueducks.goals.TopLevelClearAgentGoal;
 import dk.dtu.ai.blueducks.heuristics.ClearAgentHeuristic;
-import dk.dtu.ai.blueducks.heuristics.ClearBoxHeuristic;
 import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristic;
 import dk.dtu.ai.blueducks.heuristics.MoveBoxHeuristic;
 import dk.dtu.ai.blueducks.map.Cell;
@@ -141,10 +139,6 @@ public class Agent {
 			ClearAgentGoal caGoal = (ClearAgentGoal) goal;
 			path = AStarSearch.<State, ClearAgentGoal> getBestPath(agentState, caGoal,
 					new ClearAgentHeuristic());
-		} else if (goal instanceof ClearBoxGoal) {
-			ClearBoxGoal caGoal = (ClearBoxGoal) goal;
-			path = AStarSearch.<State, ClearBoxGoal> getBestPath(agentState, caGoal,
-					new ClearBoxHeuristic());
 		}
 		return path;
 	}
@@ -160,6 +154,7 @@ public class Agent {
 		Goal newGoal = MotherOdin.getInstance().getGoalForAgent(this);
 		// If he now doest not have a goal, just exit
 		if (newGoal == null) {
+			this.currentGoal = null;
 			MotherOdin.getInstance().agentHasNoGoal(this);
 			// TODO: For multithreading, take care
 			return;
@@ -181,6 +176,7 @@ public class Agent {
 		// If there are no more subgoals that need to be satisfied
 		if (currentSubgoalIndex >= this.subgoals.size()) {
 			log.info("Finished planning for all subgoals.");
+			this.currentGoal = null;
 			MotherOdin.getInstance().finishedTopLevelGoal(this, this.currentGoal);
 			return;
 		}
@@ -198,12 +194,20 @@ public class Agent {
 		List<State> plan = computePlanStates(subgoal, agentState);
 		// TODO: Needs checking...
 		if (plan == null) {
-			log.finest("No plan found for goal.");
-			currentSubgoalIndex--; // Stick to the same subgoal as before
-			List<State> emptyPlan = new LinkedList<State>();
-			emptyPlan.add(agentState);
-			MotherOdin.getInstance().appendPlan(this, emptyPlan, new PlanAffectedResources());
-			return;
+			log.finest("No plan found for goal using classic approach. Exploring while ignoring boes of other colors.");
+			// Try to see if a path is found ignoring boxes of other colors
+			agentState.clearBoxesOfOtherColor();
+			plan = computePlanStates(subgoal, agentState);
+			if (plan == null) {
+				log.info("No possible plan found.");
+				currentSubgoalIndex--; // Stick to the same subgoal as before
+				List<State> emptyPlan = new LinkedList<State>();
+				emptyPlan.add(agentState);
+				MotherOdin.getInstance().appendPlan(this, emptyPlan, new PlanAffectedResources());
+				return;
+			}
+			// TODO :finish this
+
 		}
 
 		// Prepare the affected resources
