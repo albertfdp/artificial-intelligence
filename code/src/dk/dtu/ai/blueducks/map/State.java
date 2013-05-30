@@ -43,9 +43,6 @@ public class State extends AStarNode {
 
 	/** The agent. */
 	Agent agent;
-
-	/** The boxes in goal cell. */
-	List<Box> boxesInGoalCell = new ArrayList<Box>();
 	
 	private int computedHashCode;
 
@@ -213,7 +210,9 @@ public class State extends AStarNode {
 	 * @return the celll visibility
 	 */
 	public CellVisibility isFree(Cell cell) {
-		if (cell == null || occupiedCells.get(cell.uniqueId) || cell == agentCell || LevelMap.getInstance().getCellAt(cell.x, cell.y) == null || agent.forbidenCell == cell)
+		if (cell == null || occupiedCells.get(cell.uniqueId) || cell == agentCell || LevelMap.getInstance().getCellAt(cell.x, cell.y) == null)
+			return CellVisibility.NOT_FREE;
+		if(agent!=null && agent.forbidenCell == cell)
 			return CellVisibility.NOT_FREE;
 		// TODO: where will we use the fact that the cell might/ might not be free
 		if (LevelMap.getInstance().isVerified(cell))
@@ -283,16 +282,6 @@ public class State extends AStarNode {
 				+ ", previousAction=" + previousAction + "]";
 	}
 
-	public List<Box> getBoxesInGoalCells() {
-		List<Box> boxList = LevelMap.getInstance().getBoxesList();
-		for (Box box : boxList) {
-			if (LevelMap.getInstance().getGoals().get(box.getId()).contains(cellsForBoxes.get(box.uniqueId))) {
-				boxesInGoalCell.add(box);
-			}
-		}
-		return boxesInGoalCell;
-	}
-
 	@Override
 	public int hashCode() {
 
@@ -329,11 +318,6 @@ public class State extends AStarNode {
 			if (other.agentCell != null)
 				return false;
 		} else if (!agentCell.equals(other.agentCell))
-			return false;
-		if (boxesInGoalCell == null) {
-			if (other.boxesInGoalCell != null)
-				return false;
-		} else if (!boxesInGoalCell.equals(other.boxesInGoalCell))
 			return false;
 		if (cellsForBoxes == null) {
 			if (other.cellsForBoxes != null)

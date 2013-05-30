@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import dk.dtu.ai.blueducks.Agent;
+import dk.dtu.ai.blueducks.goals.ClearPathGoal;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.TopLevelClearAgentGoal;
@@ -47,7 +48,12 @@ public class GoalPlanner {
 				TopLevelClearAgentGoal tlcag=(TopLevelClearAgentGoal) g;
 				if(tlcag.getAgentToBeCleared()==agent)
 					agentGoals.add(tlcag);
-				
+			}
+			else if(g instanceof ClearPathGoal)
+			{
+				ClearPathGoal cpg=(ClearPathGoal)g;
+				if(cpg.getBox().getColor().equals(agent.getColor()))
+					agentGoals.add(cpg);
 			}
 		}
 
