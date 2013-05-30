@@ -12,7 +12,7 @@ import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 
 public class GoalSplitter {
-	
+
 	/** The Constant logger. */
 	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
 
@@ -25,7 +25,7 @@ public class GoalSplitter {
 	 */
 	public List<Goal> getSubgoal(Goal goal, Agent agent) {
 		List<Goal> subgoals = new ArrayList<Goal>();
-		
+
 		if (goal instanceof DeliverBoxGoal) {
 			subgoals = splitDeliverBoxGoal((DeliverBoxGoal) goal, agent);
 		} else if (goal instanceof ClearPathGoal) {
@@ -33,23 +33,24 @@ public class GoalSplitter {
 		} else if (goal instanceof TopLevelClearAgentGoal) {
 			TopLevelClearAgentGoal tlcag = (TopLevelClearAgentGoal) goal;
 			subgoals.add((Goal) new ClearAgentGoal(tlcag.getCells()));
+		} else if (goal instanceof WaitGoal) {
+			subgoals.add(goal);
 		}
 		return subgoals;
 	}
-	
+
 	private List<Goal> splitClearPathGoal(Goal goal, Agent agent) {
 		List<Goal> subgoals = new ArrayList<Goal>();
-		
-		
+
 		ClearPathGoal cpg = (ClearPathGoal) goal;
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
-		
+
 		// get the list of cells to be cleared
 		Set<Cell> cellsToBeCleared = cpg.getCells();
-		
+
 		// get the box to be cleared, if any
 		Box boxToClear = cpg.getBox();
-		
+
 		// go to box
 		if (boxToClear != null) {
 			Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(boxToClear);
@@ -57,27 +58,25 @@ public class GoalSplitter {
 				subgoals.add((Goal) new GoToBoxGoal(agentCell, boxCell));
 			subgoals.add((Goal) new ClearBoxGoal(boxToClear, cellsToBeCleared));
 		}
-		subgoals.add((Goal) new ClearAgentGoal(cellsToBeCleared));		
-	
-		
+		subgoals.add((Goal) new ClearAgentGoal(cellsToBeCleared));
+
 		return subgoals;
 	}
-	
+
 	private List<Goal> splitDeliverBoxGoal(DeliverBoxGoal dbg, Agent agent) {
 		List<Goal> subgoals = new ArrayList<Goal>();
-		
+
 		Cell goalCell = dbg.getTo();
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
 		Box box = dbg.getWhat();
 		Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(box);
-		
+
 		// if the agent and the box are not neighbours, it is a GoToBoxGoal
 		if (!agentCell.getNeighbours().contains(boxCell))
 			subgoals.add((Goal) new GoToBoxGoal(agentCell, boxCell));
-		
+
 		// check if the path from the box to the goal is clean, and clean it or ask for help
-		
-		
+
 		subgoals.add((Goal) new MoveBoxGoal(box, goalCell));
 
 		return subgoals;

@@ -16,6 +16,7 @@ import dk.dtu.ai.blueducks.goals.ClearPathGoal;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.TopLevelClearAgentGoal;
+import dk.dtu.ai.blueducks.goals.WaitGoal;
 import dk.dtu.ai.blueducks.heuristics.GoalPlannerHeuristic;
 
 public class GoalPlanner {
@@ -42,19 +43,20 @@ public class GoalPlanner {
 				DeliverBoxGoal deliverBoxg = (DeliverBoxGoal) g;
 				if (deliverBoxg.getWhat().getColor().equals(agent.getColor()))
 					agentGoals.add(deliverBoxg);
-			}
-			else if(g instanceof TopLevelClearAgentGoal)
-			{
-				TopLevelClearAgentGoal tlcag=(TopLevelClearAgentGoal) g;
-				if(tlcag.getAgentToBeCleared()==agent)
+			} else if (g instanceof TopLevelClearAgentGoal) {
+				TopLevelClearAgentGoal tlcag = (TopLevelClearAgentGoal) g;
+				if (tlcag.getAgentToBeCleared() == agent)
 					agentGoals.add(tlcag);
-			}
-			else if(g instanceof ClearPathGoal)
-			{
-				ClearPathGoal cpg=(ClearPathGoal)g;
-				if(cpg.getBox().getColor().equals(agent.getColor()))
+			} else if (g instanceof ClearPathGoal) {
+				ClearPathGoal cpg = (ClearPathGoal) g;
+				if (cpg.getBox().getColor().equals(agent.getColor()))
 					agentGoals.add(cpg);
+			} else if (g instanceof WaitGoal) {
+				WaitGoal wg = (WaitGoal) g;
+				if (wg.getTargetAgent() == this.agent)
+					agentGoals.add(wg);
 			}
+
 		}
 
 		return agentGoals;
