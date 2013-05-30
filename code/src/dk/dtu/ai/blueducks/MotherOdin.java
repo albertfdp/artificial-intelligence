@@ -349,7 +349,7 @@ public class MotherOdin {
 						for (short agent : c.agents)
 							if (agent != chosenAgent) {
 								MotherOdin.getInstance().addRequestedGoal(
-										new WaitGoal(minSize, agents.get(agent)));
+										new WaitGoal(minSize+1, agents.get(agent)));
 								mergedPlans.get(agent).clear();
 							}
 						// Trigger replanning
