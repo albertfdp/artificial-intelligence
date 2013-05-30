@@ -141,6 +141,8 @@ public class MotherOdin {
 		mergePlans();
 
 		while (true) {
+			if (currentLoop == 330)
+				log.info("Here");
 			log.info("Starting loop " + (++currentLoop) + "...");
 
 			// Check if any agent is out of actions
@@ -177,26 +179,27 @@ public class MotherOdin {
 				else {
 					log.fine("Action not successful: " + a);
 					jointActionSuccessful = false;
+					a.updateBeliefsActionFailed();
 				}
 
 			// Notify the agents that something has changed
 			if (!jointActionSuccessful) {
 				log.info("Triggering agent replanning!");
-				// TODO: Optimize this...
 				generateTopLevelGoals();
-				assignAgentsGoals();
-				for (int a = 0; a < agents.size(); a++)
-					// By clearing the plan, a new plan will be requested at the beginning of the
-					// next loop
+				for (int a = 0; a < agents.size(); a++) { // By clearing the plan, a new plan will
+															// be requested at the beginning of the
+															// next loop
 					mergedPlans.get(a).clear();
+					agents.get(a).decreaseCurrentSubgoal();
+				}
 			}
 		}
 	}
 
-	private void mergePlans() {
+	private boolean mergePlans() {
 		// If there's no need for merging the plans, skip merging
 		if (!pendingMerge)
-			return;
+			return true;
 		// If there is only one agent, skip merging
 		if (agents.size() == 1) {
 			mergedPlans.set(0, getActionsFromPlan(unmergedPlans.get(0)));
@@ -267,18 +270,27 @@ public class MotherOdin {
 				} else {
 					log.info("Could not find way to merge plans...");
 					if (c.agents.size() == 2) {
+						// Ask agents to come up with a solution
 						solveConflict(c);
 					} else {
-						log.severe("FAILED merge of multiple agents...");
-						// TODO: Do something or this as well
+
+						int countAgentsWithoutPlan = 0;
+						for (short agent : c.agents) {
+							if (agents.get(agent).getCurrentGoal() == null)
+								countAgentsWithoutPlan++;
+						}
+						if (!(countAgentsWithoutPlan == c.agents.size() - 1))
+							log.severe("FAILED merge of multiple agents...");
+						else{
+							
+						}
 					}
-					// Ask agents to come up with a solution
 
 				}
 			}
 		}
 		Arrays.fill(needMerging, false);
-		pendingMerge = false;
+		return true;
 	}
 
 	private void solveConflict(CommonResources c) {

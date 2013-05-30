@@ -84,10 +84,9 @@ public class MoveAction extends Action {
 		return "MoveAction ["+agent+", aDir=" + agentDirection + "]";
 	}
 	
-	public void invalidateAction(){
+	public void updateBeliefsActionFailed(){
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
 		Cell destCell = agentCell.getNeighbour(agentDirection);
-		//TODO: continue
 		LevelMap.getInstance().setAsWall(destCell.x, destCell.y);
 	}
 	

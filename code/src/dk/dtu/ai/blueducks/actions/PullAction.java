@@ -139,7 +139,7 @@ public class PullAction extends Action {
 		return nextState;
 	}
 
-	public void invalidateAction(){
+	public void updateBeliefsActionFailed(){
 		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
 		Cell destCell = agentCell.getNeighbour(agentDirection);
 		LevelMap.getInstance().setAsWall(destCell.x, destCell.y);

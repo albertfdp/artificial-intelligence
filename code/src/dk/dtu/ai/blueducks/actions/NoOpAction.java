@@ -30,7 +30,7 @@ public class NoOpAction extends Action {
 	public State getNextState(State state) {
 		return state;
 	}
-	public void invalidateAction(){
+	public void updateBeliefsActionFailed(){
 	}
 
 	@Override
