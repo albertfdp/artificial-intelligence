@@ -21,6 +21,7 @@ import dk.dtu.ai.blueducks.goals.ClearPathGoal;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
+import dk.dtu.ai.blueducks.goals.TopLevelClearAgentGoal;
 import dk.dtu.ai.blueducks.heuristics.ClearAgentHeuristic;
 import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristic;
 import dk.dtu.ai.blueducks.heuristics.MoveBoxHeuristic;
@@ -133,7 +134,7 @@ public class Agent {
 		} else if (goal instanceof ClearAgentGoal) {
 			ClearAgentGoal caGoal = (ClearAgentGoal) goal;
 			path = AStarSearch.<State, ClearAgentGoal> getBestPath(agentState, caGoal, new ClearAgentHeuristic());
-		}
+		} 
 		
 		return path;
 	}
