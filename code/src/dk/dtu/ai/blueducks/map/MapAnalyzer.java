@@ -28,7 +28,7 @@ public class MapAnalyzer {
 	/** The analyzer. */
 	private static MapAnalyzer analyzer;
 	
-	private final static int MAX_NUMBER_VERTEX = 2386;
+	private final static int MAX_NUMBER_VERTEX = 60 * 60;
 	
 	private static final Logger logger = Logger.getLogger(MapAnalyzer.class.getSimpleName());
 	
