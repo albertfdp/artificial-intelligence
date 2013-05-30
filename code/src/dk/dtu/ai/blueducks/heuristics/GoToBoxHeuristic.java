@@ -20,78 +20,142 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 	
 	@Override
 	public float getHeuristicValue(State state, GoToBoxGoal goal, State prevState) {
-		return getBestHeuristic(state, goal, prevState);
+		return getFOSAMASters(state, goal, prevState);
 	}
 	
-	public float getHanoiHeuristicValue(State state, GoToBoxGoal goal, State prevState) {
-		float h = 0;
+	/*
+	 * PinkPantherHeuristic
+	 */
+	public float getPinkPantherHeuristic(State state, GoToBoxGoal goal, State prevState) {
+		
+		float h = 1;
 		
 		float a0 = 1; // distance
-		float a1 = 2; // penalize actions other than move
-		float a2 = 50; // penalize leaving boxes with high betweenness
-		float a3 = 0; // penalize undoing goals
-		float a4 = 1; // do not block goals
+		float a1 = 1; // penalize being sorrounded by boxes
 		
-		float isMoveAction = 1;
-		float betweennessBox = 0;
+		Cell agentCell = state.getAgentCell();
+		Cell goalCell = goal.getTo();
 		
-		Cell cellAgent = state.getAgentCell();
-		Cell cellGoal = goal.getTo();
-		float distance = LevelMap.getInstance().getDistance(cellAgent, cellGoal);
+		float distance = LevelMap.getInstance().getDistance(agentCell, goalCell);
+		
+		List<Cell> neighbours = agentCell.getCellNeighbours();
+		int numNeighbourBoxes = 0;
+		for (Cell neighbour : neighbours) {
+			if (neighbour != null && state.getOccupiedCells().get(neighbour.uniqueId))
+				numNeighbourBoxes++;
+		}
+		if (numNeighbourBoxes == 4)
+				a1 = 1000;
 		
 		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
 			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
-			Cell cellBox = state.getCellForBox(pullAction.getBox());
-			Cell cellBoxPrevious = prevState.getCellForBox(pullAction.getBox());
-			
-			// penalize undoing goals
-			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
-				a3 = 1;
-			}
-			
-			if (MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue()
-					>= MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBoxPrevious).floatValue()) {
-				h += 100;
-			} else {
-				h -= 10;
-			}
-			
-			// check if by resolving this goal, we block other goals
-			Set<Set<Cell>> groups = MapAnalyzer.getNeighbourGoals();
-			
-			
-			betweennessBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue();
-			isMoveAction = 0;
-			
 		} else if (prevState != null && state.getEdgeFromPrevNode() instanceof PushAction) {
 			PushAction pushAction = (PushAction) state.getEdgeFromPrevNode();
-			Cell cellBox = state.getCellForBox(pushAction.getBox());
-			Cell cellBoxPrevious = prevState.getCellForBox(pushAction.getBox());
-			
-			// penalize undoing goals
-			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
-				a3 = 1;
-			}
-			
-			if (MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue()
-					>= MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBoxPrevious).floatValue()) {
-				h += 100;
-			} else {
-				h -= 10;
-			}
-			
-			betweennessBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue();
-			isMoveAction = 0;
 		}
 		
-		h = a0 * distance + a1 * isMoveAction + a2 * betweennessBox + a3 * Heuristic.PENALTY_UNDO_GOAL;
+		h = a0 * distance + a1;
 		
 		return h;
 	}
 	
-	public float getBestHeuristic(State state, GoToBoxGoal goal, State prevState) {
+	public float getFOSAMASters(State state, GoToBoxGoal goal, State prevState) {
 		float h = 1;
-		
+
+		float a0 = 100; // distance
+		float a1 = 0; // penalize actions other than move
+		float a2 = 1000; // penalize leaving boxes in cells with high betweenness
+		float a3 = 0; // penalize leaving boxes in goal cells
+		float a4 = 0; // penalize blocking goals
+		float a5 = 0; // penalize undoing goals
+		float a6 = 0; // reward pulling
+
+		Cell cellAgent = state.getAgentCell();
+		Cell cellGoal = goal.getTo();
+
+		float distance = LevelMap.getInstance().getDistance(cellAgent, cellGoal);
+		float isNotMoveAction = 0;
+		float betweennessCellBox = 0;
+
+		List<Cell> allGoals = LevelMap.getInstance().getAllGoals();
+		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
+		Map<Cell, Double> nbc = MapAnalyzer.getNormalizedBetweennessCentrality();
+
+		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
+			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
+
+			Cell cellBox = state.getCellForBox(pullAction.getBox());
+			Cell cellBoxPrevious = prevState.getCellForBox(pullAction.getBox());
+
+			Cell cellAgentPrevious = prevState.getAgentCell();
+			isNotMoveAction = 100;
+			
+			betweennessCellBox = nbc.get(cellBox).floatValue();
+
+			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
+				a5 = 1;
+			}
+
+			for (Cell otherGoalCell : allGoals) {
+				if (otherGoalCell != cellGoal && otherGoalCell == cellBox)
+					a3 = 1;
+			}
+
+			// check if resolving this goal, locks other goals
+			for (Set<Cell> groupOfGoals : groupsOfGoals) {
+				if (groupOfGoals.contains(cellBox)) {
+					boolean hasLargestBetweenness = true;
+					for (Cell cellGroup : groupOfGoals) {
+						if (nbc.get(cellGroup) > betweennessCellBox)
+							hasLargestBetweenness = false;
+					}
+					if (hasLargestBetweenness)
+						a4 = 1;
+				}
+			}
+
+
+		} else if (prevState != null && state.getEdgeFromPrevNode() instanceof PushAction) {
+			PushAction pushAction = (PushAction) state.getEdgeFromPrevNode();
+
+			Cell cellBox = state.getCellForBox(pushAction.getBox());
+			Cell cellBoxPrevious = prevState.getCellForBox(pushAction.getBox());
+			isNotMoveAction = 1;
+
+			betweennessCellBox = nbc.get(cellBox).floatValue();
+
+			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
+				a5 = 1;
+			}
+
+			for (Cell otherGoalCell : allGoals) {
+				if (otherGoalCell != cellGoal && otherGoalCell == cellBox)
+					a3 = 1;
+			}
+
+			// check if resolving this goal, locks other goals
+			for (Set<Cell> groupOfGoals : groupsOfGoals) {
+				if (groupOfGoals.contains(cellBox)) {
+					boolean hasLargestBetweenness = true;
+					for (Cell cellGroup : groupOfGoals) {
+						if (nbc.get(cellGroup) > betweennessCellBox)
+							hasLargestBetweenness = false;
+					}
+					if (hasLargestBetweenness)
+						a4 = 1;
+				}
+			}
+		}
+
+		h = a0 * distance + a1 * isNotMoveAction + a2 * betweennessCellBox + a3 * Heuristic.PENALTY_OTHER_GOALS_CELLS 
+				+ a4 * Heuristic.PENALTY_LOCK_GOAL + a5 * Heuristic.PENALTY_UNDO_GOAL * 10 + a6;
+
+		return h;
+	}
+	
+	
+	public float getFOSAFAVASHeuristic(State state, GoToBoxGoal goal, State prevState) {
+		float h = 1;
+
 		float a0 = 100; // distance
 		float a1 = 0; // penalize actions other than move
 		float a2 = 1000; // penalize leaving boxes in cells with high betweenness
@@ -99,27 +163,27 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 		float a4 = 0; // penalize blocking goals
 		float a5 = 0; // penalize undoing goals
 		float a6 = 0; // penalize pulling in dead ends
-		
+
 		Cell cellAgent = state.getAgentCell();
 		Cell cellGoal = goal.getTo();
-		
+
 		float distance = LevelMap.getInstance().getDistance(cellAgent, cellGoal);
 		float isNotMoveAction = 0;
 		float betweennessCellBox = 0;
-		
+
 		List<Cell> allGoals = LevelMap.getInstance().getAllGoals();
 		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
 		Map<Cell, Double> nbc = MapAnalyzer.getNormalizedBetweennessCentrality();
-		
+
 		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
 			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
-			
+
 			Cell cellBox = state.getCellForBox(pullAction.getBox());
 			Cell cellBoxPrevious = prevState.getCellForBox(pullAction.getBox());
-			
+
 			Cell cellAgentPrevious = prevState.getAgentCell();
 			isNotMoveAction = 100;
-			
+
 			/*
 			Set<List<Cell>> deadEnds = MapAnalyzer.getInstance().getDeadEnds();
 			for (List<Cell> deadEnd : deadEnds) {
@@ -132,18 +196,18 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 				}
 				
 			}*/
-			
+
 			betweennessCellBox = nbc.get(cellBox).floatValue();
-						
+
 			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
 				a5 = 1;
 			}
-			
+
 			for (Cell otherGoalCell : allGoals) {
 				if (otherGoalCell != cellGoal && otherGoalCell == cellBox)
 					a3 = 1;
 			}
-			
+
 			// check if resolving this goal, locks other goals
 			for (Set<Cell> groupOfGoals : groupsOfGoals) {
 				if (groupOfGoals.contains(cellBox)) {
@@ -156,26 +220,120 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 						a4 = 1;
 				}
 			}
-			
-			
+
+
 		} else if (prevState != null && state.getEdgeFromPrevNode() instanceof PushAction) {
 			PushAction pushAction = (PushAction) state.getEdgeFromPrevNode();
-			
+
 			Cell cellBox = state.getCellForBox(pushAction.getBox());
 			Cell cellBoxPrevious = prevState.getCellForBox(pushAction.getBox());
 			isNotMoveAction = 1;
-			
+
 			betweennessCellBox = nbc.get(cellBox).floatValue();
-			
+
 			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
 				a5 = 1;
 			}
-			
+
 			for (Cell otherGoalCell : allGoals) {
 				if (otherGoalCell != cellGoal && otherGoalCell == cellBox)
 					a3 = 1;
 			}
-			
+
+			// check if resolving this goal, locks other goals
+			for (Set<Cell> groupOfGoals : groupsOfGoals) {
+				if (groupOfGoals.contains(cellBox)) {
+					boolean hasLargestBetweenness = true;
+					for (Cell cellGroup : groupOfGoals) {
+						if (nbc.get(cellGroup) > betweennessCellBox)
+							hasLargestBetweenness = false;
+					}
+					if (hasLargestBetweenness)
+						a4 = 1;
+				}
+			}
+		}
+
+		h = a0 * distance + a1 * isNotMoveAction + a2 * betweennessCellBox + a3 * Heuristic.PENALTY_OTHER_GOALS_CELLS 
+				+ a4 * Heuristic.PENALTY_LOCK_GOAL + a5 * Heuristic.PENALTY_UNDO_GOAL + a6;
+
+		return h;
+	}
+	
+	public float getBlueDucksHeuristic(State state, GoToBoxGoal goal, State prevState) {
+		float h = 1;
+
+		float a0 = 100; // distance
+		float a1 = 0; // penalize actions other than move
+		float a2 = 1000; // penalize leaving boxes in cells with high betweenness
+		float a3 = 0; // penalize leaving boxes in goal cells
+		float a4 = 0; // penalize blocking goals
+		float a5 = 0; // penalize undoing goals
+		float a6 = 0; // penalize being blocked by boxes
+
+		Cell cellAgent = state.getAgentCell();
+		Cell cellGoal = goal.getTo();
+
+		float distance = LevelMap.getInstance().getDistance(cellAgent, cellGoal);
+		float isNotMoveAction = 0;
+		float betweennessCellBox = 0;
+
+		List<Cell> allGoals = LevelMap.getInstance().getAllGoals();
+		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
+		Map<Cell, Double> nbc = MapAnalyzer.getNormalizedBetweennessCentrality();
+		
+		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
+			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
+
+			Cell cellBox = state.getCellForBox(pullAction.getBox());
+			Cell cellBoxPrevious = prevState.getCellForBox(pullAction.getBox());
+
+			Cell cellAgentPrevious = prevState.getAgentCell();
+			isNotMoveAction = 100;
+
+			betweennessCellBox = nbc.get(cellBox).floatValue();
+
+			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
+				a5 = 1;
+			}
+
+			for (Cell otherGoalCell : allGoals) {
+				if (otherGoalCell != cellGoal && otherGoalCell == cellBox)
+					a3 = 1;
+			}
+
+			// check if resolving this goal, locks other goals
+			for (Set<Cell> groupOfGoals : groupsOfGoals) {
+				if (groupOfGoals.contains(cellBox)) {
+					boolean hasLargestBetweenness = true;
+					for (Cell cellGroup : groupOfGoals) {
+						if (nbc.get(cellGroup) > betweennessCellBox)
+							hasLargestBetweenness = false;
+					}
+					if (hasLargestBetweenness)
+						a4 = 1;
+				}
+			}
+
+
+		} else if (prevState != null && state.getEdgeFromPrevNode() instanceof PushAction) {
+			PushAction pushAction = (PushAction) state.getEdgeFromPrevNode();
+
+			Cell cellBox = state.getCellForBox(pushAction.getBox());
+			Cell cellBoxPrevious = prevState.getCellForBox(pushAction.getBox());
+			isNotMoveAction = 1;
+
+			betweennessCellBox = nbc.get(cellBox).floatValue();
+
+			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
+				a5 = 1;
+			}
+
+			for (Cell otherGoalCell : allGoals) {
+				if (otherGoalCell != cellGoal && otherGoalCell == cellBox)
+					a3 = 1;
+			}
+
 			// check if resolving this goal, locks other goals
 			for (Set<Cell> groupOfGoals : groupsOfGoals) {
 				if (groupOfGoals.contains(cellBox)) {
@@ -190,53 +348,18 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 			}
 		}
 		
+		List<Cell> neighbours = cellAgent.getCellNeighbours();
+		int numNeighbourBoxes = 0;
+		for (Cell neighbour : neighbours) {
+			if (neighbour != null && state.getOccupiedCells().get(neighbour.uniqueId))
+				numNeighbourBoxes++;
+		}
+		if (numNeighbourBoxes == 4)
+				a6 = 1000;
+
 		h = a0 * distance + a1 * isNotMoveAction + a2 * betweennessCellBox + a3 * Heuristic.PENALTY_OTHER_GOALS_CELLS 
 				+ a4 * Heuristic.PENALTY_LOCK_GOAL + a5 * Heuristic.PENALTY_UNDO_GOAL + a6;
-		
-		return h;
-	}
-		
-	public float getPreviousHeuristic(State state, GoToBoxGoal goal, State prevState) {
-		float h = 1;
-		
-		Cell cellAgent = state.getAgentCell();
-		Cell cellGoal = goal.getTo();
-		
-		float distance = LevelMap.getInstance().getDistance(cellAgent, cellGoal);
-		
-		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
-			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
-			Cell cellBox = state.getCellForBox(pullAction.getBox());
-			Cell cellBoxPrevious = prevState.getCellForBox(pullAction.getBox());
-			
-			// don't put the box in a high betweenness cell
-			float betweennessCellBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue();
-			h += 1000 * betweennessCellBox;
-			
-			// don't unlock goals
-			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
-				h += Heuristic.PENALTY_UNDO_GOAL;
-			}
-			
-		} else if (prevState != null && state.getEdgeFromPrevNode() instanceof PushAction) {
-			PushAction pushAction = (PushAction) state.getEdgeFromPrevNode();
-			
-			Cell cellBox = state.getCellForBox(pushAction.getBox());
-			Cell cellBoxPrevious = prevState.getCellForBox(pushAction.getBox());
-			
-			// don't put the box in a high betweenness cell
-			float betweennessCellBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue();
-			h += 1000 * betweennessCellBox;
-			
-			// don't unlock goals
-			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
-				h += Heuristic.PENALTY_UNDO_GOAL;
-			}
-			
-		}
-		
-		h += h * distance;
-		
+
 		return h;
 	}
 
