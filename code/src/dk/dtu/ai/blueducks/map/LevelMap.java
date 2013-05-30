@@ -181,7 +181,7 @@ public class LevelMap {
 			this.boxesList.add(null);
 		
 		for(Entry<Cell, Box> entry : boxes.entrySet()) {
-			logger.info("LOOP BOX ATTACH");
+			
 			this.boxesList.set(entry.getValue().uniqueId, entry.getValue());
 			entry.getValue().computePowerHashValue();
 		}
@@ -189,7 +189,23 @@ public class LevelMap {
 			agent.computePowerHashValue();
 		}
 		this.currentState.setInitalBoxesInLevelMap(boxes);
+		
+		logger.info("Hash code: " + this.hashCode());
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((agentCells == null) ? 0 : agentCells.hashCode());
+		result = prime * result + ((allGoals == null) ? 0 : allGoals.hashCode());
+		result = prime * result + ((boxesList == null) ? 0 : boxesList.hashCode());
+		result = prime * result + ((goals == null) ? 0 : goals.hashCode());
+		result = prime * result + height;
+		result = prime * result + width;
+		return result;
+	}
+
 
 	public List<Cell> getCells() {
 		List<Cell> cells = new ArrayList<Cell>();
