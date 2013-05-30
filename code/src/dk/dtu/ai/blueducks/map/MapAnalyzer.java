@@ -42,7 +42,7 @@ public class MapAnalyzer {
 	
 	private static Set<List<Cell>> deadEnds;
 	
-	private static Set<Set<Cell>> neighbourGoals;
+	private static Set<List<Cell>> neighbourGoals;
 	
 	private static Map<Cell, Map<Cell, Number>> distances;
 	
@@ -219,11 +219,12 @@ public class MapAnalyzer {
 		MapAnalyzer.neighbourGoals = mergeListsCells(groupsGoals);
 	}
 	
-	private Set<Set<Cell>> mergeListsCells(Set<Set<Cell>> groups) {
-		Set<Set<Cell>> merged = new HashSet<Set<Cell>>();
+	private Set<List<Cell>> mergeListsCells(Set<Set<Cell>> groups) {
+
+		Set<List<Cell>> merged = new HashSet<List<Cell>>();
 		for (Set<Cell> groupA : groups) {
 			boolean alreadyMerged = false;
-			for (Set<Cell> mergedGroups : merged) {
+			for (List<Cell> mergedGroups : merged) {
 				if (mergedGroups.containsAll(groupA)) {
 					alreadyMerged = true;
 					break;
@@ -231,14 +232,29 @@ public class MapAnalyzer {
 			}
 			if (alreadyMerged)
 				continue;
-			Set<Cell> union = new HashSet<Cell>(groupA);
+			List<Cell> union = new ArrayList<Cell>(groupA);
 			for (Set<Cell> groupB : groups) {
 				Set<Cell> intersection = new HashSet<Cell>(union);
 				intersection.retainAll(groupB);
 				if (intersection.size() > 0) {
-					union.addAll(groupB);
+					for (Cell cellB : groupB) {
+						if (!union.contains(cellB))
+							union.add(cellB);
+					}
+					//union.addAll(groupB);
 				} 
 			}
+			Collections.sort(union, new Comparator<Cell>() {
+
+				@Override
+				public int compare(Cell o1, Cell o2) {
+					double b1 = normalizedBetweennessCentrality.get(o1).doubleValue();
+					double b2 = normalizedBetweennessCentrality.get(o2).doubleValue();
+					
+					return b1 < b2 ? -1 : b1 > b2 ? 1 : 0;
+				}
+				
+			});
 			merged.add(union);
 		}
 		return merged;
@@ -270,7 +286,7 @@ public class MapAnalyzer {
 		return degreeCentrality;
 	}
 
-	public static Set<Set<Cell>> getNeighbourGoals() {
+	public static Set<List<Cell>> getNeighbourGoals() {
 		return neighbourGoals;
 	}
 
