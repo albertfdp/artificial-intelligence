@@ -231,7 +231,6 @@ public class MotherOdin {
 															// be requested at the beginning of the
 															// next loop
 					mergedPlans.get(a).clear();
-					agents.get(a).decreaseCurrentSubgoal();
 				}
 			}
 		}
@@ -459,7 +458,6 @@ public class MotherOdin {
 		mergedPlans.get(fixingAgent).addAll(getActionsForEmptyPlan(unmergedPlans.get(waitingAgent).size()));
 
 		// Make the fixing agent replan when needed
-		agents.get(fixingAgent).resetCurrentSubgoal();
 
 		if (log.isLoggable(Level.FINE)) {
 			log.fine("Merged conflicted plans for fixing agent " + fixingAgent + ": "
