@@ -1,5 +1,5 @@
 #!/bin/bash
-LEVEL="complevels/FOSABlueDucks.lvl"
+LEVEL="levels/FOMABlueDucks.lvl"
 if [ $# == '1' ]
 then
     if [[ "$1" = "debug" ]]

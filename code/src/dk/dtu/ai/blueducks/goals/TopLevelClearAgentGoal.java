@@ -19,8 +19,17 @@ public class TopLevelClearAgentGoal extends Goal{
 		this.agentToBeCleared = agent;
 	}
 
+	public Agent getAgentToBeCleared() {
+		return agentToBeCleared;
+	}
+
 	public Set<Cell> getCells() {
 		return cells;
+	}
+
+	@Override
+	public String toString() {
+		return "TopLevelClearAgentGoal [agentToBeCleared=" + agentToBeCleared + ", cells=" + cells + "]";
 	}
 
 	@Override

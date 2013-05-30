@@ -8,6 +8,7 @@
 package dk.dtu.ai.blueducks.planner;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -17,6 +18,7 @@ import java.util.logging.Logger;
 
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.heuristics.Heuristic;
+import dk.dtu.ai.blueducks.map.State;
 
 public class AStarSearch {
 
@@ -45,6 +47,17 @@ public class AStarSearch {
 		int loopCount = 0;
 
 		while (!openSet.isEmpty()) {
+//			if (openSet.size() > 10000) {
+//				Iterator<NodeType> it = openSet.iterator();
+//				int i = 0;
+//				while (it.hasNext() && (i++) < 6000)
+//					it.next();
+//				while (it.hasNext()){
+//					it.next();
+//					it.remove();
+//				}
+//
+//			}
 			if (log.isLoggable(Level.INFO)) {
 				loopCount++;
 				if ((loopCount % 5000) == 0)

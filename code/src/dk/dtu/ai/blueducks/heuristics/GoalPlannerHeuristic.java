@@ -12,10 +12,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
+
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
+import dk.dtu.ai.blueducks.goals.ClearBoxGoal;
+import dk.dtu.ai.blueducks.goals.ClearPathGoal;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
+import dk.dtu.ai.blueducks.goals.TopLevelClearAgentGoal;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.MapAnalyzer;
@@ -31,13 +36,28 @@ public class GoalPlannerHeuristic {
 	public static float getHeuristicValue(Agent agent, Goal goal) {
 		if (goal instanceof DeliverBoxGoal)
 			return FOSAMAStersHeuristic(agent, goal);
-		else
+		else if(goal instanceof ClearPathGoal)
 			return clearBoxGoalHeuristic(agent, goal);
-		//return chooseClosestGoal(agent, goal);
+		else if(goal instanceof TopLevelClearAgentGoal)
+			return clearAgentGoalHeuristic(agent,goal);
+		return Float.MAX_VALUE;
 	}
 	
-	private static float clearBoxGoalHeuristic(Agent agent, Goal goal) {
+	private static float clearAgentGoalHeuristic(Agent agent, Goal goal) {
 		return 0;
+	}
+
+	private static float clearBoxGoalHeuristic(Agent agent, Goal goal) {
+		float h = 0;
+		//h += 
+		Cell cellAgent = LevelMap.getInstance().getCellForAgent(agent);
+		if(goal instanceof ClearBoxGoal) {
+			ClearBoxGoal cbg = (ClearBoxGoal) goal;
+			Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(cbg.getBox());
+			h += LevelMap.getInstance().getDistance(cellAgent, boxCell);
+		}
+		//works only if the goal is instance of ClearBoxGoal
+		return h;
 	}
 	
 	private static float FOSAMAStersHeuristic(Agent agent, Goal goal) {

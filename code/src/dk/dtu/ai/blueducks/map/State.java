@@ -85,6 +85,18 @@ public class State extends AStarNode {
 		
 	}
 
+	
+	public void clearBoxesOfOtherColor(){
+		List<Box> boxes = LevelMap.getInstance().getBoxesList();
+		for(Box box : boxes) {
+			if(!box.getColor().equals(agent.getColor())){
+				Cell cell = cellsForBoxes.get(box.uniqueId);
+				occupiedCells.set(cell.uniqueId, false);
+				this.computedHashCode = this.computedHashCode - box.powerHashValue * cell.uniqueId;				
+			}
+		}
+	}
+	
 	public List<Cell> getCellsForBoxes() {
 		return cellsForBoxes;
 	}

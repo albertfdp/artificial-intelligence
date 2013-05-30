@@ -154,7 +154,8 @@ public class Agent {
 		Goal newGoal = MotherOdin.getInstance().getGoalForAgent(this);
 		// If he now doest not have a goal, just exit
 		if (newGoal == null) {
-			log.info("Agent " + this + " has no goal.");
+			this.currentGoal = null;
+			MotherOdin.getInstance().agentHasNoGoal(this);
 			// TODO: For multithreading, take care
 			return;
 		}
@@ -175,6 +176,7 @@ public class Agent {
 		// If there are no more subgoals that need to be satisfied
 		if (currentSubgoalIndex >= this.subgoals.size()) {
 			log.info("Finished planning for all subgoals.");
+			this.currentGoal = null;
 			MotherOdin.getInstance().finishedTopLevelGoal(this, this.currentGoal);
 			return;
 		}
@@ -192,12 +194,20 @@ public class Agent {
 		List<State> plan = computePlanStates(subgoal, agentState);
 		// TODO: Needs checking...
 		if (plan == null) {
-			log.finest("No plan found for goal.");
-			currentSubgoalIndex--; // Stick to the same subgoal as before
-			List<State> emptyPlan = new LinkedList<State>();
-			emptyPlan.add(agentState);
-			MotherOdin.getInstance().appendPlan(this, emptyPlan, new PlanAffectedResources());
-			return;
+			log.finest("No plan found for goal using classic approach. Exploring while ignoring boes of other colors.");
+			// Try to see if a path is found ignoring boxes of other colors
+			agentState.clearBoxesOfOtherColor();
+			plan = computePlanStates(subgoal, agentState);
+			if (plan == null) {
+				log.info("No possible plan found.");
+				currentSubgoalIndex--; // Stick to the same subgoal as before
+				List<State> emptyPlan = new LinkedList<State>();
+				emptyPlan.add(agentState);
+				MotherOdin.getInstance().appendPlan(this, emptyPlan, new PlanAffectedResources());
+				return;
+			}
+			// TODO :finish this
+
 		}
 
 		// Prepare the affected resources
