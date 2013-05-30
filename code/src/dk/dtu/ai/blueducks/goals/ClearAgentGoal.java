@@ -16,6 +16,10 @@ public class ClearAgentGoal extends Goal {
 		this.cells = new HashSet<Cell>(cellsToBeCleared);
 	}
 
+	public Set<Cell> getCells() {
+		return cells;
+	}
+
 	@Override
 	public boolean isSatisfied(AStarNode node) {
 		State state = (State) node;
