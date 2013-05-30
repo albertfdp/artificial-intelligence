@@ -52,10 +52,10 @@ public class MotherOdin {
 	private List<Goal> topLevelGoals = new ArrayList<>();
 
 	/** The goal costs. */
-	private HashMap<Agent, PriorityQueue<GoalCost>> goalCosts = new HashMap<>();
+	private HashMap<Agent, PriorityQueue<GoalCost>> goalCostsProposals = new HashMap<>();
 
 	/** The agents' goals. */
-	private HashMap<Agent, Goal> agentsGoals = new HashMap<>();
+	private HashMap<Agent, Goal> agentsAssignedGoals = new HashMap<>();
 
 	private List<PlanAffectedResources> affectedResources;
 
@@ -116,7 +116,7 @@ public class MotherOdin {
 					if (b.getId() == goalCells.getKey()) {
 						// If the goal was already assigned to somebody else, ignore it.
 						DeliverBoxGoal newGoal = new DeliverBoxGoal(b, goalCell);
-						if (!agentsGoals.values().contains(newGoal))
+						if (!agentsAssignedGoals.values().contains(newGoal))
 							topLevelGoals.add(new DeliverBoxGoal(b, goalCell));
 					}
 
@@ -148,7 +148,6 @@ public class MotherOdin {
 				if (mergedPlans.get(agent).isEmpty()) {
 					agents.get(agent).requestPlan();
 				}
-			log.info(unmergedPlans+"");
 			// TODO: Wait for synchronization when using multi-threading
 			mergePlans();
 
@@ -324,7 +323,8 @@ public class MotherOdin {
 	 */
 	public void finishedTopLevelGoal(Agent agent, Goal goal) {
 		log.info(agent + " completed goal: " + goal);
-		LevelMap.getInstance().lockCell(((DeliverBoxGoal) goal).getTo());
+		if(goal instanceof DeliverBoxGoal)
+			LevelMap.getInstance().lockCell(((DeliverBoxGoal) goal).getTo());
 		generateTopLevelGoals();
 		if (topLevelGoals.size() > 0) {
 			for (Agent a : LevelMap.getInstance().getAgentsList())
@@ -355,7 +355,7 @@ public class MotherOdin {
 	 * @param costs the costs
 	 */
 	public synchronized void addAgentGoalsProposal(Agent agent, PriorityQueue<GoalCost> costs) {
-		goalCosts.put(agent, costs);
+		goalCostsProposals.put(agent, costs);
 	}
 
 	/**
@@ -368,34 +368,34 @@ public class MotherOdin {
 			// Try to find a goal for this agent
 			while (!done) {
 				done = true;
-				GoalCost bestGoal = goalCosts.get(agent).peek();
+				GoalCost bestGoal = goalCostsProposals.get(agent).peek();
 				// If this agent has no more proposals for goals, just leave it like this
 				if (bestGoal == null) {
-					agentsGoals.put(agent, null);
+					agentsAssignedGoals.put(agent, null);
 					break;
 				}
 				// If any other agent has the same goal as the current agent and a better score,
 				// try a new goal for the current agent
 				for (Agent other : LevelMap.getInstance().getAgentsList())
 					if (other != agent) {
-						GoalCost gc = goalCosts.get(other).peek();
-						if (bestGoal.goal == gc.goal && gc.cost <= bestGoal.cost) {
-							goalCosts.get(agent).remove();
+						GoalCost gc = goalCostsProposals.get(other).peek();
+						if (gc!=null && bestGoal.goal == gc.goal && gc.cost < bestGoal.cost) {
+							goalCostsProposals.get(agent).remove();
 							done = false;
 							break;
 						}
 					}
 				// If this is the best goal the agent can do, mark it like this
 				if (done)
-					agentsGoals.put(agent, goalCosts.get(agent).peek().goal);
+					agentsAssignedGoals.put(agent, goalCostsProposals.get(agent).peek().goal);
 			}
 		}
 		if (log.isLoggable(Level.FINE))
-			log.fine("Assigned goals to agents: " + agentsGoals);
+			log.fine("Assigned goals to agents: " + agentsAssignedGoals);
 
-		for (Entry<Agent, Goal> e : agentsGoals.entrySet()) {
+		for (Entry<Agent, Goal> e : agentsAssignedGoals.entrySet()) {
 			// If the goals for any of the agent has been changed, request a new plan from him.
-			if (!e.getValue().equals(e.getKey().getCurrentGoal())) {
+			if (e.getValue()!=null && !e.getValue().equals(e.getKey().getCurrentGoal())) {
 				log.info("Assigned new goal to " + e.getKey());
 				e.getKey().requestPlan();
 			}
@@ -403,7 +403,7 @@ public class MotherOdin {
 	}
 
 	public Goal getGoalForAgent(Agent agent) {
-		return agentsGoals.get(agent);
+		return agentsAssignedGoals.get(agent);
 	}
 
 	/**
