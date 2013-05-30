@@ -117,10 +117,7 @@ public class MotherOdin {
 				// Create goals for each of the boxes that could fulfill this goal
 				for (Box b : boxes)
 					if (b.getId() == goalCells.getKey()) {
-						// If the goal was already assigned to somebody else, ignore it.
-						DeliverBoxGoal newGoal = new DeliverBoxGoal(b, goalCell);
-						if (!agentsAssignedGoals.values().contains(newGoal))
-							topLevelGoals.add(new DeliverBoxGoal(b, goalCell));
+						topLevelGoals.add(new DeliverBoxGoal(b, goalCell));
 					}
 
 			}
@@ -241,7 +238,6 @@ public class MotherOdin {
 
 				// Check if plans are mergeable
 				// TODO:
-				boolean mergeSuccessful = true;
 
 				// Prepare actions
 				Action[][] actions = new Action[c.agents.size()][];
@@ -256,8 +252,18 @@ public class MotherOdin {
 				List<LinkedList<Action>> mergePlansResult = merger.run();
 				if (mergePlansResult != null) {
 					index = 0;
-					for (short agent : c.agents)
-						this.mergedPlans.set(agent, mergePlansResult.get(index++));
+					for (short agent : c.agents) {
+						// Trim final NoOps at the end of merge plans
+						LinkedList<Action> agentPlan = mergePlansResult.get(index++);
+						Iterator<Action> it = agentPlan.descendingIterator();
+						while (it.hasNext())
+							if (it.next() instanceof NoOpAction)
+								it.remove();
+							else
+								break;
+						// Add the merged plan
+						this.mergedPlans.set(agent, agentPlan);
+					}
 				} else {
 					log.info("Could not find way to merge plans...");
 					if (c.agents.size() == 2) {

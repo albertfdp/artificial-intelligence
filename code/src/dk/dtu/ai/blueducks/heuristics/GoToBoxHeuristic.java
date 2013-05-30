@@ -57,10 +57,8 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 			}
 			
 			// check if by resolving this goal, we block other goals
-			Set<List<Cell>> groups = MapAnalyzer.getNeighbourGoals();
-			for (List<Cell> group : groups) {
-				
-			}
+			Set<Set<Cell>> groups = MapAnalyzer.getNeighbourGoals();
+			
 			
 			betweennessBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue();
 			isMoveAction = 0;
@@ -110,7 +108,7 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 		float betweennessCellBox = 0;
 		
 		List<Cell> allGoals = LevelMap.getInstance().getAllGoals();
-		Set<List<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
+		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
 		Map<Cell, Double> nbc = MapAnalyzer.getNormalizedBetweennessCentrality();
 		
 		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
@@ -147,7 +145,7 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 			}
 			
 			// check if resolving this goal, locks other goals
-			for (List<Cell> groupOfGoals : groupsOfGoals) {
+			for (Set<Cell> groupOfGoals : groupsOfGoals) {
 				if (groupOfGoals.contains(cellBox)) {
 					boolean hasLargestBetweenness = true;
 					for (Cell cellGroup : groupOfGoals) {
@@ -179,7 +177,7 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 			}
 			
 			// check if resolving this goal, locks other goals
-			for (List<Cell> groupOfGoals : groupsOfGoals) {
+			for (Set<Cell> groupOfGoals : groupsOfGoals) {
 				if (groupOfGoals.contains(cellBox)) {
 					boolean hasLargestBetweenness = true;
 					for (Cell cellGroup : groupOfGoals) {

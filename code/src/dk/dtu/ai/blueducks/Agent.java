@@ -179,6 +179,7 @@ public class Agent {
 		// TODO: Needs checking...
 		if (plan == null) {
 			log.finest("No plan found for goal.");
+			currentSubgoalIndex--; //Stick to the same subgoal as before
 			List<State> emptyPlan = new LinkedList<State>();
 			emptyPlan.add(agentState);
 			MotherOdin.getInstance().appendPlan(this, emptyPlan, new PlanAffectedResources());
