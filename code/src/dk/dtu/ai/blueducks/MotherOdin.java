@@ -494,8 +494,8 @@ public class MotherOdin {
 			while (!done) {
 				done = true;
 				GoalCost bestGoal = goalCostsProposals.get(agent).peek();
-				// If this agent has no more proposals for goals, just leave it like this
-				if (bestGoal == null) {
+				// If this agent has no more proposals for goals, just leave it like this or the proposal is MAX_INT (ther's no path to the goal)
+				if (bestGoal == null || bestGoal.cost == Integer.MAX_VALUE) {
 					agentsAssignedGoals.put(agent, null);
 					break;
 				}

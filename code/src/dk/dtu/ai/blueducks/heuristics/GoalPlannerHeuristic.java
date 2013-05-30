@@ -116,6 +116,9 @@ public class GoalPlannerHeuristic {
 			a5 = 1;
 		}
 		
+		if(distanceAgentBox == Integer.MAX_VALUE)
+			return Integer.MAX_VALUE;
+		
 		h = a0 * (distanceAgentBox + distanceBoxGoal) + a1 * betweennessBox
 				+ a3 * betweennessGoal + a4 * Heuristic.PENALTY_LOCK_GOAL
 				+ a5 * Heuristic.PENALTY_UNDO_GOAL;

@@ -176,8 +176,8 @@ public class Agent {
 		// If there are no more subgoals that need to be satisfied
 		if (currentSubgoalIndex >= this.subgoals.size()) {
 			log.info("Finished planning for all subgoals.");
-			this.currentGoal = null;
 			MotherOdin.getInstance().finishedTopLevelGoal(this, this.currentGoal);
+			this.currentGoal = null;
 			return;
 		}
 
