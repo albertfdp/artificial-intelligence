@@ -43,9 +43,6 @@ public class State extends AStarNode {
 
 	/** The agent. */
 	Agent agent;
-
-	/** The boxes in goal cell. */
-	List<Box> boxesInGoalCell = new ArrayList<Box>();
 	
 	private int computedHashCode;
 
@@ -285,16 +282,6 @@ public class State extends AStarNode {
 				+ ", previousAction=" + previousAction + "]";
 	}
 
-	public List<Box> getBoxesInGoalCells() {
-		List<Box> boxList = LevelMap.getInstance().getBoxesList();
-		for (Box box : boxList) {
-			if (LevelMap.getInstance().getGoals().get(box.getId()).contains(cellsForBoxes.get(box.uniqueId))) {
-				boxesInGoalCell.add(box);
-			}
-		}
-		return boxesInGoalCell;
-	}
-
 	@Override
 	public int hashCode() {
 
@@ -331,11 +318,6 @@ public class State extends AStarNode {
 			if (other.agentCell != null)
 				return false;
 		} else if (!agentCell.equals(other.agentCell))
-			return false;
-		if (boxesInGoalCell == null) {
-			if (other.boxesInGoalCell != null)
-				return false;
-		} else if (!boxesInGoalCell.equals(other.boxesInGoalCell))
 			return false;
 		if (cellsForBoxes == null) {
 			if (other.cellsForBoxes != null)

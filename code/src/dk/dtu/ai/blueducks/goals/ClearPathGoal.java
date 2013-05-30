@@ -12,16 +12,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.State;
 import dk.dtu.ai.blueducks.planner.AStarNode;
 
 public class ClearPathGoal extends Goal {
-	
+
+	public Agent getRequestingAgent() {
+		return requestingAgent;
+	}
+
 	/** The cells that need to be cleared. */
-	private Set<Cell> cells; 
-	
+	private Set<Cell> cells;
+	private Agent requestingAgent;
+
 	public Set<Cell> getCells() {
 		return cells;
 	}
@@ -32,46 +38,48 @@ public class ClearPathGoal extends Goal {
 
 	/** The box which should cleared. */
 	private Box box;
-	
+
 	public Box getBox() {
 		return box;
 	}
+
 	public void setBox(Box box) {
 		this.box = box;
 	}
 
 	/**
 	 * Instantiates a new clear path goal.
-	 *
+	 * 
 	 * @param plan the plan
 	 * @param startIndexOfConflictingArea the start index of conflicting state
 	 * @param endIndexOfConflictingArea the end index of conflicting state
 	 */
-	public ClearPathGoal(List<State> plan, int startIndexOfConflictingArea, int endIndexOfConflictingArea){
+	public ClearPathGoal(List<State> plan, int startIndexOfConflictingArea, int endIndexOfConflictingArea) {
 		int i;
 		List<Cell> toBeClearedCells = new ArrayList<Cell>();
-		for(i = startIndexOfConflictingArea; i <= endIndexOfConflictingArea ;i++) {
+		for (i = startIndexOfConflictingArea; i <= endIndexOfConflictingArea; i++) {
 			toBeClearedCells.add(plan.get(i).getAgentCell());
 		}
 		this.cells = new HashSet<Cell>(toBeClearedCells);
 
 	}
-	
-	public ClearPathGoal(Box box, Set<Cell> cells) {
+
+	public ClearPathGoal(Box box, Set<Cell> cells, Agent agent) {
 		this.box = box;
+		this.requestingAgent = agent;
 		this.cells = cells;
 	}
-	
+
 	@Override
 	public boolean isSatisfied(AStarNode node) {
 		State state = (State) node;
-		
+
 		if (box != null && cells.contains(state.getCellForBox(box)))
 			return false;
-		
+
 		if (cells.contains(state.getAgentCell()))
 			return false;
-		
+
 		return true;
 	}
 
@@ -109,8 +117,6 @@ public class ClearPathGoal extends Goal {
 		} else if (!cells.equals(other.cells))
 			return false;
 		return true;
-	}	
+	}
 
-	
-	
 }

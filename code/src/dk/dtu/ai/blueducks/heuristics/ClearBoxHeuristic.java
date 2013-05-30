@@ -15,7 +15,7 @@ public class ClearBoxHeuristic implements Heuristic<State, ClearBoxGoal> {
 		float h = 1000;
 		float dist = 0;
 		for(Cell cell : goal.getCells()) {
-			dist += LevelMap.getInstance().getDistance(cell, LevelMap.getInstance().getCurrentState().getCellForBox(goal.getBox()));
+			dist += LevelMap.getInstance().getDistance(cell, state.getCellForBox(goal.getBox()));
 		}
 		h = h / dist;
 		

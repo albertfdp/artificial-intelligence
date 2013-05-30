@@ -19,6 +19,7 @@ import dk.dtu.ai.blueducks.actions.NoOpAction;
 import dk.dtu.ai.blueducks.goals.ClearAgentGoal;
 import dk.dtu.ai.blueducks.goals.ClearBoxGoal;
 import dk.dtu.ai.blueducks.goals.ClearPathGoal;
+import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
@@ -141,10 +142,9 @@ public class Agent {
 			ClearAgentGoal caGoal = (ClearAgentGoal) goal;
 			path = AStarSearch.<State, ClearAgentGoal> getBestPath(agentState, caGoal,
 					new ClearAgentHeuristic());
-		} else if(goal instanceof ClearBoxGoal){
-			ClearBoxGoal cbGoal=(ClearBoxGoal) goal;
-			path = AStarSearch.<State, ClearBoxGoal> getBestPath(agentState, cbGoal,
-					new ClearBoxHeuristic());
+		} else if (goal instanceof ClearBoxGoal) {
+			ClearBoxGoal cbGoal = (ClearBoxGoal) goal;
+			path = AStarSearch.<State, ClearBoxGoal> getBestPath(agentState, cbGoal, new ClearBoxHeuristic());
 		}
 		return path;
 	}
@@ -156,8 +156,14 @@ public class Agent {
 	 * If the agent has no plan, he must append a plan with at least one {@link NoOpAction}.
 	 */
 	public void requestPlan() {
+
 		// Build the subgoals
 		Goal newGoal = MotherOdin.getInstance().getGoalForAgent(this);
+		if (newGoal instanceof ClearPathGoal)
+			this.forbidenCell = LevelMap.getInstance().getCellForAgent(
+					((ClearPathGoal) newGoal).getRequestingAgent());
+		else
+			this.forbidenCell = null;
 		// If he now doest not have a goal, just exit
 		if (newGoal == null) {
 			this.currentGoal = null;
@@ -167,6 +173,7 @@ public class Agent {
 		}
 
 		if (this.currentGoal == null || !this.currentGoal.equals(newGoal)) {
+
 			this.currentGoal = newGoal;
 			if (log.isLoggable(Level.INFO))
 				log.info("Planning for new goal: " + currentGoal);
@@ -182,8 +189,8 @@ public class Agent {
 		// If there are no more subgoals that need to be satisfied
 		if (currentSubgoalIndex >= this.subgoals.size()) {
 			log.info("Finished planning for all subgoals.");
-			this.currentGoal = null;
 			MotherOdin.getInstance().finishedTopLevelGoal(this, this.currentGoal);
+			this.currentGoal = null;
 			return;
 		}
 
@@ -192,8 +199,6 @@ public class Agent {
 				.getInstance().getCurrentState().getOccupiedCells(), LevelMap.getInstance().getCurrentState()
 				.getCellsForBoxes());
 
-		if (id == 0)
-			log.info("here");
 		Goal subgoal = subgoals.get(currentSubgoalIndex++);
 		if (log.isLoggable(Level.FINER))
 			log.finer("\tCurrent subgoal: " + subgoal);
@@ -233,7 +238,7 @@ public class Agent {
 				log.finest("Cells that need to be cleaned: " + boxesToClean);
 			for (Box b : boxesToClean)
 				MotherOdin.getInstance().addRequestedGoal(
-						new ClearPathGoal(b, affectedResources.affectedCells));
+						new ClearPathGoal(b, affectedResources.affectedCells, this));
 		}
 
 		MotherOdin.getInstance().appendPlan(this, plan, affectedResources);
