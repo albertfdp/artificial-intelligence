@@ -17,12 +17,14 @@ import java.util.logging.Logger;
 import dk.dtu.ai.blueducks.actions.Action;
 import dk.dtu.ai.blueducks.actions.NoOpAction;
 import dk.dtu.ai.blueducks.goals.ClearAgentGoal;
+import dk.dtu.ai.blueducks.goals.ClearBoxGoal;
 import dk.dtu.ai.blueducks.goals.ClearPathGoal;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
 import dk.dtu.ai.blueducks.goals.TopLevelClearAgentGoal;
 import dk.dtu.ai.blueducks.heuristics.ClearAgentHeuristic;
+import dk.dtu.ai.blueducks.heuristics.ClearBoxHeuristic;
 import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristic;
 import dk.dtu.ai.blueducks.heuristics.MoveBoxHeuristic;
 import dk.dtu.ai.blueducks.map.Cell;
@@ -139,6 +141,10 @@ public class Agent {
 			ClearAgentGoal caGoal = (ClearAgentGoal) goal;
 			path = AStarSearch.<State, ClearAgentGoal> getBestPath(agentState, caGoal,
 					new ClearAgentHeuristic());
+		} else if (goal instanceof ClearBoxGoal) {
+			ClearBoxGoal caGoal = (ClearBoxGoal) goal;
+			path = AStarSearch.<State, ClearBoxGoal> getBestPath(agentState, caGoal,
+					new ClearBoxHeuristic());
 		}
 		return path;
 	}
