@@ -27,6 +27,7 @@ import dk.dtu.ai.blueducks.goals.ClearPathGoal;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.TopLevelClearAgentGoal;
+import dk.dtu.ai.blueducks.goals.WaitGoal;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
@@ -183,7 +184,8 @@ public class MotherOdin {
 					agents.get(agent).requestGoalsProposals();
 				assignAgentsGoals(false);
 			}
-
+			fullMerge();
+			
 			// Check if any agent is out of actions
 			for (int agent = 0; agent < mergedPlans.size(); agent++)
 				if (mergedPlans.get(agent).isEmpty()) {
@@ -336,6 +338,28 @@ public class MotherOdin {
 					} else {
 						log.severe("FAILED merge of multiple agents... " + countAgentsWithoutPlan
 								+ " without plan.");
+						// Chose the agent with the smallest plan and delay all other agents
+						int minSize = Integer.MAX_VALUE;
+						short chosenAgent = 0;
+						for (short agent : c.agents)
+							if (unmergedPlans.get(agent).size() < minSize) {
+								minSize = unmergedPlans.get(agent).size();
+								chosenAgent = agent;
+							}
+						for (short agent : c.agents)
+							if (agent != chosenAgent) {
+								MotherOdin.getInstance().addRequestedGoal(
+										new WaitGoal(minSize, agents.get(agent)));
+								mergedPlans.get(agent).clear();
+							}
+						// Trigger replanning
+						generateTopLevelGoals();
+						for (short agent : c.agents) {
+							if (agents.get(agent).getCurrentGoal() == null) {
+								agents.get(agent).requestGoalsProposals();
+							}
+						}
+						assignAgentsGoals(false);
 					}
 
 				}
@@ -519,7 +543,8 @@ public class MotherOdin {
 			while (!done) {
 				done = true;
 				GoalCost bestGoal = goalCostsProposals.get(agent).peek();
-				// If this agent has no more proposals for goals, just leave it like this or the proposal is MAX_INT (ther's no path to the goal)
+				// If this agent has no more proposals for goals, just leave it like this or the
+				// proposal is MAX_INT (ther's no path to the goal)
 				if (bestGoal == null || bestGoal.cost == Integer.MAX_VALUE) {
 					agentsAssignedGoals.put(agent, null);
 					break;

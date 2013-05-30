@@ -23,6 +23,7 @@ import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
+import dk.dtu.ai.blueducks.goals.WaitGoal;
 import dk.dtu.ai.blueducks.heuristics.ClearAgentHeuristic;
 import dk.dtu.ai.blueducks.heuristics.ClearBoxHeuristic;
 import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristic;
@@ -145,6 +146,15 @@ public class Agent {
 		} else if (goal instanceof ClearBoxGoal) {
 			ClearBoxGoal cbGoal = (ClearBoxGoal) goal;
 			path = AStarSearch.<State, ClearBoxGoal> getBestPath(agentState, cbGoal, new ClearBoxHeuristic());
+		} else if (goal instanceof WaitGoal) {
+			WaitGoal wGoal = (WaitGoal) goal;
+			wGoal.complete();
+			path = new LinkedList<State>();
+			path.add(agentState);
+			for (int i = 0; i < wGoal.getNumberOfTurnsToWait(); i++) {
+				agentState = (new NoOpAction()).getNextState(agentState);
+				path.add(agentState);
+			}
 		}
 		return path;
 	}
