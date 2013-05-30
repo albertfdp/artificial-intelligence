@@ -325,15 +325,6 @@ public class LevelMap {
 	public void executeMapPreAnalysis() {
 
 		MapAnalyzer.getInstance().doAnalysis();
-		
-		for (int i = 0; i < this.matrix.length; i++) {
-			for (int j = 0; j < this.matrix[i].length; j++) {
-				if (matrix[i][j] != null) {
-					double nbc = MapAnalyzer.getNormalizedBetweennessCentrality().get(matrix[i][j]).doubleValue();
-					logger.info(i + " " + j + " : " + nbc);
-				}
-			}
-		}
-		
+				
 	}
 }

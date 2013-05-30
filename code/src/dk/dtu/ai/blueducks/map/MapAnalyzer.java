@@ -42,7 +42,7 @@ public class MapAnalyzer {
 	
 	private static Set<List<Cell>> deadEnds;
 	
-	private static Set<List<Cell>> neighbourGoals;
+	private static Set<Set<Cell>> neighbourGoals;
 	
 	private static Map<Cell, Map<Cell, Number>> distances;
 	
@@ -62,7 +62,7 @@ public class MapAnalyzer {
 			setDefaultBetweennessCentrality();
 			computeManhattanDistances();
 		}
-		computeDeadEnds();
+		//computeDeadEnds();
 		computeNeighbourGoals();
 	}
 	
@@ -151,14 +151,18 @@ public class MapAnalyzer {
 	
 	
 	private boolean isEndOfDeadEnd(List<Cell> cells) {
+		boolean hasNeighbours = false;
 		for (Cell cell : cells) {			
-			if (cell != null && graph.degree(cell) > 2)
-				return true;
+			if (cell != null)
+				if (graph.degree(cell) > 2)
+					return true;
+			hasNeighbours = true;
 		}
-		return false;
+		return !hasNeighbours;
 	}
 	
 	private void computeDeadEnds() {
+ 		logger.info("Computing dead ends ...");
 		Set<Cell> endOfDeadEndCells = new HashSet<Cell>();
 		for (Cell cell : graph.getVertices()) {
 			if (normalizedBetweennessCentrality.get(cell) == 0) {
@@ -175,15 +179,21 @@ public class MapAnalyzer {
 			double dCurrent = 0;
 			double dNext = 0;
 			
-			while (!isEndOfDeadEnd(neighbours)) {
+			boolean isInEmptyBlock = false;
+			while (!isEndOfDeadEnd(neighbours) && !isInEmptyBlock) {
 				for (Cell neighbour : neighbours) {
 					if (neighbour != null) {
-						dCurrent = distances.get(endOfDeadEndCell).get(currentCell).doubleValue();
-						dNext = distances.get(endOfDeadEndCell).get(neighbour).doubleValue();
-						if (!deadEndCells.contains(neighbour))
-							deadEndCells.add(neighbour);
-						if (dCurrent < dNext) {
-							currentCell = neighbour;
+						if (endOfDeadEndCells.contains(neighbour)) {
+							isInEmptyBlock = true;
+							break;
+						} else {
+							dCurrent = distances.get(endOfDeadEndCell).get(currentCell).doubleValue();
+							dNext = distances.get(endOfDeadEndCell).get(neighbour).doubleValue();
+							if (!deadEndCells.contains(neighbour))
+								deadEndCells.add(neighbour);
+							if (dCurrent < dNext) {
+								currentCell = neighbour;
+							}
 						}
 					}
 				}
@@ -202,9 +212,11 @@ public class MapAnalyzer {
 			});
 			deadEnds.add(deadEndCells);
 		}
+		logger.info("Dead ends computed ...");
 	}
 		
 	private void computeNeighbourGoals() {
+		logger.info("Computing groups of goals ...");
 		List<Cell> goals = LevelMap.getInstance().getAllGoals();
 		Set<Set<Cell>> groupsGoals = new HashSet<Set<Cell>>();
 		for (Cell goal : goals) {
@@ -217,14 +229,14 @@ public class MapAnalyzer {
 			groupsGoals.add(neighbourGoals);
 		}
 		MapAnalyzer.neighbourGoals = mergeListsCells(groupsGoals);
+		logger.info("Groups of goals computed ...");
 	}
 	
-	private Set<List<Cell>> mergeListsCells(Set<Set<Cell>> groups) {
-
-		Set<List<Cell>> merged = new HashSet<List<Cell>>();
+	private Set<Set<Cell>> mergeListsCells(Set<Set<Cell>> groups) {
+		Set<Set<Cell>> merged = new HashSet<Set<Cell>>();
 		for (Set<Cell> groupA : groups) {
 			boolean alreadyMerged = false;
-			for (List<Cell> mergedGroups : merged) {
+			for (Set<Cell> mergedGroups : merged) {
 				if (mergedGroups.containsAll(groupA)) {
 					alreadyMerged = true;
 					break;
@@ -232,29 +244,14 @@ public class MapAnalyzer {
 			}
 			if (alreadyMerged)
 				continue;
-			List<Cell> union = new ArrayList<Cell>(groupA);
+			Set<Cell> union = new HashSet<Cell>(groupA);
 			for (Set<Cell> groupB : groups) {
 				Set<Cell> intersection = new HashSet<Cell>(union);
 				intersection.retainAll(groupB);
 				if (intersection.size() > 0) {
-					for (Cell cellB : groupB) {
-						if (!union.contains(cellB))
-							union.add(cellB);
-					}
-					//union.addAll(groupB);
+					union.addAll(groupB);
 				} 
 			}
-			Collections.sort(union, new Comparator<Cell>() {
-
-				@Override
-				public int compare(Cell o1, Cell o2) {
-					double b1 = normalizedBetweennessCentrality.get(o1).doubleValue();
-					double b2 = normalizedBetweennessCentrality.get(o2).doubleValue();
-					
-					return b1 < b2 ? -1 : b1 > b2 ? 1 : 0;
-				}
-				
-			});
 			merged.add(union);
 		}
 		return merged;
@@ -286,7 +283,7 @@ public class MapAnalyzer {
 		return degreeCentrality;
 	}
 
-	public static Set<List<Cell>> getNeighbourGoals() {
+	public static Set<Set<Cell>> getNeighbourGoals() {
 		return neighbourGoals;
 	}
 
