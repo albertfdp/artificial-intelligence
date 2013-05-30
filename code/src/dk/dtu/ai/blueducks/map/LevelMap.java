@@ -293,7 +293,7 @@ public class LevelMap {
 	public int getDistance(Cell cellA, Cell cellB) {
 		Number n = MapAnalyzer.getDistances().get(cellA).get(cellB);
 		if (n != null)
-			n.doubleValue();
+			return n.intValue();
 		return Integer.MAX_VALUE;
 	}
 
