@@ -30,6 +30,9 @@ public class GoalSplitter {
 			subgoals = splitDeliverBoxGoal((DeliverBoxGoal) goal, agent);
 		} else if (goal instanceof ClearPathGoal) {
 			subgoals = splitClearPathGoal((ClearPathGoal) goal, agent);
+		} else if (goal instanceof TopLevelClearAgentGoal) {
+			TopLevelClearAgentGoal tlcag = (TopLevelClearAgentGoal) goal;
+			subgoals.add((Goal) new ClearAgentGoal(tlcag.getCells()));
 		}
 		return subgoals;
 	}
@@ -37,28 +40,25 @@ public class GoalSplitter {
 	private List<Goal> splitClearPathGoal(Goal goal, Agent agent) {
 		List<Goal> subgoals = new ArrayList<Goal>();
 		
-		if(goal instanceof ClearPathGoal) {
-			ClearPathGoal cpg = (ClearPathGoal) goal;
-			Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
-			
-			// get the list of cells to be cleared
-			Set<Cell> cellsToBeCleared = cpg.getCells();
-			
-			// get the box to be cleared, if any
-			Box boxToClear = cpg.getBox();
-			
-			// go to box
-			if (boxToClear != null) {
-				Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(boxToClear);
-				if (!agentCell.getNeighbours().contains(boxToClear))
-					subgoals.add((Goal) new GoToBoxGoal(agentCell, boxCell));
-				subgoals.add((Goal) new ClearBoxGoal(boxToClear, cellsToBeCleared));
-			}
-			subgoals.add((Goal) new ClearAgentGoal(cellsToBeCleared));		
-		} if(goal instanceof TopLevelClearAgentGoal){
-			TopLevelClearAgentGoal tlcag = (TopLevelClearAgentGoal) goal;
-			subgoals.add((Goal) new ClearAgentGoal(tlcag.getCells()));
+		
+		ClearPathGoal cpg = (ClearPathGoal) goal;
+		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
+		
+		// get the list of cells to be cleared
+		Set<Cell> cellsToBeCleared = cpg.getCells();
+		
+		// get the box to be cleared, if any
+		Box boxToClear = cpg.getBox();
+		
+		// go to box
+		if (boxToClear != null) {
+			Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(boxToClear);
+			if (!agentCell.getNeighbours().contains(boxToClear))
+				subgoals.add((Goal) new GoToBoxGoal(agentCell, boxCell));
+			subgoals.add((Goal) new ClearBoxGoal(boxToClear, cellsToBeCleared));
 		}
+		subgoals.add((Goal) new ClearAgentGoal(cellsToBeCleared));		
+	
 		
 		return subgoals;
 	}
