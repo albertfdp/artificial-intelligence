@@ -16,7 +16,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
+import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
 import dk.dtu.ai.blueducks.heuristics.Heuristic;
 import dk.dtu.ai.blueducks.map.State;
 
@@ -34,8 +36,10 @@ public class AStarSearch {
 		Set<NodeType> closedSet;
 		PriorityQueue<NodeType> openSet;
 
-		if (log.isLoggable(Level.FINE))
+		if (log.isLoggable(Level.FINE)) {
 			log.fine("Starting Path Planning from " + begin + " for " + end);
+			log.fine("Hash: " + begin.hashCode());
+		}
 		// empty set for already explored cells
 		closedSet = new HashSet<>(100000);
 		openSet = new PriorityQueue<>(100000);
@@ -47,17 +51,18 @@ public class AStarSearch {
 		int loopCount = 0;
 
 		while (!openSet.isEmpty()) {
-//			if (openSet.size() > 10000) {
-//				Iterator<NodeType> it = openSet.iterator();
-//				int i = 0;
-//				while (it.hasNext() && (i++) < 6000)
-//					it.next();
-//				while (it.hasNext()){
-//					it.next();
-//					it.remove();
-//				}
-//
-//			}
+			// if (openSet.size() > 10000) {
+			// Iterator<NodeType> it = openSet.iterator();
+			// int i = 0;
+			// while (it.hasNext() && (i++) < 6000)
+			// it.next();
+			// while (it.hasNext()){
+			// it.next();
+			// it.remove();
+			// }
+			//
+			// }
+
 			if (log.isLoggable(Level.INFO)) {
 				loopCount++;
 				if ((loopCount % 5000) == 0)
