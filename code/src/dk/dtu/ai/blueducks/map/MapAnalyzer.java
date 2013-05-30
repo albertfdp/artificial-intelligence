@@ -53,6 +53,7 @@ public class MapAnalyzer {
 	}
 	
 	public void doAnalysis() {
+		MapHashCode = LevelMap.getInstance().hashCode();
 		MapAnalyzer.graph = this.computeGraph(LevelMap.getInstance().getCells());
 		if (MapAnalyzer.graph.getVertexCount() < MAX_NUMBER_VERTEX) {
 			// precompute dijkstra and betweenness centrality
@@ -69,6 +70,10 @@ public class MapAnalyzer {
 		computeNeighbourGoals();
 	}
 		
+	public static int getMapHashCode() {
+		return MapHashCode;
+	}
+
 	public static MapAnalyzer getInstance() {
 		if (MapAnalyzer.analyzer == null) {
 			MapAnalyzer.analyzer = new MapAnalyzer();
