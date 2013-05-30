@@ -84,7 +84,7 @@ public class PushAction extends Action {
 		Map<Cell, Agent> agents = LevelMap.getInstance().getAgents();
 		agents.put(boxCell, agent);
 		agents.remove(agentCell);
-		
+
 		Cell previousBoxCell = LevelMap.getInstance().getCurrentState().getCellForBox(box);
 		if (LevelMap.getInstance().getLockedCells().contains(previousBoxCell))
 			LevelMap.getInstance().unlockCell(previousBoxCell);
@@ -100,7 +100,8 @@ public class PushAction extends Action {
 		Cell destCell = boxCell.getNeighbour(boxDirection);
 		Cell agentCell = state.getAgentCell();
 
-		State nextState = new State(boxCell, this, state, agent, state.getOccupiedCells(), state.getCellsForBoxes());
+		State nextState = new State(boxCell, this, state, agent, state.getOccupiedCells(),
+				state.getCellsForBoxes());
 
 		nextState.movedBox(box, boxCell, destCell);
 		nextState.movedAgent(agentCell, boxCell);
@@ -108,9 +109,9 @@ public class PushAction extends Action {
 		return nextState;
 	}
 
-	public void invalidateAction() {
-		Cell agentCell = LevelMap.getInstance().getCellForAgent(agent);
-		Cell destCell = agentCell.getNeighbour(agentDirection);
+	public void updateBeliefsActionFailed() {
+		Cell destCell = LevelMap.getInstance().getCurrentState().getCellForBox(box)
+				.getNeighbour(boxDirection);
 		LevelMap.getInstance().setAsWall(destCell.x, destCell.y);
 	}
 
@@ -169,10 +170,10 @@ public class PushAction extends Action {
 		Cell boxCell = state.getCellForBox(box);
 		Cell agentCell = state.getCellForAgent(agent);
 		Cell destCell = boxCell.getNeighbour(boxDirection);
-		
+
 		state.changeBoxPosition(destCell, boxCell, box);
 		state.changeAgentPosition(boxCell, agentCell, agent);
-		
+
 	}
 
 	@Override
