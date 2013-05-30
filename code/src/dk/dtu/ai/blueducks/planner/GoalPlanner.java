@@ -52,7 +52,7 @@ public class GoalPlanner {
 	 */
 	public PriorityQueue<GoalCost> computeGoalCosts(List<Goal> topLevelGoals) {
 		List<Goal> possibleGoals = generateAgentGoals(topLevelGoals);
-		PriorityQueue<GoalCost> queue = new PriorityQueue<>(possibleGoals.size());
+		PriorityQueue<GoalCost> queue = new PriorityQueue<>(possibleGoals.size()+1);
 
 		for (Goal goal : possibleGoals) {
 			float cost = GoalPlannerHeuristic.getHeuristicValue(agent, goal);

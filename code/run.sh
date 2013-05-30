@@ -1,4 +1,5 @@
 #!/bin/bash
+
 LEVEL="complevels/FOSABlueDucks.lvl"
 if [ $# == '1' ]
 then

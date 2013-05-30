@@ -148,7 +148,7 @@ public class Agent {
 		// Build the subgoals
 		Goal newGoal = MotherOdin.getInstance().getGoalForAgent(this);
 		if (this.currentGoal == null || !this.currentGoal.equals(newGoal)) {
-			this.currentGoal = MotherOdin.getInstance().getGoalForAgent(this);
+			this.currentGoal = newGoal;
 			if (log.isLoggable(Level.INFO))
 				log.info("Planning for new goal: " + currentGoal);
 			this.subgoals = goalSplitter.getSubgoal(currentGoal, this);
