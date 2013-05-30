@@ -7,6 +7,7 @@
  */
 package dk.dtu.ai.blueducks.actions;
 
+import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.MultiAgentState;
 import dk.dtu.ai.blueducks.map.State;
 
@@ -28,7 +29,8 @@ public class NoOpAction extends Action {
 
 	@Override
 	public State getNextState(State state) {
-		return state;
+		State nextState = new State(state.getAgentCell(), this, state, state.getAgent(), state.getOccupiedCells(), state.getCellsForBoxes());
+		return nextState;	
 	}
 	public void updateBeliefsActionFailed(){
 	}

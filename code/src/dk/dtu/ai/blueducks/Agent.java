@@ -23,6 +23,7 @@ import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.GoToBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.MoveBoxGoal;
+import dk.dtu.ai.blueducks.goals.WaitGoal;
 import dk.dtu.ai.blueducks.heuristics.ClearAgentHeuristic;
 import dk.dtu.ai.blueducks.heuristics.ClearBoxHeuristic;
 import dk.dtu.ai.blueducks.heuristics.GoToBoxHeuristic;
@@ -147,6 +148,15 @@ public class Agent {
 		} else if (goal instanceof ClearBoxGoal) {
 			ClearBoxGoal cbGoal = (ClearBoxGoal) goal;
 			path = AStarSearch.<State, ClearBoxGoal> getBestPath(agentState, cbGoal, new ClearBoxHeuristic());
+		} else if (goal instanceof WaitGoal) {
+			WaitGoal wGoal = (WaitGoal) goal;
+			wGoal.complete();
+			path = new LinkedList<State>();
+			path.add(agentState);
+			for (int i = 0; i < wGoal.getNumberOfTurnsToWait(); i++) {
+				agentState = (new NoOpAction()).getNextState(agentState);
+				path.add(agentState);
+			}
 		}
 		return path;
 	}
@@ -336,4 +346,33 @@ public class Agent {
 		MotherOdin.getInstance().appendConflictPlan(this, completePlan);
 		this.forbidenCell = null;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((color == null) ? 0 : color.hashCode());
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Agent other = (Agent) obj;
+		if (color == null) {
+			if (other.color != null)
+				return false;
+		} else if (!color.equals(other.color))
+			return false;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
 }

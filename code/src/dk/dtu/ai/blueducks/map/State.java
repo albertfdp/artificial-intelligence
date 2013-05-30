@@ -35,6 +35,10 @@ public class State extends AStarNode {
 	/** The agent cell. */
 	Cell agentCell;
 
+	public Agent getAgent() {
+		return agent;
+	}
+
 	/** The previous state. */
 	State previousState;
 
