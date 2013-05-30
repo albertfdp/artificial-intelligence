@@ -30,7 +30,7 @@ public class MapAnalyzer {
 	
 	private final static int MAX_NUMBER_VERTEX = 60 * 60;
 	
-	private static final Logger logger = Logger.getLogger(MapLoader.class.getSimpleName());
+	private static final Logger logger = Logger.getLogger(MapAnalyzer.class.getSimpleName());
 	
 	public static Graph<Cell, CellEdge> graph;
 	
@@ -176,6 +176,7 @@ public class MapAnalyzer {
 			double dNext = 0;
 			
 			while (!isEndOfDeadEnd(neighbours)) {
+				logger.finest("neighbours " + neighbours);
 				for (Cell neighbour : neighbours) {
 					if (neighbour != null) {
 						dCurrent = distances.get(endOfDeadEndCell).get(currentCell).doubleValue();
