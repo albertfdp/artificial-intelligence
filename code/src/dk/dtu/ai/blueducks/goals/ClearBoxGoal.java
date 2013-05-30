@@ -46,4 +46,9 @@ public class ClearBoxGoal extends Goal {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "ClearBoxGoal [cells=" + cells + ", box=" + box + "]";
+	}
+
 }

@@ -57,9 +57,9 @@ public class ClearPathGoal extends Goal {
 
 	}
 	
-	public ClearPathGoal(Box box, List<Cell> cells) {
+	public ClearPathGoal(Box box, Set<Cell> cells) {
 		this.box = box;
-		this.cells = new HashSet<Cell>(cells);
+		this.cells = cells;
 	}
 	
 	@Override
@@ -78,6 +78,37 @@ public class ClearPathGoal extends Goal {
 	@Override
 	public String toString() {
 		return "ClearPathGoal [cells=" + cells + ", box=" + box + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((box == null) ? 0 : box.hashCode());
+		result = prime * result + ((cells == null) ? 0 : cells.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ClearPathGoal other = (ClearPathGoal) obj;
+		if (box == null) {
+			if (other.box != null)
+				return false;
+		} else if (!box.equals(other.box))
+			return false;
+		if (cells == null) {
+			if (other.cells != null)
+				return false;
+		} else if (!cells.equals(other.cells))
+			return false;
+		return true;
 	}	
 
 	

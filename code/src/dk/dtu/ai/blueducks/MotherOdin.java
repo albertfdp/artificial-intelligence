@@ -74,6 +74,8 @@ public class MotherOdin {
 
 	private Set<Goal> requestedClearPathGoals;
 
+	private boolean pendingGoalRegeneration = false;
+
 	/**
 	 * Gets the single instance of MotherOdin.
 	 * 
@@ -174,6 +176,13 @@ public class MotherOdin {
 			if (currentLoop == 330)
 				log.info("Here");
 			log.info("Starting loop " + (++currentLoop) + "...");
+
+			if (pendingGoalRegeneration) {
+				generateTopLevelGoals();
+				for (int agent = 0; agent < agents.size(); agent++)
+					agents.get(agent).requestGoalsProposals();
+				assignAgentsGoals(false);
+			}
 
 			// Check if any agent is out of actions
 			for (int agent = 0; agent < mergedPlans.size(); agent++)
@@ -336,6 +345,14 @@ public class MotherOdin {
 		return !mergeFailed;
 	}
 
+	public void addRequestedGoal(Goal g) {
+		if (log.isLoggable(Level.INFO))
+			log.info("Added clear requested goal: " + g);
+		requestedClearPathGoals.add(g);
+		pendingGoalRegeneration = true;
+
+	}
+
 	private void requestAllButOneAgentsOutOfWay(CommonResources c, short agentWithPlan) {
 		log.info("All agents but one have no plan, so ClearPath requests are sent to all but agent "
 				+ agentWithPlan);
@@ -390,12 +407,20 @@ public class MotherOdin {
 			waitingAgent = agent2;
 
 		} // If both agents have a plan
-		else if (conflictSolvingPlans.get(agent1).size() <= conflictSolvingPlans.get(agent2).size()) {
-			fixingAgent = agent1;
-			waitingAgent = agent2;
-		} else {
-			fixingAgent = agent2;
-			waitingAgent = agent1;
+		else {
+			if (agents.get(agent1).getCurrentGoal() instanceof ClearPathGoal) {
+				fixingAgent = agent2;
+				waitingAgent = agent1;
+			} else if (agents.get(agent2).getCurrentGoal() instanceof ClearPathGoal) {
+				fixingAgent = agent1;
+				waitingAgent = agent2;
+			} else if (conflictSolvingPlans.get(agent1).size() <= conflictSolvingPlans.get(agent2).size()) {
+				fixingAgent = agent1;
+				waitingAgent = agent2;
+			} else {
+				fixingAgent = agent2;
+				waitingAgent = agent1;
+			}
 		}
 
 		// Add stuff to merged plans

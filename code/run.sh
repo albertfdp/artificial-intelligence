@@ -1,5 +1,5 @@
 #!/bin/bash
-LEVEL="levels/FOMABlueDucks.lvl"
+LEVEL="levels/FOMAsimple3.lvl"
 if [ $# == '1' ]
 then
     if [[ "$1" = "debug" ]]

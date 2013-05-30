@@ -60,7 +60,7 @@ public class AStarSearch {
 //			}
 			if (log.isLoggable(Level.INFO)) {
 				loopCount++;
-				if ((loopCount % 5000) == 0)
+				if ((loopCount % 10) == 0)
 					log.info("Expanded " + loopCount + " states. OpenSet size: " + openSet.size());
 			}
 			NodeType current = openSet.peek();
