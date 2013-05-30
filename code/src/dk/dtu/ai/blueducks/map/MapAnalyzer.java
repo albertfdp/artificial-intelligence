@@ -28,7 +28,7 @@ public class MapAnalyzer {
 	/** The analyzer. */
 	private static MapAnalyzer analyzer;
 	
-	private final static int MAX_NUMBER_VERTEX = 60 * 60;
+	private final static int MAX_NUMBER_VERTEX = 2386;
 	
 	private static final Logger logger = Logger.getLogger(MapAnalyzer.class.getSimpleName());
 	
@@ -62,6 +62,7 @@ public class MapAnalyzer {
 			setDefaultBetweennessCentrality();
 			computeManhattanDistances();
 		}
+		computeDegreeCentrality();
 		//computeDeadEnds();
 		computeNeighbourGoals();
 	}
@@ -100,6 +101,7 @@ public class MapAnalyzer {
 	 * Sets the betweenness centrality to 1 for all cells.
 	 */
 	public void setDefaultBetweennessCentrality() {
+		normalizedBetweennessCentrality = new HashMap<Cell, Double>();
 		for (Cell cell : graph.getVertices()) {
 			normalizedBetweennessCentrality.put(cell, 1.00);
 		}
@@ -153,10 +155,8 @@ public class MapAnalyzer {
 	private boolean isEndOfDeadEnd(List<Cell> cells) {
 		boolean hasNeighbours = false;
 		for (Cell cell : cells) {			
-			if (cell != null)
-				if (graph.degree(cell) > 2)
-					return true;
-			hasNeighbours = true;
+			if (graph.degree(cell) > 2)
+				return true;
 		}
 		return !hasNeighbours;
 	}
@@ -174,6 +174,7 @@ public class MapAnalyzer {
 		for (final Cell endOfDeadEndCell : endOfDeadEndCells) {
 			List<Cell> deadEndCells = new ArrayList<Cell>();
 			List<Cell> neighbours = endOfDeadEndCell.getCellNeighbours();
+			neighbours.removeAll(Collections.singleton(null)); // remove nulls
 			Cell currentCell = endOfDeadEndCell;
 			
 			double dCurrent = 0;
@@ -183,18 +184,16 @@ public class MapAnalyzer {
 			boolean isInEmptyBlock = false;
 			while (!isEndOfDeadEnd(neighbours) && !isInEmptyBlock) {
 				for (Cell neighbour : neighbours) {
-					if (neighbour != null) {
-						if (endOfDeadEndCells.contains(neighbour)) {
-							isInEmptyBlock = true;
-							break;
-						} else {
-							dCurrent = distances.get(endOfDeadEndCell).get(currentCell).doubleValue();
-							dNext = distances.get(endOfDeadEndCell).get(neighbour).doubleValue();
-							if (!deadEndCells.contains(neighbour))
-								deadEndCells.add(neighbour);
-							if (dCurrent < dNext) {
-								currentCell = neighbour;
-							}
+					if (endOfDeadEndCells.contains(neighbour)) {
+						isInEmptyBlock = true;
+						break;
+					} else {
+						dCurrent = distances.get(endOfDeadEndCell).get(currentCell).doubleValue();
+						dNext = distances.get(endOfDeadEndCell).get(neighbour).doubleValue();
+						if (!deadEndCells.contains(neighbour))
+							deadEndCells.add(neighbour);
+						if (dCurrent < dNext) {
+							currentCell = neighbour;
 						}
 					}
 				}
