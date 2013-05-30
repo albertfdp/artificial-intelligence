@@ -141,6 +141,8 @@ public class MotherOdin {
 		mergePlans();
 
 		while (true) {
+			if (currentLoop == 330)
+				log.info("Here");
 			log.info("Starting loop " + (++currentLoop) + "...");
 
 			// Check if any agent is out of actions
@@ -194,10 +196,10 @@ public class MotherOdin {
 		}
 	}
 
-	private void mergePlans() {
+	private boolean mergePlans() {
 		// If there's no need for merging the plans, skip merging
 		if (!pendingMerge)
-			return;
+			return true;
 		// If there is only one agent, skip merging
 		if (agents.size() == 1) {
 			mergedPlans.set(0, getActionsFromPlan(unmergedPlans.get(0)));
@@ -268,18 +270,27 @@ public class MotherOdin {
 				} else {
 					log.info("Could not find way to merge plans...");
 					if (c.agents.size() == 2) {
+						// Ask agents to come up with a solution
 						solveConflict(c);
 					} else {
-						log.severe("FAILED merge of multiple agents...");
-						// TODO: Do something or this as well
+
+						int countAgentsWithoutPlan = 0;
+						for (short agent : c.agents) {
+							if (agents.get(agent).getCurrentGoal() == null)
+								countAgentsWithoutPlan++;
+						}
+						if (!(countAgentsWithoutPlan == c.agents.size() - 1))
+							log.severe("FAILED merge of multiple agents...");
+						else{
+							
+						}
 					}
-					// Ask agents to come up with a solution
 
 				}
 			}
 		}
 		Arrays.fill(needMerging, false);
-		pendingMerge = false;
+		return true;
 	}
 
 	private void solveConflict(CommonResources c) {

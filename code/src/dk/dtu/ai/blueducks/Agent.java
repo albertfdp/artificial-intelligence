@@ -107,8 +107,8 @@ public class Agent {
 	public void resetCurrentSubgoal() {
 		this.currentSubgoalIndex = 0;
 	}
-	
-	public void decreaseCurrentSubgoal(){
+
+	public void decreaseCurrentSubgoal() {
 		this.currentSubgoalIndex--;
 	}
 
@@ -136,9 +136,10 @@ public class Agent {
 			path = AStarSearch.<State, MoveBoxGoal> getBestPath(agentState, mbGoal, new MoveBoxHeuristic());
 		} else if (goal instanceof ClearAgentGoal) {
 			ClearAgentGoal caGoal = (ClearAgentGoal) goal;
-			path = AStarSearch.<State, ClearAgentGoal> getBestPath(agentState, caGoal, new ClearAgentHeuristic());
+			path = AStarSearch.<State, ClearAgentGoal> getBestPath(agentState, caGoal,
+					new ClearAgentHeuristic());
 		}
-		
+
 		return path;
 	}
 
@@ -151,6 +152,13 @@ public class Agent {
 	public void requestPlan() {
 		// Build the subgoals
 		Goal newGoal = MotherOdin.getInstance().getGoalForAgent(this);
+		// If he now doest not have a goal, just exit
+		if (newGoal == null) {
+			log.info("Agent " + this + " has no goal.");
+			// TODO: For multithreading, take care
+			return;
+		}
+
 		if (this.currentGoal == null || !this.currentGoal.equals(newGoal)) {
 			this.currentGoal = newGoal;
 			if (log.isLoggable(Level.INFO))
@@ -176,6 +184,8 @@ public class Agent {
 				.getInstance().getCurrentState().getOccupiedCells(), LevelMap.getInstance().getCurrentState()
 				.getCellsForBoxes());
 
+		if(id==0)
+			log.info("here");
 		Goal subgoal = subgoals.get(currentSubgoalIndex++);
 		if (log.isLoggable(Level.FINER))
 			log.finer("\tCurrent subgoal: " + subgoal);
@@ -183,7 +193,7 @@ public class Agent {
 		// TODO: Needs checking...
 		if (plan == null) {
 			log.finest("No plan found for goal.");
-			currentSubgoalIndex--; //Stick to the same subgoal as before
+			currentSubgoalIndex--; // Stick to the same subgoal as before
 			List<State> emptyPlan = new LinkedList<State>();
 			emptyPlan.add(agentState);
 			MotherOdin.getInstance().appendPlan(this, emptyPlan, new PlanAffectedResources());
@@ -236,21 +246,20 @@ public class Agent {
 	 */
 	public void requestPlanForConflictSolving(ClearPathGoal goal, State agentState, State otheAgentState) {
 		this.forbidenCell = otheAgentState.getAgentCell();
-		
-		
+
 		log.finest("Looking for a plan for the clearPathGoal " + goal);
 
-		if(goal.isSatisfied(agentState)){
+		if (goal.isSatisfied(agentState)) {
 			log.finest("Plan found. No action taken");
 			List<State> emptyPlan = new LinkedList<State>();
 			emptyPlan.add(agentState);
 			MotherOdin.getInstance().appendConflictPlan(this, emptyPlan);
 			return;
 		}
-		
+
 		List<Goal> clearPathSubgoals = goalSplitter.getSubgoal(goal, this);
-		
-		if(log.isLoggable(Level.FINEST)){
+
+		if (log.isLoggable(Level.FINEST)) {
 			log.finest("CLEAR PATH SUBGOAL: " + clearPathSubgoals.get(0));
 		}
 		List<State> completePlan = new ArrayList<State>();
