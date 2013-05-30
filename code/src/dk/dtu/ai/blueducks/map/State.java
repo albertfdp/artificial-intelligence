@@ -85,6 +85,11 @@ public class State extends AStarNode {
 		
 	}
 
+	
+	public void clearBoxesOfOtherColor(){
+		//TODO:
+	}
+	
 	public List<Cell> getCellsForBoxes() {
 		return cellsForBoxes;
 	}
