@@ -16,6 +16,7 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.Box;
+import dk.dtu.ai.blueducks.goals.ClearBoxGoal;
 import dk.dtu.ai.blueducks.goals.ClearPathGoal;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
@@ -43,13 +44,19 @@ public class GoalPlannerHeuristic {
 	}
 	
 	private static float clearAgentGoalHeuristic(Agent agent, Goal goal) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	private static float clearBoxGoalHeuristic(Agent agent, Goal goal) {
 		float h = 0;
-		// TODO Auto-generated method stub		
+		//h += 
+		Cell cellAgent = LevelMap.getInstance().getCellForAgent(agent);
+		if(goal instanceof ClearBoxGoal) {
+			ClearBoxGoal cbg = (ClearBoxGoal) goal;
+			Cell boxCell = LevelMap.getInstance().getCurrentState().getCellForBox(cbg.getBox());
+			h += LevelMap.getInstance().getDistance(cellAgent, boxCell);
+		}
+		//works only if the goal is instance of ClearBoxGoal
 		return h;
 	}
 	

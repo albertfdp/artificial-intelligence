@@ -16,6 +16,22 @@ public class ClearBoxGoal extends Goal {
 	/** The box which should cleared. */
 	private Box box;
 	
+	public Set<Cell> getCells() {
+		return cells;
+	}
+
+	public void setCells(Set<Cell> cells) {
+		this.cells = cells;
+	}
+
+	public Box getBox() {
+		return box;
+	}
+
+	public void setBox(Box box) {
+		this.box = box;
+	}
+
 	public ClearBoxGoal(Box box, Set<Cell> cells) {
 		this.box = box;
 		this.cells = new HashSet<Cell>(cells);
