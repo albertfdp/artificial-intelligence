@@ -30,6 +30,8 @@ if not args.all:
         levels.extend([file for file in all_levels if re.match(r'levels\\POMA.*', file)])
 else:
     levels = all_levels
+
+levels = ['complevels/FOSAteam42.lvl']
     
 if not os.path.exists('logs'):
     os.makedirs('logs')
@@ -43,4 +45,6 @@ for level in levels:
     else:
         cmd = "java -jar server.jar -l %s -c \"java -classpath bin;lib\* dk.dtu.ai.blueducks.BlueDucksClient -Djava.util.logging.SimpleFormatter.format=\"%%1$tY-%%1$tm-%%1$td %%1$tH:%%1$tM:%%1$tS %%4$s %%2$s %%5$s%%6$s%%n\"\" > %s 2>&1" % (level, filename)
     print '[%s] executing %s ...' % (utc_datetime, level)
+    subprocess.call('echo %time%', shell = True)
     ret = subprocess.call(cmd, shell = True)
+    subprocess.call('echo %time%', shell = True)

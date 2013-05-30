@@ -291,7 +291,10 @@ public class LevelMap {
 	}
 
 	public int getDistance(Cell cellA, Cell cellB) {
-		return MapAnalyzer.getDistances().get(cellA).get(cellB).intValue();
+		Number n = MapAnalyzer.getDistances().get(cellA).get(cellB);
+		if (n != null)
+			return n.intValue();
+		return Integer.MAX_VALUE;
 	}
 
 	public Set<Cell> getLockedCells() {
