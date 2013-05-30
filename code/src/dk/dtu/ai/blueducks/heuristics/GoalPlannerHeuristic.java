@@ -78,8 +78,8 @@ public class GoalPlannerHeuristic {
 		float a4 = 0; // locking goal
 		float a5 = 0; // undoing a goal
 		
-		if (agent.getCurrentGoal().equals(goal))
-			return h + Heuristic.PENALTY_DELIVER_BOX_GOAL;
+		if (agent.getCurrentGoal()!=null && agent.getCurrentGoal().equals(goal))
+			return Heuristic.PENALTY_DELIVER_BOX_GOAL;
 		
 		DeliverBoxGoal deliverBoxGoal = (DeliverBoxGoal) goal;
 				
