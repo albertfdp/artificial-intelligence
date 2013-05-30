@@ -154,7 +154,7 @@ public class Agent {
 		Goal newGoal = MotherOdin.getInstance().getGoalForAgent(this);
 		// If he now doest not have a goal, just exit
 		if (newGoal == null) {
-			log.info("Agent " + this + " has no goal.");
+			MotherOdin.getInstance().agentHasNoGoal(this);
 			// TODO: For multithreading, take care
 			return;
 		}

@@ -40,6 +40,12 @@ public class PlanAffectedResources {
 		affectedBoxes = new LinkedHashSet<Box>();
 		affectedCells = new LinkedHashSet<Cell>();
 	}
+	
+	public PlanAffectedResources(Cell cell) {
+		affectedBoxes = new LinkedHashSet<Box>();
+		affectedCells = new LinkedHashSet<Cell>();
+		affectedCells.add(cell);
+	}
 
 	/**
 	 * @return the affectedCells

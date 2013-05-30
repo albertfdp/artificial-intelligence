@@ -10,12 +10,14 @@ package dk.dtu.ai.blueducks;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +26,7 @@ import dk.dtu.ai.blueducks.actions.NoOpAction;
 import dk.dtu.ai.blueducks.goals.ClearPathGoal;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
+import dk.dtu.ai.blueducks.goals.TopLevelClearAgentGoal;
 import dk.dtu.ai.blueducks.map.Cell;
 import dk.dtu.ai.blueducks.map.LevelMap;
 import dk.dtu.ai.blueducks.map.State;
@@ -69,6 +72,8 @@ public class MotherOdin {
 	private boolean needMerging[];
 	private boolean pendingMerge;
 
+	private Set<Goal> requestedClearPathGoals;
+
 	/**
 	 * Gets the single instance of MotherOdin.
 	 * 
@@ -81,6 +86,7 @@ public class MotherOdin {
 	public MotherOdin() {
 		super();
 		agents = LevelMap.getInstance().getAgentsList();
+		requestedClearPathGoals = new HashSet<>();
 		// Init the plans list
 		unmergedPlans = new ArrayList<LinkedList<State>>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
@@ -93,8 +99,12 @@ public class MotherOdin {
 			mergedPlans.add(new LinkedList<Action>());
 		affectedResources = new ArrayList<PlanAffectedResources>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
-			affectedResources.add(null);
+			affectedResources.add(new PlanAffectedResources(LevelMap.getInstance().getCellForAgent(
+					agents.get(i))));
 		this.needMerging = new boolean[agents.size()];
+		for(Agent agent:agents)
+			agentsAssignedGoals.put(agent, null);
+			
 	}
 
 	/**
@@ -122,6 +132,15 @@ public class MotherOdin {
 
 			}
 		}
+		// Add unsatisfied requested goals
+		Iterator<Goal> it = requestedClearPathGoals.iterator();
+		while (it.hasNext()) {
+			Goal g = it.next();
+			if (g.isSatisfied(LevelMap.getInstance().getCurrentState()))
+				it.remove();
+			else
+				topLevelGoals.add(g);
+		}
 
 		if (log.isLoggable(Level.FINE))
 			log.fine("Generated top level goals: " + topLevelGoals);
@@ -136,9 +155,10 @@ public class MotherOdin {
 		for (Agent a : LevelMap.getInstance().getAgentsList())
 			a.requestGoalsProposals();
 		// TODO: Wait for synchronization when using multi-threading
-		assignAgentsGoals();
+		assignAgentsGoals(true);
 		// TODO: Wait for synchronization when using multi-threading
-		mergePlans();
+		while (!mergePlans())
+			;
 
 		while (true) {
 			if (currentLoop == 330)
@@ -151,7 +171,8 @@ public class MotherOdin {
 					agents.get(agent).requestPlan();
 				}
 			// TODO: Wait for synchronization when using multi-threading
-			mergePlans();
+			while (!mergePlans())
+				;
 
 			// Build the joint action
 			List<Action> actions = new LinkedList<>();
@@ -200,10 +221,13 @@ public class MotherOdin {
 		// If there's no need for merging the plans, skip merging
 		if (!pendingMerge)
 			return true;
+		this.pendingMerge = false;
 		// If there is only one agent, skip merging
 		if (agents.size() == 1) {
 			mergedPlans.set(0, getActionsFromPlan(unmergedPlans.get(0)));
 		}
+
+		boolean mergeFailed = false;
 
 		log.info("Starting plan merging...");
 
@@ -269,28 +293,53 @@ public class MotherOdin {
 					}
 				} else {
 					log.info("Could not find way to merge plans...");
-					if (c.agents.size() == 2) {
+					// Check how many agents don't have a plan
+					int countAgentsWithoutPlan = 0;
+					short agentWithPlan = 0;
+					for (short agent : c.agents) {
+						if (agents.get(agent).getCurrentGoal() == null)
+							countAgentsWithoutPlan++;
+						else
+							agentWithPlan = agent;
+					}
+					// If all the agents but one don't have a plan, ask them to get out of the way
+					// of the other
+					if (countAgentsWithoutPlan == c.agents.size() - 1) {
+						requestAllButOneAgentsOutOfWay(c, agentWithPlan);
+						mergeFailed = true;
+						continue;
+					} else if (c.agents.size() == 2) {
 						// Ask agents to come up with a solution
 						solveConflict(c);
 					} else {
-
-						int countAgentsWithoutPlan = 0;
-						for (short agent : c.agents) {
-							if (agents.get(agent).getCurrentGoal() == null)
-								countAgentsWithoutPlan++;
-						}
-						if (!(countAgentsWithoutPlan == c.agents.size() - 1))
-							log.severe("FAILED merge of multiple agents...");
-						else{
-							
-						}
+						log.severe("FAILED merge of multiple agents...");
 					}
 
 				}
 			}
 		}
+
 		Arrays.fill(needMerging, false);
-		return true;
+		return !mergeFailed;
+	}
+
+	private void requestAllButOneAgentsOutOfWay(CommonResources c, short agentWithPlan) {
+		log.info("All agents but one have no plan, so ClearPath requests are sent to all but agent "
+				+ agentWithPlan);
+		Set<Cell> cellsToBeCleared = affectedResources.get(agentWithPlan).affectedCells;
+		for (short agent : c.agents) {
+			if (agents.get(agent).getCurrentGoal() == null) {
+				requestedClearPathGoals.add(new TopLevelClearAgentGoal(cellsToBeCleared, agents.get(agent)));
+				mergedPlans.get(agent).clear();
+			}
+		}
+		generateTopLevelGoals();
+		assignAgentsGoals(false);
+		for (short agent : c.agents) {
+			if (agents.get(agent).getCurrentGoal() == null) {
+				agents.get(agent).requestPlan();
+			}
+		}
 	}
 
 	private void solveConflict(CommonResources c) {
@@ -385,7 +434,7 @@ public class MotherOdin {
 			for (Agent a : LevelMap.getInstance().getAgentsList())
 				a.requestGoalsProposals();
 			// TODO: Wait for synchronization when using multi-threading
-			assignAgentsGoals();
+			assignAgentsGoals(false);
 		} else
 			log.info("No more top level goals.");
 	}
@@ -405,6 +454,12 @@ public class MotherOdin {
 		this.pendingMerge = true;
 	}
 
+	public synchronized void agentHasNoGoal(Agent agent) {
+		log.info(agent + " has no goal.");
+		this.affectedResources.set(agent.getId(), new PlanAffectedResources(LevelMap.getInstance()
+				.getCellForAgent(agent)));
+	}
+
 	/**
 	 * Adds the agent's goals proposal.
 	 * 
@@ -418,7 +473,7 @@ public class MotherOdin {
 	/**
 	 * Assign the goals for each agent.
 	 */
-	private void assignAgentsGoals() {
+	private void assignAgentsGoals(boolean forcePlanRequest) {
 		// For each agent
 		for (Agent agent : LevelMap.getInstance().getAgentsList()) {
 			boolean done = false;
@@ -452,7 +507,8 @@ public class MotherOdin {
 
 		for (Entry<Agent, Goal> e : agentsAssignedGoals.entrySet()) {
 			// If the goals for any of the agent has been changed, request a new plan from him.
-			if (e.getValue() != null && !e.getValue().equals(e.getKey().getCurrentGoal())) {
+			if (forcePlanRequest
+					| (e.getValue() != null && !e.getValue().equals(e.getKey().getCurrentGoal()))) {
 				log.info("Assigned new goal to " + e.getKey());
 				e.getKey().requestPlan();
 			}
@@ -476,6 +532,8 @@ public class MotherOdin {
 	public static LinkedList<Action> getActionsFromPlan(List<State> plan) {
 		// Prepare the actions, ignoring the first state in the plan (the current state)
 		LinkedList<Action> actions = new LinkedList<Action>();
+		if(plan.size()<=1)
+			return actions;
 		Iterator<State> it = plan.iterator();
 		it.next();
 		while (it.hasNext())

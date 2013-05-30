@@ -14,6 +14,7 @@ import java.util.PriorityQueue;
 import dk.dtu.ai.blueducks.Agent;
 import dk.dtu.ai.blueducks.goals.DeliverBoxGoal;
 import dk.dtu.ai.blueducks.goals.Goal;
+import dk.dtu.ai.blueducks.goals.TopLevelClearAgentGoal;
 import dk.dtu.ai.blueducks.heuristics.GoalPlannerHeuristic;
 
 public class GoalPlanner {
@@ -36,9 +37,18 @@ public class GoalPlanner {
 		List<Goal> agentGoals = new ArrayList<Goal>();
 
 		for (Goal g : topLevelGoals) {
-			DeliverBoxGoal deliverBoxg = (DeliverBoxGoal) g;
-			if (deliverBoxg.getWhat().getColor().equals(agent.getColor()))
-				agentGoals.add(deliverBoxg);
+			if (g instanceof DeliverBoxGoal) {
+				DeliverBoxGoal deliverBoxg = (DeliverBoxGoal) g;
+				if (deliverBoxg.getWhat().getColor().equals(agent.getColor()))
+					agentGoals.add(deliverBoxg);
+			}
+			else if(g instanceof TopLevelClearAgentGoal)
+			{
+				TopLevelClearAgentGoal tlcag=(TopLevelClearAgentGoal) g;
+				if(tlcag.getAgentToBeCleared()==agent)
+					agentGoals.add(tlcag);
+				
+			}
 		}
 
 		return agentGoals;
@@ -52,7 +62,7 @@ public class GoalPlanner {
 	 */
 	public PriorityQueue<GoalCost> computeGoalCosts(List<Goal> topLevelGoals) {
 		List<Goal> possibleGoals = generateAgentGoals(topLevelGoals);
-		PriorityQueue<GoalCost> queue = new PriorityQueue<>(possibleGoals.size()+1);
+		PriorityQueue<GoalCost> queue = new PriorityQueue<>(possibleGoals.size() + 1);
 
 		for (Goal goal : possibleGoals) {
 			float cost = GoalPlannerHeuristic.getHeuristicValue(agent, goal);
