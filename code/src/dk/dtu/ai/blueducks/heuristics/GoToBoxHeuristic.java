@@ -23,6 +23,74 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 		return getBestHeuristic(state, goal, prevState);
 	}
 	
+	public float getHanoiHeuristicValue(State state, GoToBoxGoal goal, State prevState) {
+		float h = 0;
+		
+		float a0 = 1; // distance
+		float a1 = 2; // penalize actions other than move
+		float a2 = 50; // penalize leaving boxes with high betweenness
+		float a3 = 0; // penalize undoing goals
+		float a4 = 1; // do not block goals
+		
+		float isMoveAction = 1;
+		float betweennessBox = 0;
+		
+		Cell cellAgent = state.getAgentCell();
+		Cell cellGoal = goal.getTo();
+		float distance = LevelMap.getInstance().getDistance(cellAgent, cellGoal);
+		
+		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
+			PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
+			Cell cellBox = state.getCellForBox(pullAction.getBox());
+			Cell cellBoxPrevious = prevState.getCellForBox(pullAction.getBox());
+			
+			// penalize undoing goals
+			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
+				a3 = 1;
+			}
+			
+			if (MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue()
+					>= MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBoxPrevious).floatValue()) {
+				h += 100;
+			} else {
+				h -= 10;
+			}
+			
+			// check if by resolving this goal, we block other goals
+			Set<List<Cell>> groups = MapAnalyzer.getNeighbourGoals();
+			for (List<Cell> group : groups) {
+				
+			}
+			
+			betweennessBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue();
+			isMoveAction = 0;
+			
+		} else if (prevState != null && state.getEdgeFromPrevNode() instanceof PushAction) {
+			PushAction pushAction = (PushAction) state.getEdgeFromPrevNode();
+			Cell cellBox = state.getCellForBox(pushAction.getBox());
+			Cell cellBoxPrevious = prevState.getCellForBox(pushAction.getBox());
+			
+			// penalize undoing goals
+			if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
+				a3 = 1;
+			}
+			
+			if (MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue()
+					>= MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBoxPrevious).floatValue()) {
+				h += 100;
+			} else {
+				h -= 10;
+			}
+			
+			betweennessBox = MapAnalyzer.getNormalizedBetweennessCentrality().get(cellBox).floatValue();
+			isMoveAction = 0;
+		}
+		
+		h = a0 * distance + a1 * isMoveAction + a2 * betweennessBox + a3 * Heuristic.PENALTY_UNDO_GOAL;
+		
+		return h;
+	}
+	
 	public float getBestHeuristic(State state, GoToBoxGoal goal, State prevState) {
 		float h = 1;
 		
@@ -42,7 +110,7 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 		float betweennessCellBox = 0;
 		
 		List<Cell> allGoals = LevelMap.getInstance().getAllGoals();
-		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
+		Set<List<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
 		Map<Cell, Double> nbc = MapAnalyzer.getNormalizedBetweennessCentrality();
 		
 		if (prevState != null && state.getEdgeFromPrevNode() instanceof PullAction) {
@@ -79,7 +147,7 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 			}
 			
 			// check if resolving this goal, locks other goals
-			for (Set<Cell> groupOfGoals : groupsOfGoals) {
+			for (List<Cell> groupOfGoals : groupsOfGoals) {
 				if (groupOfGoals.contains(cellBox)) {
 					boolean hasLargestBetweenness = true;
 					for (Cell cellGroup : groupOfGoals) {
@@ -111,7 +179,7 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 			}
 			
 			// check if resolving this goal, locks other goals
-			for (Set<Cell> groupOfGoals : groupsOfGoals) {
+			for (List<Cell> groupOfGoals : groupsOfGoals) {
 				if (groupOfGoals.contains(cellBox)) {
 					boolean hasLargestBetweenness = true;
 					for (Cell cellGroup : groupOfGoals) {
@@ -173,65 +241,5 @@ public class GoToBoxHeuristic implements Heuristic<State, GoToBoxGoal> {
 		
 		return h;
 	}
-	
-//	@Override
-//	public float getHeuristicValue(State state, GoToBoxGoal goal, State prevState) {
-//		float h = 1;
-//		
-//		float a0 = 1;
-//		float a1 = 1;
-//		
-//		// cell where the agent is
-//		Cell cellAgent = state.getAgentCell();
-//		
-//		// cell of the goal
-//		Cell cellGoal = goal.getTo();
-//		
-//		float betweennessAgent = LevelMap.getInstance().getBetweenessCentrality().get(cellAgent).floatValue();
-//		
-//		float distance = LevelMap.getInstance().getDistance(cellAgent, cellGoal);		
-//		
-//		h += a0 * distance + a1 * betweennessAgent;
-//		
-//		if (prevState != null) {
-//			if (state.getEdgeFromPrevNode() instanceof PullAction) {
-//				
-//				PullAction pullAction = (PullAction) state.getEdgeFromPrevNode();
-//				Cell cellBoxPrevious = prevState.getCellForBox(pullAction.getBox());
-//				Cell cellBoxNow = state.getCellForBox(pullAction.getBox());
-//				
-//				if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
-//					h += Heuristic.PENALTY_UNDO_GOAL;
-//				}
-//				
-//				float betweennessBoxPrevious = LevelMap.getInstance().getBetweenessCentrality().get(cellBoxPrevious).floatValue();
-//				float betweennessBoxNow = LevelMap.getInstance().getBetweenessCentrality().get(cellBoxNow).floatValue();
-//				if (betweennessBoxPrevious <= betweennessBoxNow) {
-//					h += 1000;
-//				} else {
-//					h -= 10;
-//				}
-//				
-//			} else if (state.getEdgeFromPrevNode() instanceof PushAction) {
-//				PushAction pushAction = (PushAction) state.getEdgeFromPrevNode();
-//				Cell cellBoxPrevious = prevState.getCellForBox(pushAction.getBox());
-//				Cell cellBoxNow = state.getCellForBox(pushAction.getBox());
-//				
-//				if (LevelMap.getInstance().getLockedCells().contains(cellBoxPrevious)) {
-//					h += Heuristic.PENALTY_UNDO_GOAL;
-//				}
-//				
-//				float betweennessBoxPrevious = LevelMap.getInstance().getBetweenessCentrality().get(cellBoxPrevious).floatValue();
-//				float betweennessBoxNow = LevelMap.getInstance().getBetweenessCentrality().get(cellBoxNow).floatValue();
-//				if (betweennessBoxPrevious <= betweennessBoxNow) {
-//					h += 1000;
-//				} else {
-//					h -= 10;
-//				}
-//				
-//			}
-//		}
-//		return h;
-//		
-//	}
+
 }

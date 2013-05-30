@@ -7,6 +7,7 @@
  */
 package dk.dtu.ai.blueducks.heuristics;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -28,8 +29,17 @@ public class GoalPlannerHeuristic {
 	private static final Logger logger = Logger.getLogger(LevelMap.class.getSimpleName());
 
 	public static float getHeuristicValue(Agent agent, Goal goal) {
-		return chooseNotBlockingGoal(agent, goal);
+		if (goal instanceof DeliverBoxGoal)
+			return chooseNotBlockingGoal(agent, goal);
+		else
+			return clearBoxGoalHeuristic(agent, goal);
 		//return chooseClosestGoal(agent, goal);
+	}
+	
+	private static float clearBoxGoalHeuristic(Agent agent, Goal goal) {
+		float h = 0;
+		
+		return h;
 	}
 	
 	private static float chooseClosestGoal(Agent agent, Goal goal) {
@@ -68,6 +78,9 @@ public class GoalPlannerHeuristic {
 		float a4 = 0; // locking goal
 		float a5 = 0; // undoing a goal
 		
+		if (agent.getCurrentGoal() == goal)
+			return h;
+		
 		DeliverBoxGoal deliverBoxGoal = (DeliverBoxGoal) goal;
 				
 		// cell where the agent is located now
@@ -87,21 +100,18 @@ public class GoalPlannerHeuristic {
 		float betweennessBox = nbc.get(boxCell).floatValue();
 		float betweennessGoal = nbc.get(goalCell).floatValue();
 		
-		
-		// check if resolving this goal, locks other goals
-		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
-		for (Set<Cell> groupOfGoals : groupsOfGoals) {
-			if (groupOfGoals.contains(goalCell)) {
-				boolean hasLargestBetweenness = true;
-				int numCells = groupOfGoals.size();
-				for (Cell cellGroup : groupOfGoals) {
-					if (LevelMap.getInstance().getLockedCells().contains(cellGroup))
-						numCells--;
-					if (nbc.get(cellGroup) > betweennessGoal)
-						hasLargestBetweenness = false;
+		// check if resolving this goal, we lock other goals
+		Set<List<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
+		for (List<Cell> group : groupsOfGoals) {
+			if (group.contains(goalCell)) {
+				// check if there are other goals with less betweennes unresolved
+				for (Cell groupGoal : group) {
+					if ((nbc.get(groupGoal).floatValue() < betweennessGoal) 
+							&& !LevelMap.getInstance().getLockedCells().contains(groupGoal)){
+						a4 = 1;
+						break;
+					}
 				}
-				if (hasLargestBetweenness && numCells > 1)
-					a4 = 1;
 			}
 		}
 		
@@ -125,7 +135,7 @@ public class GoalPlannerHeuristic {
 		
 		logger.info(deliverBoxGoal.toString() + " => " + h);
 		
-		return h;
+		return h + Heuristic.PENALTY_DELIVER_BOX_GOAL;
 	}
 	
 }
