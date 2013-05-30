@@ -8,6 +8,7 @@
 package dk.dtu.ai.blueducks;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -59,13 +60,14 @@ public class MotherOdin {
 
 	private List<PlanAffectedResources> affectedResources;
 
-	private List<List<State>> unmergedPlans;
+	private List<LinkedList<State>> unmergedPlans;
 
 	private List<LinkedList<Action>> mergedPlans;
 
 	private List<List<State>> conflictSolvingPlans;
 
-	private boolean needMerging;
+	private boolean needMerging[];
+	private boolean pendingMerge;
 
 	/**
 	 * Gets the single instance of MotherOdin.
@@ -80,9 +82,9 @@ public class MotherOdin {
 		super();
 		agents = LevelMap.getInstance().getAgentsList();
 		// Init the plans list
-		unmergedPlans = new ArrayList<List<State>>(agents.size());
+		unmergedPlans = new ArrayList<LinkedList<State>>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
-			unmergedPlans.add(null);
+			unmergedPlans.add(new LinkedList<State>());
 		conflictSolvingPlans = new ArrayList<List<State>>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
 			conflictSolvingPlans.add(null);
@@ -92,6 +94,7 @@ public class MotherOdin {
 		affectedResources = new ArrayList<PlanAffectedResources>(agents.size());
 		for (int i = 0; i < agents.size(); i++)
 			affectedResources.add(null);
+		this.needMerging = new boolean[agents.size()];
 	}
 
 	/**
@@ -155,10 +158,10 @@ public class MotherOdin {
 			List<Action> actions = new LinkedList<>();
 			for (int agent = 0; agent < agents.size(); agent++)
 				if (mergedPlans.get(agent).peek() != null) {
-					Action nextAction = mergedPlans.get(agent).remove();
+					Action nextAction = mergedPlans.get(agent).removeFirst();
 					actions.add(nextAction);
-					// if (nextAction == unmergedPlans.get(agent).peek())
-					// unmergedPlans.get(agent).remove(0);
+					if (nextAction == unmergedPlans.get(agent).get(1).getEdgeFromPrevNode())
+						unmergedPlans.get(agent).removeFirst();
 				} else
 					actions.add(new NoOpAction());
 
@@ -194,7 +197,7 @@ public class MotherOdin {
 
 	private void mergePlans() {
 		// If there's no need for merging the plans, skip merging
-		if (!needMerging)
+		if (!pendingMerge)
 			return;
 		// If there is only one agent, skip merging
 		if (agents.size() == 1) {
@@ -215,10 +218,26 @@ public class MotherOdin {
 			if (c.agents.size() == 1) {
 				short agent = c.agents.iterator().next();
 				log.fine("Not need for merging for agent " + agent);
-				mergedPlans.set(agent, getActionsFromPlan(unmergedPlans.get(agent)));
+				if (needMerging[agent]) {
+					mergedPlans.set(agent, getActionsFromPlan(unmergedPlans.get(agent)));
+				}
 			} else {
+				// If we have multiple agents and at least one of them needs merging
+				boolean mergeNeeded = false;
+				for (short agent : c.agents)
+					if (needMerging[agent]) {
+						mergeNeeded = true;
+						break;
+					}
+				if (!mergeNeeded) {
+					if (log.isLoggable(Level.FINE))
+						log.fine("No need for merging for agents: " + c.agents);
+					continue;
+				}
+
 				if (log.isLoggable(Level.FINE))
 					log.fine("Merging plans for agents: " + c.agents);
+
 				// Check if plans are mergeable
 				// TODO:
 				boolean mergeSuccessful = true;
@@ -251,8 +270,8 @@ public class MotherOdin {
 				}
 			}
 		}
-		log.info("Merged plan: " + mergedPlans);
-		needMerging = false;
+		Arrays.fill(needMerging, false);
+		pendingMerge = false;
 	}
 
 	private void solveConflict(CommonResources c) {
@@ -272,7 +291,7 @@ public class MotherOdin {
 
 		// Now we have the conflict solving plans
 		short fixingAgent, waitingAgent;
-		//TODO: Handle situation where plans where not found
+		// TODO: Handle situation where plans where not found
 		if (conflictSolvingPlans.get(agent1).size() <= conflictSolvingPlans.get(agent2).size()) {
 			fixingAgent = agent1;
 			waitingAgent = agent2;
@@ -323,7 +342,7 @@ public class MotherOdin {
 	 */
 	public void finishedTopLevelGoal(Agent agent, Goal goal) {
 		log.info(agent + " completed goal: " + goal);
-		if(goal instanceof DeliverBoxGoal)
+		if (goal instanceof DeliverBoxGoal)
 			LevelMap.getInstance().lockCell(((DeliverBoxGoal) goal).getTo());
 		generateTopLevelGoals();
 		if (topLevelGoals.size() > 0) {
@@ -343,9 +362,11 @@ public class MotherOdin {
 	 * @param affectedResources the resources affected by the plan
 	 */
 	public synchronized void appendPlan(Agent agent, List<State> plan, PlanAffectedResources affectedResources) {
-		this.unmergedPlans.set(agent.getId(), plan);
+		this.unmergedPlans.get(agent.getId()).clear();
+		this.unmergedPlans.get(agent.getId()).addAll(plan);
 		this.affectedResources.set(agent.getId(), affectedResources);
-		this.needMerging = true;
+		this.needMerging[agent.getId()] = true;
+		this.pendingMerge = true;
 	}
 
 	/**
@@ -379,7 +400,7 @@ public class MotherOdin {
 				for (Agent other : LevelMap.getInstance().getAgentsList())
 					if (other != agent) {
 						GoalCost gc = goalCostsProposals.get(other).peek();
-						if (gc!=null && bestGoal.goal == gc.goal && gc.cost < bestGoal.cost) {
+						if (gc != null && bestGoal.goal == gc.goal && gc.cost < bestGoal.cost) {
 							goalCostsProposals.get(agent).remove();
 							done = false;
 							break;
@@ -395,7 +416,7 @@ public class MotherOdin {
 
 		for (Entry<Agent, Goal> e : agentsAssignedGoals.entrySet()) {
 			// If the goals for any of the agent has been changed, request a new plan from him.
-			if (e.getValue()!=null && !e.getValue().equals(e.getKey().getCurrentGoal())) {
+			if (e.getValue() != null && !e.getValue().equals(e.getKey().getCurrentGoal())) {
 				log.info("Assigned new goal to " + e.getKey());
 				e.getKey().requestPlan();
 			}
@@ -419,9 +440,9 @@ public class MotherOdin {
 	public static LinkedList<Action> getActionsFromPlan(List<State> plan) {
 		// Prepare the actions, ignoring the first state in the plan (the current state)
 		LinkedList<Action> actions = new LinkedList<Action>();
-		Iterator<State> it=plan.iterator();
+		Iterator<State> it = plan.iterator();
 		it.next();
-		while(it.hasNext())
+		while (it.hasNext())
 			actions.add((Action) it.next().getEdgeFromPrevNode());
 		return actions;
 	}
