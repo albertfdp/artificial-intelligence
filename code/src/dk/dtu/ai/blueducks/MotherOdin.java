@@ -160,7 +160,8 @@ public class MotherOdin {
 				if (mergedPlans.get(agent).peek() != null) {
 					Action nextAction = mergedPlans.get(agent).removeFirst();
 					actions.add(nextAction);
-					if (nextAction == unmergedPlans.get(agent).get(1).getEdgeFromPrevNode())
+					if (unmergedPlans.get(agent).size() > 1
+							&& nextAction == unmergedPlans.get(agent).get(1).getEdgeFromPrevNode())
 						unmergedPlans.get(agent).removeFirst();
 				} else
 					actions.add(new NoOpAction());
@@ -289,10 +290,27 @@ public class MotherOdin {
 		agents.get(agent2).requestPlanForConflictSolving(cpg2, plan2.get(0), plan1.get(0));
 		// TODO: Wait for synchronization when using multi-threading
 
-		// Now we have the conflict solving plans
+		// Now we should have the conflict solving plans
 		short fixingAgent, waitingAgent;
-		// TODO: Handle situation where plans where not found
-		if (conflictSolvingPlans.get(agent1).size() <= conflictSolvingPlans.get(agent2).size()) {
+		if (conflictSolvingPlans.get(agent1) == null) {
+			// If neither of the agents has a plan
+			if (conflictSolvingPlans.get(agent2) == null) {
+				log.severe("No agent found conflict solutions.");
+				return;
+
+			} // If only agent 2 has a plan
+			else {
+				fixingAgent = agent2;
+				waitingAgent = agent1;
+			}
+
+		} // If only agent 1 has a plan
+		else if (conflictSolvingPlans.get(agent2) == null) {
+			fixingAgent = agent1;
+			waitingAgent = agent2;
+
+		} // If both agents have a plan
+		else if (conflictSolvingPlans.get(agent1).size() <= conflictSolvingPlans.get(agent2).size()) {
 			fixingAgent = agent1;
 			waitingAgent = agent2;
 		} else {
