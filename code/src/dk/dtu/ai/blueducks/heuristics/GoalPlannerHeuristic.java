@@ -101,8 +101,8 @@ public class GoalPlannerHeuristic {
 		float betweennessGoal = nbc.get(goalCell).floatValue();
 		
 		// check if resolving this goal, we lock other goals
-		Set<List<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
-		for (List<Cell> group : groupsOfGoals) {
+		Set<Set<Cell>> groupsOfGoals = MapAnalyzer.getNeighbourGoals();
+		for (Set<Cell> group : groupsOfGoals) {
 			if (group.contains(goalCell)) {
 				// check if there are other goals with less betweennes unresolved
 				for (Cell groupGoal : group) {
