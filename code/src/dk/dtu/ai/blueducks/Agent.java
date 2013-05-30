@@ -107,6 +107,10 @@ public class Agent {
 	public void resetCurrentSubgoal() {
 		this.currentSubgoalIndex = 0;
 	}
+	
+	public void decreaseCurrentSubgoal(){
+		this.currentSubgoalIndex--;
+	}
 
 	/**
 	 * Gets the current goal.

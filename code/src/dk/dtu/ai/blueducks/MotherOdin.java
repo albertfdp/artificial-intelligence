@@ -177,18 +177,19 @@ public class MotherOdin {
 				else {
 					log.fine("Action not successful: " + a);
 					jointActionSuccessful = false;
+					a.updateBeliefsActionFailed();
 				}
 
 			// Notify the agents that something has changed
 			if (!jointActionSuccessful) {
 				log.info("Triggering agent replanning!");
-				// TODO: Optimize this...
 				generateTopLevelGoals();
-				assignAgentsGoals();
-				for (int a = 0; a < agents.size(); a++)
-					// By clearing the plan, a new plan will be requested at the beginning of the
-					// next loop
+				for (int a = 0; a < agents.size(); a++) { // By clearing the plan, a new plan will
+															// be requested at the beginning of the
+															// next loop
 					mergedPlans.get(a).clear();
+					agents.get(a).decreaseCurrentSubgoal();
+				}
 			}
 		}
 	}

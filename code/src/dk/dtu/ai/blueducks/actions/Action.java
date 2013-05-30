@@ -37,7 +37,10 @@ public abstract class Action {
 	public abstract State getNextState(State state);
 	
 	
-	public abstract void invalidateAction();
+	/**
+	 * Update the beliefs if this action failed.
+	 */
+	public abstract void updateBeliefsActionFailed();
 	
 	/**
 	 * Checks if this action in conflict with some other agent's action;
