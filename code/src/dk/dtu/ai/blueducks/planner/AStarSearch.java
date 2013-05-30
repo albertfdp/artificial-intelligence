@@ -47,17 +47,17 @@ public class AStarSearch {
 		int loopCount = 0;
 
 		while (!openSet.isEmpty()) {
-			if (openSet.size() > 10000) {
-				Iterator<NodeType> it = openSet.iterator();
-				int i = 0;
-				while (it.hasNext() && (i++) < 6000)
-					it.next();
-				while (it.hasNext()){
-					it.next();
-					it.remove();
-				}
-
-			}
+//			if (openSet.size() > 10000) {
+//				Iterator<NodeType> it = openSet.iterator();
+//				int i = 0;
+//				while (it.hasNext() && (i++) < 6000)
+//					it.next();
+//				while (it.hasNext()){
+//					it.next();
+//					it.remove();
+//				}
+//
+//			}
 			if (log.isLoggable(Level.INFO)) {
 				loopCount++;
 				if ((loopCount % 5000) == 0)
