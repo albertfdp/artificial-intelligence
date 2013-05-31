@@ -70,6 +70,8 @@ public class Agent {
 	/** The current position in path. */
 	int currentPositionInPath;
 
+	int currentSubgoalIndex;
+
 	/** The Constant logger. */
 	private final Logger log;
 
@@ -80,6 +82,14 @@ public class Agent {
 	public int powerHashValue;
 
 	public Cell forbidenCell;
+
+	public void resetCurrentSubgoal() {
+		this.currentSubgoalIndex = 0;
+	}
+
+	public void decreaseCurrentSubgoal() {
+		this.currentSubgoalIndex--;
+	}
 
 	/**
 	 * Instantiates a new agent.
@@ -183,22 +193,12 @@ public class Agent {
 			this.subgoals = goalSplitter.getSubgoal(currentGoal, this);
 			if (log.isLoggable(Level.FINEST))
 				log.finest("Subgoals generated: " + subgoals);
+			 currentSubgoalIndex = 0; 
 		} else {
 			if (log.isLoggable(Level.INFO))
 				log.info("Planning for existing goal: " + currentGoal);
 		}
 
-		State agentState = new State(LevelMap.getInstance().getCellForAgent(this), null, null, this, LevelMap
-				.getInstance().getCurrentState().getOccupiedCells(), LevelMap.getInstance().getCurrentState()
-				.getCellsForBoxes());
-
-		// Find current subgoal index
-		int currentSubgoalIndex = 0;
-		for (Goal g : subgoals)
-			if (g.isSatisfied(agentState))
-				currentSubgoalIndex++;
-			else
-				break;
 
 		// If there are no more subgoals that need to be satisfied
 		if (currentSubgoalIndex >= this.subgoals.size()) {
@@ -209,8 +209,11 @@ public class Agent {
 		}
 
 		// Replan
+		State agentState = new State(LevelMap.getInstance().getCellForAgent(this), null, null, this, LevelMap
+				.getInstance().getCurrentState().getOccupiedCells(), LevelMap.getInstance().getCurrentState()
+				.getCellsForBoxes());
 
-		Goal subgoal = subgoals.get(currentSubgoalIndex);
+		Goal subgoal = subgoals.get(currentSubgoalIndex++);
 		if (log.isLoggable(Level.FINER))
 			log.finer("\tCurrent subgoal: " + subgoal);
 		List<State> plan = computePlanStates(subgoal, agentState);
@@ -223,6 +226,7 @@ public class Agent {
 			plan = computePlanStates(subgoal, agentState);
 			if (plan == null) {
 				log.info("No possible plan found.");
+				 currentSubgoalIndex--; // Stick to the same subgoal as before 
 				List<State> emptyPlan = new LinkedList<State>();
 				emptyPlan.add(agentState);
 				MotherOdin.getInstance().appendPlan(this, emptyPlan, new PlanAffectedResources());
@@ -354,22 +358,4 @@ public class Agent {
 		return result;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Agent other = (Agent) obj;
-		if (color == null) {
-			if (other.color != null)
-				return false;
-		} else if (!color.equals(other.color))
-			return false;
-		if (id != other.id)
-			return false;
-		return true;
-	}
 }
