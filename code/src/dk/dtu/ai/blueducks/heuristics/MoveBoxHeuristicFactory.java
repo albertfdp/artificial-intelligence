@@ -33,7 +33,7 @@ public class MoveBoxHeuristicFactory {
 			case (HeuristicChooser.FOMABlueDucks):
 				return new BlueDucksMoveBoxHeuristic();
 			case (HeuristicChooser.POMABlueDucks):
-				return new BlueDucksMoveBoxHeuristic();
+				return new FOSAMAStersHeuristic();
 			case (HeuristicChooser.POMAchenapans):
 				return new FOSAMAStersHeuristic();
 			default:

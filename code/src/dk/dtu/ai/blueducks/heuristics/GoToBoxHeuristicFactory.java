@@ -45,7 +45,7 @@ public class GoToBoxHeuristicFactory {
 			case (HeuristicChooser.FOMABlueDucks):
 				return new GoToBoxBlueDucksHeuristic();
 			case (HeuristicChooser.POMABlueDucks):
-				return new GoToBoxBlueDucksHeuristic();
+				return new GoToBoxFOSAMAStersHeuristics();
 			case (HeuristicChooser.POMAchenapans):
 				return new GoToBoxFOSAMAStersHeuristics();
 			default:

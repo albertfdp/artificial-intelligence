@@ -18,6 +18,7 @@ import dk.dtu.ai.blueducks.goals.Goal;
 import dk.dtu.ai.blueducks.goals.TopLevelClearAgentGoal;
 import dk.dtu.ai.blueducks.goals.WaitGoal;
 import dk.dtu.ai.blueducks.heuristics.GoalPlannerHeuristic;
+import dk.dtu.ai.blueducks.heuristics.GoalPlannerHeuristicFactory;
 
 public class GoalPlanner {
 
@@ -73,7 +74,7 @@ public class GoalPlanner {
 		PriorityQueue<GoalCost> queue = new PriorityQueue<>(possibleGoals.size() + 1);
 
 		for (Goal goal : possibleGoals) {
-			float cost = GoalPlannerHeuristic.getHeuristicValue(agent, goal);
+			float cost = GoalPlannerHeuristicFactory.getHeuristic().getHeuristicValue(agent, goal);
 			queue.add(new GoalCost(cost, goal));
 		}
 
