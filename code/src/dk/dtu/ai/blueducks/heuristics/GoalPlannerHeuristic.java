@@ -33,10 +33,11 @@ public class GoalPlannerHeuristic {
 
 	public static float getHeuristicValue(Agent agent, Goal goal) {
 		if (goal instanceof DeliverBoxGoal) {
-			if (LevelMap.getInstance().getAgentsList().size() > 1) {
+			/*if (LevelMap.getInstance().getAgentsList().size() > 1) {
 				return multiAgentHeuristic(agent, goal);
 			}
-			return chooseNotBlockingGoal(agent, goal);
+			return chooseNotBlockingGoal(agent, goal);*/
+			return FOSAMAStersHeuristic(agent, goal);
 		} else if (goal instanceof ClearPathGoal)
 			return clearBoxGoalHeuristic(agent, goal);
 		else if (goal instanceof TopLevelClearAgentGoal)
