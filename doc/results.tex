@@ -26,17 +26,11 @@ that the defined heuristic was correctly guiding the agent to the optimal soluti
 Figure~\ref{fig:goalplanneraresults}, presents an example of a solution produced by the system. Blue cells indicate boxes, while yellow cells indicate goal cells. Numbers indicate the order in which they were solved. It can be observed that the agent correctly identified the non-blocking goals as well as the ones that were closer to them (this is, the distance to the box, and from the box to the goal).
 
 \begin{figure}[htb]
-
 \begin{center}
-
 \includegraphics[width=0.4\textwidth]{figures/example_goal_planner}
-
 \caption{Evaluation of the Goal Planner Heuristic}
-
 \label{fig:goalplanneraresults}
-
 \end{center}
-
 \end{figure}
 
 A side-effect of trying to find optimal solutions is that more time is needed in order to come up with the
@@ -84,33 +78,26 @@ another plan and tries again to complete its goal. Figure \ref{fig:poma_step2} p
 interactions the agent manages to find the correct path.
 
 \begin{figure}[htb]
-
 \begin{center}
-
 \includegraphics[width=0.8\textwidth]{figures/POMA_step1}
-
 \caption{The agent 1 finds an unknown object in its path.}
-
 \label{fig:poma_step1}
-
 \end{center}
 
 \end{figure}
-
 \begin{figure}[htb]
-
 \begin{center}
-
 \includegraphics[width=0.8\textwidth]{figures/POMA_step2}
-
 \caption{Agent 1 finally success in finding a path without unknown objects.}
-
 \label{fig:poma_step2}
-
 \end{center}
-
 \end{figure}
 
-The presented system has been tested in a competition against the projects developed by other students. The results show that the system is able to handle single agent maps with good results, being the group resolving in fewest actions in three of the thirteen maps, and resolving other two maps.
+The presented system has been tested in a competition against the projects developed by other students. The
+results show that the system is able to handle single agent maps with good results, being the group resolving
+with fewest actions three of the thirteen maps.
 
-However, multiagent environments did not present the same performance, and results were not as good as expected. While we were able to find more optimal solutions by merging plans of the agents and replanning if necessary, the fact that we opted for a multiagent system instead of multibody had a huge impact the performance.
+However, multiagent environments did not present the same performance and results were not as good as
+expected. While we were able to find more optimal solutions by merging plans of the agents and replanning if
+necessary, the fact that we opted for a multiagent system instead of multibody had a huge impact on the
+results in some scenarios.

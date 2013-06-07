@@ -1,6 +1,10 @@
-We have implemented a multi-agent infrastructure using the beliefs-desires-intention model. The agents are
-capable of planning by themselves and a central unit merges the plans of the different agents when possible,
-otherwise agents request other agents to help them or recompute new plans if necessary.
+We have implemented a multi-agent infrastructure using the Beliefs-Desires-Intention model. The agents are
+capable of planning by themselves using various optimizations and techniques. A central unit then merges the
+plans of the different agents when possible, otherwise agents request other agents to help them or recompute
+new plans if necessary.
 
 The results have shown that the system can resolve all three types of maps: FOSA, FOMA and POMA. The
-performance on the first is good, although some improvements might be necessary to resolve complex scenarios.
+performance on the first type is very good, although some heuristics improvements might be necessary to
+resolve some complex scenarios. For the multi-agent maps, due to the plan merging and conflict resolution
+methods, the system has great results with near-optimal solutions for situations with a fewer number of
+agents, but can be improved for other situations.

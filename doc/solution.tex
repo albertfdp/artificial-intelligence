@@ -20,6 +20,7 @@ multitude of data structures and low-level optimization. This has made the state
 computations and all the required processing as fast as possible.
 
 \subsection{Architecture}
+\label{sec:architecture}
 \writer{Cosmin}
 
 % Architecture subsection content
@@ -39,7 +40,7 @@ most important components in our implementation can be seen in Figure~\ref{fig:a
 As it can be observed from the figure, the system's main components are a central entity and a set of agents.
 The central entity maintains a set of top level goals that need to be completed for a level to be solved. Each
 of the agents gets assigned one of these goals and is responsible for breaking it into smaller and easier
-subgoals and for elaborating a plan to complete it.
+subgoals and for elaborating a plan to complete them.
 
 The central component of our application is depicted as the \textbf{Central Entity}. Among the tasks that are
 handled by it we can enumerate:
@@ -48,11 +49,12 @@ handled by it we can enumerate:
 \begin{itemize}
 \setlength{\itemsep}{0cm}
 \item coordinate the communication between the agents
-\item manage the list of top level goals that need to be completed
+\item manage the list of top level goals that need to be completed (Desires)
 \item decide which agents work on which goals (in situations when multiple agents have proposals for the same goal)
 \item merge agents' plans, if possible
 \item coordinate the communication between agents when plan merging conflicts appear
 \item handle communication with the server
+\item maintain a real, up-to-date representation of how the level map looks like (Beliefs)
 \end{itemize}
 \vspace{-0.3cm}
 
@@ -64,7 +66,8 @@ Each of the agents in the system handles the following tasks:
 \item make proposals for each of the goals it can handle
 \item divide the goals into easier subgoals
 \item make a plan for completing its goal
-\item make a plan to solve a plan merging conflict, if needed
+\item make a plan to solve a plan merging conflict, if requested
+\item make a plan to help other agents with clearing paths, if requested
 \end{itemize}
 
 \vspace{-0.3cm}
@@ -78,19 +81,19 @@ Each of the agents in the system handles the following tasks:
 
 Figure~\ref{fig:communication_flow} shows the most important steps followed by our implementation and the
 communication flow between the agents and the central entity. The diagram only depicts a full iteration of the
-steps and it has to be mentioned that, while running, some of the steps and communication messages might not
-be applicable or are skipped for optimization reasons. More details about these optimization will be provided
-in the following subsections.
+steps and it has to be mentioned that, while running, some of the steps and communication messages shown might
+not be applicable or are skipped for optimization reasons. More details about these situations will be
+provided in the following subsections.
 
 Initially, the central entity is identifying the top level goals that still need to be completed.
 Subsequently, agents are asked to compute an estimation of the cost of the plan for solving those goals (if
 applicable). Based on these estimations, the central entity then assigns goals to the agents. After this step,
 agents break down the goals into subgoals that are easier to use and for which different heuristics can be
-applied and then use an AStar-based search to identify a plan. These plans are then connected by the central
+applied. Then an AStar-based search is used to identify a plan. These plans are then collected by the central
 entity, which tries to merge them using various methods. If the merge is successful, the joint actions are
-extracted and sent to the server for each turn. If the plans for some of the agents cannot be merged, the
-conflicts are solved under the coordination of the central entity. All these steps and the actual
-implementation optimizations are presented with more details in the following subsections.
+extracted and sent to the server for each turn. If the plans for some of the agents cannot be merged, the plan
+merging conflicts are solved under the coordination of the central entity. All these steps and the actual
+implementation are presented with more details in the following subsections.
 
 
 \subsection{Techniques}
@@ -230,11 +233,12 @@ depending on the differences between the two states (boxes' positions/ agent's p
 helped in expanding the states faster as it is easier to compute the hash, but also because the hash is better
 suited for the problem and gives fewer conflicts.
 
+\newpage % to make it look good on a new page
 \subsubsection{Plan merging}
 \writer{Rafaela}
 \label{sec:plan_merging}
 
-In multi-agent systems, as mentioned in the \ref{sec:architecture} section, one of the most important aspects
+In multi-agent systems, as mentioned in the section \ref{sec:architecture}, one of the most important aspects
 to be considered is how plans originating from multiple agents are merged together, so that no actions are
 conflicting and that no resources are used at the same time.
 
@@ -313,22 +317,23 @@ merging of plans is only done for the ones of agents 0 and 1.
 \writer{Rafaela, Cosmin}
 
 While merging plans, there are some situations where plan merging cannot possibly be made, even though all
-possible plan intercalation ways are tried. We have called this plan merging conflict.
+possible plan intercalation options are tried. We have called this \textit{plan merging conflict}.
 
 In order to make a good decision on how to solve such situations, we first need to identify them in a correct
-way. In some situations, they can even be identified even before running the merging algorithm. On way in
+way. In some situations, they can even be identified even before running the merging algorithm. One way in
 which we have identified the apparition of a conflict is by analyzing if the paths of two agents are
 colliding. Two paths collide if the end or the beginning of an agent’s path (that it has to follow in order to
 complete a goal) is situated on another agent’s path and the two cannot avoid each other no matter how many
-NoOp actions they might do in order to try to merge their plans.
+NoOp actions they might do while trying to merge their plans.
 
-When a conflict is found\footnote{Either though the above mentioned method or simply because plan merging
-fails}, agents need to solve it in order to be able to achieve their goals. The conflict solving can be done
-by the central entity, it can be discussed between the conflicting agents or a hybrid solution can be used. In
-our approach, we have considered the hybrid solution, in which the central entity is the one identifying the
-conflicting situation, but then it contacts the agents so that they can come up with possible solutions for
-solving the conflict. The steps of our plan conflict solving process can be seen in
-Figure~\ref{fig:conflict_solving} below.
+When a conflict is found\footnote{Either because the above mentioned method or simply because the plan merging
+described in the section above fails}, agents need to solve it in order to be able to achieve their goals. The
+conflict solving can be done by the central entity, it can be discussed between the conflicting agents or a
+hybrid solution can be used. In our approach, we have considered the hybrid solution, in which the central
+entity is the one identifying the conflicting situation, but then it contacts the agents so that they can come
+up with possible solutions for solving the conflict. The steps of our plan conflict solving process can be
+seen in Figure~\ref{fig:conflict_solving}. For the purpose of keeping simplicity, a situation with only 2
+agents is presented.
 
 \begin{figure}[htb]
 \begin{center}
@@ -347,15 +352,21 @@ before resuming its initial plan. In the given example, agent 1 will wait for ag
 and then agent 1 can resume its original plan. Agent 2 now needs to re-plan and see if it resumes the initial
 plan (if it’s the best option) or if it chooses another goal which will lead for it to have a new plan.
 
-Similarly to the case presented in Section \ref{sec:plan_merging}, when two agents are conflicting and there
+Similarly to the case presented in section \ref{sec:plan_merging}, when two agents are conflicting and there
 are other agents who are not, there is no need to make the agents which are not in conflict wait for the
-conflict to be solved before they can continue their plans. However, in the case that the plan chosen to solve
-the conflict affects the plans of other agents (which were not originally in the conflict), then, plan merging
+conflict to be solved before they can continue their plans. In the situation that the plan chosen to solve
+the conflict affects the plans of other agents (which were not originally in the conflict), then plan merging
 or conflict solving is tried for the new affected agents.
 
-\subsubsection{Plan cooperation (clear my path goals)}
+\subsubsection{Agent cooperation}
 \writer{Cosmin}
-There are cases when agents cannot solve some situations or some goals by themselves, thus cooperation between agents is required. One such situation is presented in figure \ref{fig:cooperation}. As we can see, agent 0 is not able to reach box A in order to deliver it unless box B is moved out of its path. For this, agent 0 first detects that he cannot reach box A, then it identifies that box B should be moved out of the way. After this, other agents are asked to clear the path and agent 1 comes up with a plan to move B out of the way and return to its initial position. After this, the central entity merges the plans of the 2 agents and the solution is found.
+There are cases when agents cannot solve some situations or some goals by themselves, thus cooperation between
+agents is required. One such situation is presented in figure \ref{fig:cooperation}. As we can see, agent 0 is
+not able to reach box A in order to deliver it unless box B is moved out of its path. For this, agent 0 first
+detects that he cannot reach box A, then it identifies that box B should be moved out of the way. After this,
+other agents are asked to clear the path and agent 1 comes up with a plan to move B out of the way and return
+to its initial position. After this, the central entity merges the plans of the 2 agents and the solution is
+found.
 
 \begin{figure}[htb]
 \begin{center}
