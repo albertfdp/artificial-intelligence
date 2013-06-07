@@ -1,0 +1,60 @@
+\writer{Rafaela, Ruxandra}
+The first step when starting to work on the project was to decide upon the general architecture of our
+implementation. When dealing with a system of this amplitude it is best to start testing individual components
+as soon as possible. Module testing ensures that everything that needs to be integrated, has been previously
+tested and verified.
+
+Besides ensuring the modularity of the system, a decision that has to be made from the beginning is whether to
+use \textbf{multibody planning} or \textbf{multi-agent planning}. While both have their advantages, each of
+them is applicable in different scenarios. Multibody planning is preferred when dealing with an environment
+where state exploration is very efficient due to low branching factor. However, when planning on a large scale
+with many possible alternative actions, where the branching factor is very large, a solution based on
+multi-agent systems reacts better.
+
+The next step was analysing to which extent the environment, the number of agents and the unpredictable
+obstacles affect the performance and the decision making process. Before starting to compute the plan for
+achieving the goals, a \textbf{pre-analysis} of the existent paths, patterns and goal, as well as the
+complexity of the environment must be made.
+
+Even though a good knowledge of the map is useful, the way the states are explored can dramatically affect the
+performance. When doing blind state exploration the branching factor can exponentially escalate. To create a
+good heuristic, the data from the pre-analysis should be used, though a comprehensive analysis of the  current
+state is essential. However, considering the high branching factor, a complete analysis of the current state
+would take an unacceptable amount of time. Aside from time, memory resources need to be kept in mind when
+dealing with high branching factors, as very large number of states are being generated. Thus, a
+\textbf{compromise} between having the optimal solution and finding the least computationally expensive
+solution needs to be found. Compromises include using \textbf{heuristics} and \textbf{pruning} of states
+during the exploration.
+
+The problems analysed up to this point regard mostly single agent systems. In the case of multi-agent systems,
+such as the one we are dealing with, other problems should be considered. Even when dealing with only two
+agents, cases where the agents have conflicting plans might occur. In some cases, the \textbf{conflict}
+appears just because the agents have not chosen their goals in the proper order. This can easily be solved by
+\textbf{reordering/ replanning} of goals. In other cases, in order to avoid conflicts, the plans of the agents
+could be merged by \textbf{postponing actions}. This is not always possible as two agents might need to access
+common resources. Furthermore, for very big plans or for a large number of agents, the number of possibilities
+to interlace the agents’ plans is very big and, as such, it could lead to wasting a lot of time and resources
+on computing the solution. When plan merging is not an option, other approaches can be taken. Among them,
+there are the \textbf{inter-agent communication} and the \textbf{high-level conflict solving}.
+
+The communication between agents can also prove to be problematic as it can introduce synchronization problems
+which can lead to cases like multiple agents being assigned the same goal or a goal not being assigned to any
+agent. For this problem, solutions that involve direct interagent communication like
+FIPA-ACL\footnote{FIPA-ACL \url{http://www.fipa.org/repository/aclspecs.html}}  can be used, as well as
+solutions that involve communication being performed through a central entity.
+
+When conflicts arise, there is the option to make agents communicate in order to solve the conflict and decide
+upon a plan or the option for the agents to resort to a central entity that tells them what to do in order to
+solve the conflict. In some cases, a hybrid solution between the two can also be used.
+
+For the case where unknown objects are present in the environment, special approaches need to be taken into
+consideration. As replanning could be triggered at any moment due to detection of unknown objects, it is not
+that important to have a complete and optimal plan, but to be able to compute an acceptable plan in a short
+amount of time. Also, when dealing with multiple agents, not all agents need to recompute the plan when
+another agent identifies an unknown object.
+
+As it is expected, the number of things that need to be taken into consideration for elaborating efficient and
+optimal solutions is very large and a compromise should always be found between all the factors involved, as
+some will prove to be more important in some cases while others in other cases.
+
+

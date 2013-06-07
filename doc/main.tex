@@ -1,0 +1,206 @@
+% Use only LaTeX2e, calling the article.cls class and 12-point type.
+
+\documentclass[10pt,oneside]{article}
+\def\thesisversion{net}
+% Users of the {thebibliography} environment or BibTeX should use the
+% scicite.sty package, downloadable from *Science* at
+% www.sciencemag.org/about/authors/prep/TeX_help/ .
+% This package should properly format in-text
+% reference calls and reference-list numbers.
+\usepackage{LukeThesis}
+\usepackage[utf8]{inputenc} 
+\usepackage{calc}
+\usepackage{float}
+\usepackage{titlesec}  
+
+\usepackage{changepage}   % for the adjustwidth environment
+
+% Use times if you have the font installed; otherwise, comment out the
+% following line.
+\usepackage{times}
+
+\titleformat{\section}{\Large\bfseries}{\thesection}{0.5em}{}
+\titleformat{\paragraph}{\small\bfseries}{\theparagraph}{0.5em}{}
+
+\titlespacing\section{0pt}{4pt}{0pt} %[MARIUS]:change the middle value if you want to change the spacing of the section
+\titlespacing\subsection{0pt}{2pt}{0pt}%[MARIUS]:change the middle value if you want to change the spacing of the subsection
+\titlespacing\subsubsection{0pt}{1pt}{0pt}%[MARIUS]:change the middle value if you want to change the spacing of the subsubsection
+\titlespacing\paragraph{0pt}{1pt}{0pt}%[MARIUS]:change the middle value if you want to change the spacing of the paragraph
+
+\setlength\parindent{0pt} % sets indent to zero
+\setlength{\parskip}{7pt} % changes vertical space between paragraphs
+
+
+
+
+% writtenby skal måske layoutes lidt anderledes
+%\newcommand{\writtenby}[1]{\vspace*{-18pt}\hfill#1\vspace{18pt}\newline}
+% \newcommand{\writtenby}[1]{\vspace*{-36pt}\hfill#1\vspace{12pt}\newline}
+
+
+\newcommand{\fig}[1]{Figure~\ref{fig:#1}}
+\newcommand{\tbl}[1]{Table~\ref{tbl:#1}}
+\newcommand{\glos}[1]{(Glossary: ~\ref{glos:#1})}
+\newcommand\writer[1]{\nobreak\begin{flushright} \vspace{-0.6cm}\small\textbf{Author: \textit{#1}}\end{flushright} \vspace{-0.5cm}}
+
+\renewcommand{\b}[1]{\textbf{#1}}
+\renewcommand{\i}[1]{\textit{#1}}
+
+%
+%==================================================================================================
+% SECTION NUMBERING SETUP
+%==================================================================================================
+\setcounter{tocdepth}{2}                            %2 adds sections up to subsections
+\setcounter{secnumdepth}{5}                         %Subsubsections get a number when this is
+%\setcounter{section}{1}
+
+% The preamble here sets up a lot of new/revised commands and
+% environments.  It's annoying, but please do *not* try to strip these
+% out into a separate .sty file (which could lead to the loss of some
+% information when we convert the file to other formats).  Instead, keep
+% them in the preamble of your main LaTeX source file.
+
+
+% The following parameters seem to provide a reasonable page setup.
+
+%\topmargin 0.0cm
+%\oddsidemargin 0.2cm
+%\textwidth 16cm 
+%\textheight 21cm
+%\footskip 1.0cm
+
+
+%The next command sets up an environment for the abstract to your paper.
+
+%\newenvironment{sciabstract}{%
+%\begin{quote} \bf}
+%{\end{quote}}
+
+
+% If your reference list includes text notes as well as references,
+% include the following line; otherwise, comment it out.
+
+%\renewcommand\refname{References and Notes}
+\begin{document} 
+%==================================================================================================
+% FRONT PAGE
+%==================================================================================================
+\begin{titlepage}
+\begin{center}
+\includegraphics[width=0.15\textwidth]{figures/DTU-logo.pdf}\\[1.3cm]
+
+\textsc{\LARGE Technical University of Denmark}\\[0.8cm]
+\textsc{\LARGE Artificial Intelligence \\[0.1cm]and Multi-Agent Systems}
+
+% Title
+{
+ \vspace{1.5cm}
+ \huge \bfseries Final Project Report}\\
+ \vspace{2.5cm}
+ \rule{\linewidth}{0.1mm} \\[0.4cm]
+%\hrule \\[1.5cm]
+% Author and supervisor
+\begin{minipage}{0.4\textwidth}
+    \begin{flushleft} \large
+	\emph{Authors:}\\
+    Albert Fernández de la Peña \\
+    Cosmin Stefan Dobrin\\
+    Javier Calvo\\
+    Marius Constantinescu\\
+    Rafaela-Ioana Voiculescu\\
+	Ruxandra Nistor
+	\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+	\begin{flushright} \large
+	\emph{Student numbers:} \\
+    s112213\\
+    s121038\\
+    s110747\\
+    s121039\\
+	s120931\\
+    s121037
+	\end{flushright}
+\end{minipage}
+\vfill
+% Bottom of the page
+{\large \today}
+\end{center}
+\end{titlepage}
+
+
+
+%%%%%%%%%%%%%%%%% END OF PREAMBLE %%%%%%%%%%%%%%%%
+
+
+
+
+% In setting up this template for *Science* papers, we've used both
+% the \section* command and the \paragraph* command for topical
+% divisions.  Which you use will of course depend on the type of paper
+% you're writing.  Review Articles tend to have displayed headings, for
+% which \section* is more appropriate; Research Articles, when they have
+% formal topical divisions at all, tend to signal them with bold text
+% that runs into the paragraph, for which \paragraph* is the right
+% choice.  Either way, use the asterisk (*) modifier, as shown, to
+% suppress numbering.
+
+\section{Introduction}
+
+\input{introduction}
+
+
+\section{Problem analysis}
+\label{sec:problem}
+\input{problem}
+
+\section{Solution}
+\label{sec:solution}
+\input{solution}
+
+\section{Results and findings}
+\label{sec:results}
+\input{results}
+
+\section{Conclusions}
+\input{conclusions}
+
+\section{Further work}
+\input{further_work}
+
+% Your references go at the end of the main text, and before the
+% figures.  For this document we've used BibTeX, the .bib file
+% scibib.bib, and the .bst file Science.bst.  The package scicite.sty
+% was included to format the reference numbers according to *Science*
+% style.
+
+
+
+
+\bibliographystyle{Science}
+\nocite{*}
+\bibliography{scibib}
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
